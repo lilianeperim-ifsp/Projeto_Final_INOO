@@ -9,6 +9,7 @@ Trabalho final da disciplina Introdução à Orientação a Objetos (IFSP), feit
 | `contexto/regras-negocio.md` | Fórmulas, perfis, validação, rastreamento, avisos, formato de entrada e saída, gabarito |
 | `contexto/especificacoes-tecnicas.md` | Restrições técnicas, cenários de evolução, padrões GoF, conteúdo da Etapa 1 e da Etapa 2, stress test, defesa |
 | `contexto/slides/` | O que foi ensinado em aula: um `.md` por PDF (`aula_01.md` … `aula_12.md`). Comece pelo `README.md`, que tem o índice e o resumo |
+| `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Consultar antes de escrever ou revisar código |
 | `contexto/pdfs/` | Originais em PDF (enunciado e slides). Em caso de divergência, o enunciado vale mais |
 | `memory/` | Histórico das sessões e decisões do grupo (ver "Memória do projeto") |
 | `docs/` | Documento de Projeto, `relatorio_ia_notas.md` e `COMO_EXECUTAR.md` (a criar) |
@@ -24,7 +25,7 @@ As aulas 7, 8 e 9 **não foram fornecidas**.
 
 1. **Idioma:** responder e documentar em português do Brasil. Identificadores de código seguem a convenção Java.
 2. **Projeto antes do código.** Não escrever código de produção até o Documento de Projeto da Etapa 1 estar aprovado pelo grupo.
-3. **Todos precisam entender tudo.** A defesa oral é individual e inclui alterar o código ao vivo. Toda decisão de projeto vem com justificativa curta e uma alternativa descartada. Propor, explicar e esperar aprovação antes de mudanças estruturais.
+3. **Todos precisam entender tudo.** A defesa oral é individual e inclui alterar o código ao vivo: um cenário de evolução em **no máximo 5 minutos** (orientação do professor). Toda decisão de projeto vem com justificativa curta e uma alternativa descartada. Propor, explicar e esperar aprovação antes de mudanças estruturais.
 4. **Registrar o uso de IA.** Quando o Claude errar ou o grupo rejeitar uma proposta dele, anotar em `docs/relatorio_ia_notas.md` (data, autor, o que foi proposto, por que estava errado ou foi rejeitado, correção). O relatório final exige no mínimo 3 erros e 1 rejeição.
 5. **Mudanças de rumo** em relação ao Documento de Projeto são anotadas para a seção "Do projeto ao código".
 6. **Não commitar nem dar push** sem o usuário pedir.
@@ -107,7 +108,7 @@ main                       versão estável (o que será entregue)
 ## Estrutura do repositório
 
 - `LogiTech/` — projeto IntelliJ (JDK 26), código em `LogiTech/src`. `Main.java` ainda é o template do IntelliJ.
-- `contexto/` — regras em `.md`, `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
+- `contexto/` — regras em `.md`, `projeto-exemplo.md` (Livraria das aulas 10–12), `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
 - `memory/` — memória compartilhada das sessões
 - `docs/` — Documento de Projeto, notas do relatório de IA, `COMO_EXECUTAR.md`
 - `.claude/skills/` — skills do projeto (`salvar-memoria`)
