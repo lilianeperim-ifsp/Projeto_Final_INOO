@@ -9,6 +9,7 @@ Trabalho final da disciplina Introdução à Orientação a Objetos (IFSP), feit
 | `contexto/regras-negocio.md` | Fórmulas, perfis, validação, rastreamento, avisos, formato de entrada e saída, gabarito |
 | `contexto/especificacoes-tecnicas.md` | Restrições técnicas, cenários de evolução, padrões GoF, conteúdo da Etapa 1 e da Etapa 2, stress test, defesa |
 | `contexto/slides/` | O que foi ensinado em aula: um `.md` por PDF (`aula_01.md` … `aula_12.md`). Comece pelo `README.md`, que tem o índice e o resumo |
+| `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Consultar antes de escrever ou revisar código |
 | `contexto/pdfs/` | Originais em PDF (enunciado e slides). Em caso de divergência, o enunciado vale mais |
 | `memory/` | Histórico das sessões e decisões do grupo (ver "Memória do projeto") |
 | `docs/` | Documento de Projeto, `relatorio_ia_notas.md` e `COMO_EXECUTAR.md` (a criar) |
@@ -107,7 +108,7 @@ main                       versão estável (o que será entregue)
 ## Estrutura do repositório
 
 - `LogiTech/` — projeto IntelliJ (JDK 26), código em `LogiTech/src`. `Main.java` ainda é o template do IntelliJ.
-- `contexto/` — regras em `.md`, `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
+- `contexto/` — regras em `.md`, `projeto-exemplo.md` (Livraria das aulas 10–12), `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
 - `memory/` — memória compartilhada das sessões
 - `docs/` — Documento de Projeto, notas do relatório de IA, `COMO_EXECUTAR.md`
 - `.claude/skills/` — skills do projeto (`salvar-memoria`)

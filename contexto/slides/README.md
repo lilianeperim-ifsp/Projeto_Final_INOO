@@ -19,6 +19,8 @@ Um arquivo `.md` por PDF de `contexto/pdfs/`, gerado automaticamente: rodapés e
 | 11 | Sobrescrita, `@Override`, `toString`, `equals` x `==`, polimorfismo, `instanceof` e casting, `abstract` | [aula_11.md](aula_11.md) | `aula_11_slides.pdf` |
 | 12 | `interface`, `implements` múltiplo, interface como tipo, `default`/`static`/`private` em interface, interface funcional | [aula_12.md](aula_12.md) | `aula_12_slides.pdf` |
 
+A análise do exercício da Livraria das aulas 10–12 (exemplo usado em aula), com o checklist de erros a não repetir no LogiTech, está em [`../projeto-exemplo.md`](../projeto-exemplo.md).
+
 ## Resumo do que foi ensinado
 
 Síntese feita a partir dos slides, para apoiar a regra do enunciado de usar só o que foi ensinado em sala.
