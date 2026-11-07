@@ -12,7 +12,10 @@ Preencha uma linha por caso, assim que ele acontecer. A skill `/salvar-memoria` 
 
 | Data | Autor | Tipo | O que a IA propôs ou fez | Por que estava errado ou foi rejeitado | Correção ou decisão |
 |---|---|---|---|---|---|
-| | | | | | |
+| 2026-11-06 | Murilo Leandro | rejeicao (processo) | Fluxo de git com branches `nome/assunto` e PR direto na `main` | O grupo quis uma `dev` intermediária para testar antes da `main` e uma branch fixa por integrante | Fluxo `main` → `dev` → `logitech/<usuario>`, reviewer `alexsant22` |
+| 2026-11-06 | Murilo Leandro | rejeicao (processo) | Proteger `main`/`dev` no GitHub e usar CODEOWNERS | O grupo preferiu só documentar; o Murilo não é admin do repositório | Regras no `CLAUDE.md` e template de PR |
+| 2026-11-06 | Murilo Leandro | rejeicao (processo) | Base inicial passar pelo fluxo completo de PR | O grupo preferiu commit direto na `main` para todas as branches nascerem iguais | Commit `b074eea` na `main` e branches criadas a partir dele |
+| 2026-11-06 | Murilo Leandro | rejeicao (organização) | Manter `contexto/slides.md` como índice após dividir por aula | O grupo preferiu apagar o arquivo | Índice e resumo em `contexto/slides/README.md` |
 
 **Tipo:** `erro` (IA errou) ou `rejeicao` (sugestão rejeitada, projeto do grupo mantido).
 
