@@ -24,7 +24,7 @@ As aulas 7, 8 e 9 **não foram fornecidas**.
 
 1. **Idioma:** responder e documentar em português do Brasil. Identificadores de código seguem a convenção Java.
 2. **Projeto antes do código.** Não escrever código de produção até o Documento de Projeto da Etapa 1 estar aprovado pelo grupo.
-3. **Todos precisam entender tudo.** A defesa oral é individual e inclui alterar o código ao vivo. Toda decisão de projeto vem com justificativa curta e uma alternativa descartada. Propor, explicar e esperar aprovação antes de mudanças estruturais.
+3. **Todos precisam entender tudo.** A defesa oral é individual e inclui alterar o código ao vivo: um cenário de evolução em **no máximo 5 minutos** (orientação do professor). Toda decisão de projeto vem com justificativa curta e uma alternativa descartada. Propor, explicar e esperar aprovação antes de mudanças estruturais.
 4. **Registrar o uso de IA.** Quando o Claude errar ou o grupo rejeitar uma proposta dele, anotar em `docs/relatorio_ia_notas.md` (data, autor, o que foi proposto, por que estava errado ou foi rejeitado, correção). O relatório final exige no mínimo 3 erros e 1 rejeição.
 5. **Mudanças de rumo** em relação ao Documento de Projeto são anotadas para a seção "Do projeto ao código".
 6. **Não commitar nem dar push** sem o usuário pedir.

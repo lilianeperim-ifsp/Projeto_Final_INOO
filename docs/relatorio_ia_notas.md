@@ -16,6 +16,7 @@ Preencha uma linha por caso, assim que ele acontecer. A skill `/salvar-memoria` 
 | 2026-11-06 | Murilo Leandro | rejeicao (processo) | Proteger `main`/`dev` no GitHub e usar CODEOWNERS | O grupo preferiu só documentar; o Murilo não é admin do repositório | Regras no `CLAUDE.md` e template de PR |
 | 2026-11-06 | Murilo Leandro | rejeicao (processo) | Base inicial passar pelo fluxo completo de PR | O grupo preferiu commit direto na `main` para todas as branches nascerem iguais | Commit `b074eea` na `main` e branches criadas a partir dele |
 | 2026-11-06 | Murilo Leandro | rejeicao (organização) | Manter `contexto/slides.md` como índice após dividir por aula | O grupo preferiu apagar o arquivo | Índice e resumo em `contexto/slides/README.md` |
+| 2026-11-07 | Murilo Leandro | rejeicao (processo) | Salvar a regra dos 5 minutos da defesa na memória local do Claude Code | O grupo quer as regras na memória do projeto, versionada e visível aos 3 | Registro em `memory/2026-11-07-defesa-ao-vivo-5-minutos.md` e no `CLAUDE.md`; memória local apagada |
 
 **Tipo:** `erro` (IA errou) ou `rejeicao` (sugestão rejeitada, projeto do grupo mantido).
 
