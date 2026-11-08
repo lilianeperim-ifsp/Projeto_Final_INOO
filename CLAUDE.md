@@ -99,6 +99,12 @@ main                       versão estável (o que será entregue)
 - Ao abrir PR, usar a base correta (`dev` para branch de integrante, `main` só a partir da `dev`) e sempre incluir o reviewer.
 - O `gh` foi instalado em `C:\Program Files\GitHub CLI\gh.exe`; se não estiver no PATH do terminal, use o caminho completo.
 
+## Quadro Kanban do grupo
+
+- O grupo acompanha tarefas, responsáveis e PRs num artefato do claude.ai: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH (precisa de acesso de Colaborador ou superior para editar).
+- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Está planejada uma rotina na nuvem que roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), mas **ainda não está ativa** (falta conectar o GitHub à conta e levar a skill para a `main`). Por enquanto, **rode a skill depois de abrir ou mergear um PR**.
+- A skill só lê o GitHub e escreve no banco do artefato: não faz commit, push nem abre PR.
+
 ## Memória do projeto
 
 - Ao fim de cada sessão, rodar **`/salvar-memoria`** (skill do projeto em `.claude/skills/salvar-memoria/`). Ela grava `memory/AAAA-MM-DD-assunto-principal.md` com resumo, decisões, erros da IA, pendências e próximos passos, e depois o arquivo é commitado.
@@ -111,4 +117,4 @@ main                       versão estável (o que será entregue)
 - `contexto/` — regras em `.md`, `projeto-exemplo.md` (Livraria das aulas 10–12), `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
 - `memory/` — memória compartilhada das sessões
 - `docs/` — Documento de Projeto, notas do relatório de IA, `COMO_EXECUTAR.md`
-- `.claude/skills/` — skills do projeto (`salvar-memoria`)
+- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`)
