@@ -33,7 +33,13 @@ Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `
    ```
    gh pr list --repo lilianeperim-ifsp/Projeto_Final_INOO --state all --limit 100 --json number,title,headRefName,baseRefName,state,author,reviewRequests,reviews,mergedAt,url
    ```
-   Se o `gh` não existir, não estiver autenticado ou falhar, **pare**: relate o erro e **não grave nada**.
+   **Plano B, só se o `gh` não existir ou falhar na autenticação** (acontece na rotina na nuvem, onde o `GH_TOKEN` do ambiente pode estar inválido). O repositório é público, então a API REST responde sem token (limite de 60 chamadas por hora por IP):
+   - Lista: `curl -s "https://api.github.com/repos/lilianeperim-ifsp/Projeto_Final_INOO/pulls?state=all&per_page=100"`. Daqui saem `number`, `title`, `state`, `merged_at`, `html_url`, `user.login`, `head.ref`, `base.ref` e `requested_reviewers[].login` (pedidos pendentes).
+   - Avaliações: `curl -s ".../pulls/<n>/reviews"` (campos `user.login` e `state`). Busque só dos PRs abertos, dos novos e dos que mudaram de estado em relação ao banco. Dos demais, reaproveite `revisoresPedidos` e `aprovadoPor` já gravados.
+   - Estado: `state = open` → `aberto`; `state = closed` com `merged_at` preenchido → `mergeado`; `closed` sem `merged_at` → `fechado`.
+   - Use `python3` ou `jq` para ler o JSON, o que estiver instalado.
+
+   Se o plano B também falhar (sem rede, HTTP 403 por limite de chamadas ou erro de leitura), **pare**: relate o erro e **não grave nada**.
 5. **Montar cada documento `prs/<número>`:**
    - `estado`: `OPEN` → `aberto`, `MERGED` → `mergeado`, `CLOSED` → `fechado`.
    - Pessoas, sem diferenciar maiúsculas: `lilianeperim-ifsp` → `Liliane`, `murilolss` → `Murilo`, `alexsant22` → `Alexandre`. Login desconhecido fica como veio.
