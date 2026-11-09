@@ -22,6 +22,7 @@ Preencha uma linha por caso, assim que ele acontecer. A skill `/salvar-memoria` 
 | 2026-11-07 | Murilo Leandro | rejeicao (processo) | Quadro de consulta com checklist de prazos e tarefas só em parte criadas | O Murilo queria um Kanban com fase de PR e campo de responsável, e com a maioria das tarefas já criadas | Kanban de 4 colunas, responsável por cartão e 47 cartões iniciais |
 | 2026-11-07 | Murilo Leandro | erro (documentação) | Escreveu no quadro e no `CLAUDE.md` que a rotina das 08:00, 12:00 e 18:00 rodava, antes de ela existir | A rotina ainda não existia: faltavam o GitHub conectado e a skill na `main` | Percebeu ao rodar o `/schedule`; textos trocados por "ainda não ativada" e revertidos só depois do teste passar |
 | 2026-11-07 | Murilo Leandro | erro (premissa) | Planejou a sincronização na nuvem com o `gh` autenticado | Na nuvem o `GH_TOKEN` é inválido e o GraphQL é bloqueado | Percebido no teste da rotina; skill ganhou o plano B pela API REST sem token |
+| 2026-11-09 | Alexandre Santos | erro (processo) | Ao retomar a sessão, leu `memory/` e as notas do relatório só na `main` local e informou 5 rejeições e 2 erros, dizendo que ainda faltava 1 erro | A `dev` estava à frente da `main`: faltou a sessão do quadro Kanban, e as contagens reais eram 6 rejeições e 4 erros | O próprio Claude percebeu ao rodar `/salvar-memoria`, comparando com `origin/main`; corrigiu a contagem e avisou o Alexandre |
 
 **Tipo:** `erro` (IA errou) ou `rejeicao` (sugestão rejeitada, projeto do grupo mantido).
 
