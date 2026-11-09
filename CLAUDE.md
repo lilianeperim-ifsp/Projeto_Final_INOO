@@ -71,10 +71,11 @@ main                       versão estável (o que será entregue)
       └── logitech/alexsant22
 ```
 
-- `main`: só recebe PR vindo da `dev`, depois de testado.
+- `main`: só recebe PR vindo da `dev`, depois de testado (única exceção: recados da inbox, ver abaixo).
 - `dev`: só recebe PR vindo das branches `logitech/<usuario>`.
 - `logitech/<usuario>`: cada integrante trabalha **só na própria branch**, criada a partir da `dev`.
 - **Nada de push direto em `main` ou `dev`.**
+- **Exceção da inbox:** um commit que altera **somente** arquivos dentro de `inbox/` pode ir direto para a `main`, sem PR (ver `inbox/README.md`). Se o commit tocar em qualquer arquivo fora de `inbox/`, segue o fluxo normal.
 
 ### Passo a passo
 
@@ -95,7 +96,7 @@ main                       versão estável (o que será entregue)
 ### Regras para o Claude
 
 - Só commitar, dar push ou abrir PR quando o usuário pedir.
-- Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`.
+- Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`, salvo commit só com arquivos de `inbox/` na `main` (exceção da inbox), e ainda assim apenas quando o usuário pedir.
 - Ao abrir PR, usar a base correta (`dev` para branch de integrante, `main` só a partir da `dev`) e sempre incluir o reviewer.
 - O `gh` foi instalado em `C:\Program Files\GitHub CLI\gh.exe`; se não estiver no PATH do terminal, use o caminho completo.
 
