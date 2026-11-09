@@ -16,7 +16,8 @@ Registra, em um arquivo versionado na pasta `memory/` (raiz do repositório), o 
 2. **Data:** use a data de hoje no formato `AAAA-MM-DD`.
 3. **Assunto principal:** escolha o tema central da sessão em poucas palavras. Se o usuário passou um assunto como argumento, use-o.
 4. **Nome do arquivo:** `memory/AAAA-MM-DD-assunto-principal.md`, com o assunto em minúsculas, sem acento, sem caracteres especiais e com hifens (ex.: `2026-11-06-estrutura-do-projeto.md`).
-   - Se o arquivo já existir, **não sobrescreva**: acrescente `-2`, `-3`, … antes de `.md`.
+   - Antes de gravar, crie uma cópia temporária da `dev`, para não tocar na branch de trabalho: `git fetch origin dev` e `git worktree add --detach "<pasta temporária>" origin/dev`. Os passos 5 e 6 gravam **nessa cópia**.
+   - Se o arquivo já existir nessa cópia, **não sobrescreva**: acrescente `-2`, `-3`, … antes de `.md`.
 5. **Conteúdo:** escreva em português do Brasil, usando exatamente este modelo:
 
 ```markdown
@@ -43,7 +44,13 @@ O que fazer na próxima sessão.
 ```
 
 6. **Relatório de IA:** se a seção "Erros e rejeições da IA" não for "Nenhum", acrescente também uma linha para cada caso na tabela de `docs/relatorio_ia_notas.md` (crie o arquivo a partir do modelo existente se faltar). Isso evita ter que reconstruir os casos no fim do projeto.
-7. **Não faça commit nem push.** Avise o usuário o caminho do arquivo criado e lembre que ele precisa commitar para o grupo ver.
+7. **Enviar direto para a `dev`.** Rodar esta skill já é o pedido para enviar a memória (exceção do `CLAUDE.md`). Dentro da cópia temporária:
+   - Adicione somente o arquivo da memória e, se foi alterado, `docs/relatorio_ia_notas.md`. Confira com `git diff --cached --name-only` que não há mais nada; se houver, pare e avise.
+   - Faça o commit com a mensagem `Memória da sessão: <assunto>` e dê `git push origin HEAD:dev`.
+   - Se o push for rejeitado porque alguém enviou antes, rode `git pull --rebase origin dev` e tente de novo. Nunca use `--force`.
+   - Se o push falhar por outro motivo, ou houver conflito, pare e avise o usuário. Mantenha a cópia temporária, para o conteúdo não se perder.
+   - Com o push feito, remova a cópia: `git worktree remove "<pasta temporária>"`.
+8. **Avisar o usuário:** informe o caminho do arquivo e o commit enviado. O arquivo chega à branch de trabalho no próximo `git pull origin dev`.
 
 ## Regras
 

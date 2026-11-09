@@ -17,9 +17,9 @@ Resumo do uso:
 
 - Cada integrante recebe recados na própria pasta (`inbox/ale/`, `inbox/murilo/` ou `inbox/liliane/`). Esta pasta,
   `inbox/grupo/`, é para os recados aos três, e quem assumir o assunto fecha o recado.
-- A inbox mora na `main`. Para ver os recados sem sair da branch de trabalho, usem os comandos da seção "Rotina do dia
+- A inbox mora na `dev`. Para receber os recados na branch de trabalho, usem os comandos da seção "Rotina do dia
   a dia" do guia.
-- Enviar, responder e fechar são feitos na `main`, em commit só com arquivos de `inbox/`. Depois, voltem para a branch
+- Enviar, responder e fechar são feitos na `dev`, em commit só com arquivos de `inbox/`. Depois, voltem para a branch
   de trabalho.
 - Só quem recebeu muda o status e escreve na Resposta. Nunca apaguem um recado.
 
