@@ -105,30 +105,30 @@ pendente → aceito → concluido
 
 ## Rotina do dia a dia
 
-O uso se resume a quatro ações: ler, enviar, responder e fechar. A inbox mora na `main`, mas o trabalho do dia a dia
-fica na branch `logitech/<usuario>`, que não recebe sozinha o que vai para a `main`. Por isso, a leitura consulta a
-`main` sem trocar de branch, e as outras três ações são feitas na `main`.
+O uso se resume a quatro ações: ler, enviar, responder e fechar. A inbox mora na `dev`, então os recados chegam à
+branch de trabalho no mesmo `git pull origin dev` que o grupo já faz ao começar. Enviar, responder e fechar são feitos
+na `dev`.
 
 ### 1. Ao começar a trabalhar: ler
 
-Funciona igual no Git Bash e no PowerShell (troque `ale` pela sua pasta):
+Na sua branch de trabalho (troque `ale` pela sua pasta):
 
 ```bash
-git fetch origin main
-git grep -l "status: pendente" origin/main -- inbox/ale inbox/grupo
+git pull origin dev
+grep -l "status: pendente" inbox/ale/* inbox/grupo/*
 ```
 
-Para abrir um recado da lista sem sair da sua branch:
+No PowerShell, o equivalente da segunda linha é:
 
-```bash
-git show origin/main:inbox/ale/2026-11-09-de-murilo-revisar-diagrama-er.md
+```powershell
+Select-String -Path inbox\ale\*, inbox\grupo\* -Pattern "status: pendente" -List | Select Path
 ```
 
 ### 2. Enviar um recado
 
 Antes de trocar de branch, faça commit do que está em andamento ou guarde com `git stash`.
 
-1. Vá para a `main` atualizada: `git switch main` e `git pull`.
+1. Vá para a `dev` atualizada: `git switch dev` e `git pull`.
 2. Copie o modelo para a pasta de quem vai receber, com o nome no padrão.
 3. Preencha e salve.
 4. Faça o commit e o push, adicionando somente a inbox, e volte para a sua branch:
@@ -142,13 +142,13 @@ git switch logitech/<usuario>
 
 ### 3. Responder
 
-Na `main` atualizada, quem recebeu escreve na seção **Resposta** do próprio arquivo e muda o status, de `pendente`
+Na `dev` atualizada, quem recebeu escreve na seção **Resposta** do próprio arquivo e muda o status, de `pendente`
 para `aceito`, por exemplo. Depois, faz o commit e o push como no envio. Se a resposta for uma pergunta de volta, crie
 um recado novo na pasta de quem enviou.
 
 ### 4. Fechar
 
-Na `main` atualizada, mude para `concluido` e diga na Resposta **o que** fechou: o commit, o arquivo ou a decisão. Não
+Na `dev` atualizada, mude para `concluido` e diga na Resposta **o que** fechou: o commit, o arquivo ou a decisão. Não
 apague o arquivo; ele vira histórico.
 
 ```bash
@@ -160,8 +160,8 @@ git switch logitech/<usuario>
 
 ## Regras combinadas
 
-1. **Recado de inbox vai direto na `main`**, sem pull request, em commit que altera somente arquivos de `inbox/`.
-   Código continua seguindo o fluxo normal do grupo. Não traga a `main` para a sua branch só para ler recados.
+1. **Recado de inbox vai direto na `dev`**, sem pull request, em commit que altera somente arquivos de `inbox/`.
+   Código continua seguindo o fluxo normal do grupo. Os recados chegam à `main` no próximo PR da `dev` para a `main`.
 2. **Só edite o seu lado**: crie recados na pasta dos outros, mas o status e a Resposta são de quem recebeu.
 3. **Nunca apague um recado.** Feche com `concluido` ou `descartado`.
 4. **Conflito no push?** Rode `git pull --rebase` e depois `git push`. Como cada recado é um arquivo, quase nunca dá
@@ -188,14 +188,13 @@ acrescentar este trecho ao `CLAUDE.md` na raiz do repositório:
 ## Inbox
 
 Ao iniciar uma sessão:
-1. Rodar `git fetch origin main`.
+1. Rodar `git pull origin dev`.
 2. Descobrir quem está usando pelo `git config user.name` e achar a pasta
    correspondente em `inbox/` (ale, murilo ou liliane).
-3. Mostrar os recados com `status: pendente` dessa pasta e de `inbox/grupo/`,
-   consultando `origin/main` com `git grep`, sem trocar de branch.
+3. Mostrar os recados com `status: pendente` dessa pasta e de `inbox/grupo/`.
 
 Para deixar um recado, seguir o modelo de `inbox/README.md`, criar o arquivo
-na pasta de quem recebe e fazer commit e push direto na main.
+na pasta de quem recebe e fazer commit e push direto na dev.
 ```
 
 Com isso, dá para pedir "deixa um recado para Murilo revisar o diagrama", e o agente cria o arquivo no formato certo.
@@ -211,7 +210,7 @@ As pastas `ale/`, `murilo/` e `liliane/` já existem. Falta pouco:
    ```
 
 2. Salve este guia como `inbox/README.md`.
-3. Na `main` atualizada (`git switch main` e `git pull`), faça o commit e o push:
+3. Na `dev` atualizada (`git switch dev` e `git pull`), faça o commit e o push:
    `git add inbox && git commit -m "inbox: estrutura inicial" && git push`.
 4. Mande o primeiro recado em `inbox/grupo/` pedindo que cada um confirme que leu o guia. Cada pessoa muda o status
    para `concluido` quando ler.

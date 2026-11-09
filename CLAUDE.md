@@ -71,11 +71,11 @@ main                       versão estável (o que será entregue)
       └── logitech/alexsant22
 ```
 
-- `main`: só recebe PR vindo da `dev`, depois de testado (única exceção: recados da inbox, ver abaixo).
-- `dev`: só recebe PR vindo das branches `logitech/<usuario>`.
+- `main`: só recebe PR vindo da `dev`, depois de testado.
+- `dev`: só recebe PR vindo das branches `logitech/<usuario>` (única exceção: inbox e memória, ver abaixo).
 - `logitech/<usuario>`: cada integrante trabalha **só na própria branch**, criada a partir da `dev`.
 - **Nada de push direto em `main` ou `dev`.**
-- **Exceção da inbox:** um commit que altera **somente** arquivos dentro de `inbox/` pode ir direto para a `main`, sem PR (ver `inbox/README.md`). Se o commit tocar em qualquer arquivo fora de `inbox/`, segue o fluxo normal.
+- **Exceção da inbox e da memória:** um commit que altera **somente** arquivos de `inbox/`, de `memory/` ou `docs/relatorio_ia_notas.md` pode ir direto para a `dev`, sem PR (ver `inbox/README.md` e a skill `/salvar-memoria`). Esses arquivos chegam a todos no `git pull origin dev` e vão para a `main` no próximo PR da `dev`. Se o commit tocar em qualquer outro arquivo, segue o fluxo normal.
 
 ### Passo a passo
 
@@ -96,7 +96,7 @@ main                       versão estável (o que será entregue)
 ### Regras para o Claude
 
 - Só commitar, dar push ou abrir PR quando o usuário pedir.
-- Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`, salvo commit só com arquivos de `inbox/` na `main` (exceção da inbox), e ainda assim apenas quando o usuário pedir.
+- Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`, salvo commit na `dev` coberto pela exceção da inbox e da memória, e ainda assim apenas quando o usuário pedir. Rodar `/salvar-memoria` conta como pedido para enviar a memória da sessão.
 - Ao abrir PR, usar a base correta (`dev` para branch de integrante, `main` só a partir da `dev`) e sempre incluir o reviewer.
 - O `gh` foi instalado em `C:\Program Files\GitHub CLI\gh.exe`; se não estiver no PATH do terminal, use o caminho completo.
 
@@ -108,9 +108,9 @@ main                       versão estável (o que será entregue)
 
 ## Memória do projeto
 
-- Ao fim de cada sessão, rodar **`/salvar-memoria`** (skill do projeto em `.claude/skills/salvar-memoria/`). Ela grava `memory/AAAA-MM-DD-assunto-principal.md` com resumo, decisões, erros da IA, pendências e próximos passos, e depois o arquivo é commitado.
+- Ao fim de cada sessão, rodar **`/salvar-memoria`** (skill do projeto em `.claude/skills/salvar-memoria/`). Ela grava `memory/AAAA-MM-DD-assunto-principal.md` com resumo, decisões, erros da IA, pendências e próximos passos, e a própria skill envia o arquivo direto para a `dev`.
 - `/memory` é o comando interno do Claude Code (edita arquivos de memória do próprio Claude) e **não** grava nessa pasta.
-- No início de uma sessão nova, ler os arquivos mais recentes de `memory/` para retomar de onde o grupo parou.
+- No início de uma sessão nova, rodar `git pull origin dev` e ler os arquivos mais recentes de `memory/` para retomar de onde o grupo parou.
 
 ## Estrutura do repositório
 

@@ -16,9 +16,9 @@ status e as regras.
 Resumo do uso:
 
 - Seus recados ficam em `inbox/liliane/`, e os recados para os três ficam em `inbox/grupo/`.
-- A inbox mora na `main`. Para ver os recados sem sair da sua branch, use os comandos da seção "Rotina do dia a dia"
+- A inbox mora na `dev`. Para receber os recados na sua branch, use os comandos da seção "Rotina do dia a dia"
   do guia.
-- Enviar, responder e fechar são feitos na `main`, em commit só com arquivos de `inbox/`. Depois, volte para a sua
+- Enviar, responder e fechar são feitos na `dev`, em commit só com arquivos de `inbox/`. Depois, volte para a sua
   branch de trabalho.
 - Só quem recebeu muda o status e escreve na Resposta. Nunca apague um recado.
 
