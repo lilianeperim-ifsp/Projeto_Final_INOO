@@ -103,7 +103,7 @@ main                       versão estável (o que será entregue)
 ## Quadro Kanban do grupo
 
 - O grupo acompanha tarefas, responsáveis e PRs num artefato do claude.ai: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH (precisa de acesso de Colaborador ou superior para editar).
-- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Está planejada uma rotina na nuvem que roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), mas **ainda não está ativa** (falta conectar o GitHub à conta e levar a skill para a `main`). Por enquanto, **rode a skill depois de abrir ou mergear um PR**.
+- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), com alguns minutos de variação. Para atualizar na hora, **rode a skill depois de abrir ou mergear um PR**.
 - A skill só lê o GitHub e escreve no banco do artefato: não faz commit, push nem abre PR.
 
 ## Memória do projeto
@@ -118,4 +118,8 @@ main                       versão estável (o que será entregue)
 - `contexto/` — regras em `.md`, `projeto-exemplo.md` (Livraria das aulas 10–12), `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
 - `memory/` — memória compartilhada das sessões
 - `docs/` — Documento de Projeto, notas do relatório de IA, `COMO_EXECUTAR.md`
-- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`)
+- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`, `atualizar-branch`, `documento`)
+
+## Documento de Projeto
+
+- O texto fica em **`docs/Documento_de_Projeto.md`** (Markdown). A skill **`/documento`** mostra o arquivo para conferência e, depois da aprovação, gera `docs/Documento_de_Projeto.pdf` pelo Chrome/Edge (precisa de internet; os diagramas Mermaid saem desenhados). Ela não edita o texto nem commita.
