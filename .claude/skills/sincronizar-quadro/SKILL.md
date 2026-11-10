@@ -16,11 +16,13 @@ O quadro do grupo é um artefato do claude.ai. A página dele não alcança a AP
 
 | Coleção | Documento | Campos |
 |---|---|---|
-| `cartoes` | `t01` … (criados pela página) | `n, titulo, coluna, ordem, responsavel, pr, revisor, etapa, area, atualizadoPorId, atualizadoEm` |
+| `cartoes` | `t01` … (criados pela página) | `n, titulo, coluna, ordem, responsavel, pr, revisor, etapa, area, dependeDe[], atualizadoPorId, atualizadoEm` |
 | `prs` | `<número do PR>` (ex.: `2`) | `numero, titulo, branch, base, estado, autor, revisoresPedidos[], aprovadoPor[], url, mergeadoEm, sincronizadoEm` |
 | `sincronizacoes` | `s-AAAAMMDDhhmm` (UTC) | `quando, origem, por, resumo, mudancas[]` |
 
 Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `aberto`, `mergeado`, `fechado`. Valores de `origem`: `manual`, `agendada`.
+
+`dependeDe` é a lista de ids de cartões (ex.: `["t07","t08"]`) que precisam estar em `feito` para o cartão sair de `fazer`. Quem aplica a regra é a página do quadro; esta skill não valida dependências e só move cartões de `pr` para `feito`. Não apague nem altere esse campo.
 
 ## Passos
 
