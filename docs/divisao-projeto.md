@@ -1,6 +1,6 @@
 # Divisão do projeto entre os 3 (T01)
 
-**Status:** proposta para revisão do Murilo. Ainda sem commit e sem PR.
+**Status:** aprovada pelo Alexandre e mergeada na `dev` (PR #14). Responsáveis preenchidos no quadro em 2026-11-10.
 **Autor:** Murilo, com o Claude. **Data:** 2026-11-10.
 
 ## O que foi dividido
@@ -97,12 +97,15 @@ defesa oral individual, em que cada um precisa explicar e alterar ao vivo, em at
 | Cartões de testes | 2 | 2 | 1 |
 | Outros já feitos ou em andamento | T01 e T02 | nenhum | nenhum |
 
-Pontos de atenção para o Murilo decidir:
+Pontos de atenção:
 
 - **O Murilo tem a maior carga de código** (7 cartões de Implementação, contra 5 e 4) e já carrega a T01 e a T02. Em
   compensação, a Liliane e o Alexandre têm mais cartões de documento e de modelagem, que pedem mais decisão de
-  projeto. Se preferir equilibrar mais, a troca natural é passar o **T35** (tratar linha inválida) para o Alexandre,
-  que fica com 5 cartões de código e o Murilo com 6.
+  projeto.
+- **Decisão sobre o T35 (2026-11-10):** a opção de passar o T35 (tratar linha inválida) para o Alexandre foi
+  **recusada por ele** na revisão do PR #14. O cartão **fica com o Murilo**: tratar linha inválida faz parte da
+  camada de entrada e validação, e passá-lo quebraria o critério de fatia vertical. Além disso, a carga do Alexandre
+  já se concentra no fim (T43, T44, T45 e T46 vencem em 04/12), somada à revisão de todos os PRs de código.
 - **O Alexandre é revisor de todos os PRs** do grupo, por isso não recebe mais de 15 cartões.
 - **O Murilo é o único que roda `/sincronizar-quadro`**, trabalho extra que não aparece nos cartões.
 
@@ -133,11 +136,8 @@ os três fizeram:
   mas na defesa individual quem só escreveu documento não consegue alterar o código ao vivo em 5 minutos, e quem só
   programou não consegue defender as alternativas descartadas.
 
-## Depois da aprovação do Murilo
+## Situação e próximos passos
 
-1. O Murilo revisa este arquivo e autoriza o commit e o PR.
-2. O Claude abre o PR para a `dev` com o Alexandre como revisor, anota o número do PR no cartão T01 e deixa o
-   recado em `inbox/ale/`.
-3. Depois que os três aprovarem e o PR for mergeado, o Murilo preenche o responsável de cada cartão no quadro e roda
-   `/sincronizar-quadro`.
-4. Qualquer troca de dono depois disso é combinada na inbox e anotada neste arquivo.
+1. **Feito:** o PR #14 foi aprovado pelo Alexandre (revisor) e mergeado na `dev`.
+2. **Feito:** o Murilo preencheu o responsável de cada cartão (T03 a T47) no quadro e rodou `/sincronizar-quadro`.
+3. Qualquer troca de dono daqui em diante é combinada na inbox e anotada neste arquivo.
