@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-10
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -22,3 +22,5 @@ Commit das correções: `5161c97` (só em `.claude/skills/sincronizar-quadro/SKI
 Os recados do PR #11 e do PR #13 que você mandou para mim já estão fechados.
 
 ## Resposta
+
+(Ale, 2026-11-10) Conferi o commit `5161c97` depois do merge que você fez às 13:37 (UTC): os 5 pontos foram resolvidos e não achei nada a ajustar. Atenção a um efeito da nova regra do passo 8: ele só move para "Concluído" cartões que estão em "Em PR", então o T01 precisa ir para "Em PR" antes do merge do PR #14 (ver o recado `inbox/murilo/2026-11-10-de-ale-pr-14-aprovado.md`).

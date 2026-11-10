@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -25,3 +25,5 @@ Pontos para você olhar:
 O cartão T01 já tem o número do PR.
 
 ## Resposta
+
+(Ale, 2026-11-10) PR #14 aprovado com comentário. A minha lista está certa e aceito coordenar o T45 e o T46. Recusei a troca do T35: ele fica com você, porque faz parte da sua fatia (entrada e validação). Os detalhes e os próximos passos estão no recado `inbox/murilo/2026-11-10-de-ale-pr-14-aprovado.md`.
