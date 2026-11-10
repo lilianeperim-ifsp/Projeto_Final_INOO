@@ -16,3 +16,5 @@ O guia está em `inbox/README.md`. Ao terminar a leitura, escreva seu nome na Re
 confirmado, o status muda para `concluido`.
 
 ## Resposta
+
+- Murilo: li o guia da inbox (2026-11-10).

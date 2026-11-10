@@ -6,11 +6,11 @@ disable-model-invocation: true
 
 # Sincronizar o quadro com o GitHub
 
-O quadro do grupo é um artefato do claude.ai. A página dele não alcança a API do GitHub, então esta skill lê os PRs com o `gh` e grava o resultado no banco do artefato. A rotina agendada roda a mesma skill às 08:00, 12:00 e 18:00 (horário de Brasília). Qualquer integrante pode rodá-la na hora.
+O quadro do grupo é um artefato do claude.ai. A página dele não alcança a API do GitHub, então esta skill lê os PRs com o `gh` e grava o resultado no banco do artefato. A rotina agendada roda a mesma skill às 08:00, 12:00 e 18:00 (horário de Brasília). **Apenas o Murilo consegue rodá-la na hora.**
 
 - **Artefato:** https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH
 - **Repositório:** `lilianeperim-ifsp/Projeto_Final_INOO`
-- **Quem pode rodar:** quem tem acesso de Colaborador (Contributor) ou superior ao artefato. Sem isso as gravações são recusadas.
+- **Quem pode rodar:** apenas o Murilo e a rotina agendada. Gravar no quadro exige acesso de Colaborador (Contributor) ou superior ao artefato; sem isso as gravações são recusadas. Se o `git config user.name` indicar outro integrante, avise que quem sincroniza é o Murilo e pare, sem tentar gravar.
 
 ## Dados no banco do artefato
 

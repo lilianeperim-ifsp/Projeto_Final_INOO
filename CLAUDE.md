@@ -10,6 +10,7 @@ Trabalho final da disciplina Introdução à Orientação a Objetos (IFSP), feit
 | `contexto/especificacoes-tecnicas.md` | Restrições técnicas, cenários de evolução, padrões GoF, conteúdo da Etapa 1 e da Etapa 2, stress test, defesa |
 | `contexto/slides/` | O que foi ensinado em aula: um `.md` por PDF (`aula_01.md` … `aula_12.md`). Comece pelo `README.md`, que tem o índice e o resumo |
 | `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Consultar antes de escrever ou revisar código |
+| `contexto/padroes-projeto/` | Notas sobre os 11 padrões do enunciado (um `.md` por padrão; comece pelo `README.md`). Consultar **somente** ao codificar ou quando alguém perguntar sobre um padrão |
 | `contexto/pdfs/` | Originais em PDF (enunciado e slides). Em caso de divergência, o enunciado vale mais |
 | `memory/` | Histórico das sessões e decisões do grupo (ver "Memória do projeto") |
 | `docs/` | Documento de Projeto, `relatorio_ia_notas.md` e `COMO_EXECUTAR.md` (a criar) |
@@ -84,6 +85,8 @@ main                       versão estável (o que será entregue)
 3. Antes do PR, atualizar de novo com a `dev` (`git pull origin dev`), resolver conflitos e conferir que compila e que os testes passam.
 4. `git push` e abrir o PR para a `dev`:
    `gh pr create --base dev --head logitech/<usuario> --reviewer alexsant22`
+
+   Se quem abriu o PR foi o Alexandre ou a Liliane, deixar um recado em `inbox/murilo/` para ele rodar `/sincronizar-quadro` (ver "Quadro Kanban do grupo").
 5. Depois do merge e dos testes na `dev`, abrir o PR da `dev` para a `main`:
    `gh pr create --base main --head dev --reviewer alexsant22`
 
@@ -98,12 +101,15 @@ main                       versão estável (o que será entregue)
 - Só commitar, dar push ou abrir PR quando o usuário pedir.
 - Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`, salvo commit na `dev` coberto pela exceção da inbox e da memória, e ainda assim apenas quando o usuário pedir. Rodar `/salvar-memoria` conta como pedido para enviar a memória da sessão.
 - Ao abrir PR, usar a base correta (`dev` para branch de integrante, `main` só a partir da `dev`) e sempre incluir o reviewer.
+- Ao abrir PR para o Alexandre ou a Liliane, criar também o recado em `inbox/murilo/` e enviá-lo para a `dev`, voltando depois para a branch de trabalho. Pedir para abrir o PR conta como pedido para enviar esse recado.
 - O `gh` foi instalado em `C:\Program Files\GitHub CLI\gh.exe`; se não estiver no PATH do terminal, use o caminho completo.
 
 ## Quadro Kanban do grupo
 
 - O grupo acompanha tarefas, responsáveis e PRs num artefato do claude.ai: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH (precisa de acesso de Colaborador ou superior para editar).
-- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), com alguns minutos de variação. Para atualizar na hora, **rode a skill depois de abrir ou mergear um PR**.
+- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), com alguns minutos de variação.
+- **Apenas o Murilo consegue rodar `/sincronizar-quadro`.** O Claude não deve sugerir que outro integrante a rode.
+- **Todo PR aberto pelo Alexandre ou pela Liliane gera um recado na inbox do Murilo** para ele rodar a skill: arquivo `inbox/murilo/AAAA-MM-DD-de-<autor>-sincronizar-quadro-pr-<numero>.md`, com `tipo: tarefa`, no modelo de `inbox/README.md`, citando o número e o link do PR. Depois de mergear um PR, avise o Murilo para rodar a skill.
 - A skill só lê o GitHub e escreve no banco do artefato: não faz commit, push nem abre PR.
 
 ## Memória do projeto
