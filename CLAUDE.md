@@ -10,6 +10,7 @@ Trabalho final da disciplina Introdução à Orientação a Objetos (IFSP), feit
 | `contexto/especificacoes-tecnicas.md` | Restrições técnicas, cenários de evolução, padrões GoF, conteúdo da Etapa 1 e da Etapa 2, stress test, defesa |
 | `contexto/slides/` | O que foi ensinado em aula: um `.md` por PDF (`aula_01.md` … `aula_12.md`). Comece pelo `README.md`, que tem o índice e o resumo |
 | `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Consultar antes de escrever ou revisar código |
+| `contexto/padroes-projeto/` | Notas sobre os 11 padrões do enunciado (um `.md` por padrão; comece pelo `README.md`). Consultar **somente** ao codificar ou quando alguém perguntar sobre um padrão |
 | `contexto/pdfs/` | Originais em PDF (enunciado e slides). Em caso de divergência, o enunciado vale mais |
 | `memory/` | Histórico das sessões e decisões do grupo (ver "Memória do projeto") |
 | `docs/` | Documento de Projeto, `relatorio_ia_notas.md` e `COMO_EXECUTAR.md` (a criar) |
