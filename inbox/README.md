@@ -47,6 +47,7 @@ data: 2026-11-09
 tipo: tarefa              # tarefa | duvida | decisao | aviso | bug
 status: pendente          # pendente | aceito | concluido | descartado
 prazo: 2026-11-12         # opcional
+prioridade: maxima        # opcional: o Claude de quem recebe trata este recado antes de tudo
 ---
 
 ## O que é
