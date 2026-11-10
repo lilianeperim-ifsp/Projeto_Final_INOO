@@ -128,4 +128,4 @@ main                       versão estável (o que será entregue)
 
 ## Documento de Projeto
 
-- O texto fica em **`docs/Documento_de_Projeto.md`** (Markdown). A skill **`/documento`** mostra o arquivo para conferência e, depois da aprovação, gera `docs/Documento_de_Projeto.pdf` pelo Chrome/Edge (precisa de internet; os diagramas Mermaid saem desenhados). Ela não edita o texto nem commita.
+- O texto fica em **`docs/Documento_de_Projeto.md`** (Markdown). **Desde 2026-11-10 é o documento oficial** (começou com a seção 1, T07): **não pode ser apagado, renomeado nem substituído, apenas editado**, por PR. O Claude não deve apagá-lo nem recriá-lo do zero, mesmo a pedido de "começar de novo"; nesse caso, editar as seções. A skill **`/documento`** mostra o arquivo para conferência e, depois da aprovação, gera `docs/Documento_de_Projeto.pdf` pelo Chrome/Edge (precisa de internet; os diagramas Mermaid saem desenhados). Ela não edita o texto nem commita.
