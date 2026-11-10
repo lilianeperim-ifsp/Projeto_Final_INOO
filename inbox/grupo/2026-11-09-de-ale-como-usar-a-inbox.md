@@ -3,7 +3,7 @@ para: grupo
 de: ale
 data: 2026-11-09
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -24,3 +24,5 @@ Resumo do uso:
 - Só quem recebeu muda o status e escreve na Resposta. Nunca apaguem um recado.
 
 ## Resposta
+
+Murilo: li o guia em `inbox/README.md` e entendi o formato, os status e as regras. Recado fechado em 2026-11-10.
