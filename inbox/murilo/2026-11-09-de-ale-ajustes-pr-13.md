@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-09
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -32,3 +32,13 @@ Todos os pontos são sobre `.claude/skills/sincronizar-quadro/SKILL.md`.
 Os pontos 3, 4 e 5 vieram da leitura do código da página do quadro. Os cartões reais não foram consultados.
 
 ## Resposta
+
+Murilo, 2026-11-10: apliquei os 5 pontos em `.claude/skills/sincronizar-quadro/SKILL.md` e enviei o commit `5161c97` para o PR #13.
+
+1. Passo 8 limitado a cartões em `coluna = pr`.
+2. Passos 7 e 8 agora exigem `update`, nunca `set`, para preservar o `dependeDe`.
+3. Incluí `descricao` na tabela de `cartoes`.
+4. Esclareci que o `dependeDe` usa o id do documento (ex.: `t07`), não o número T-NN.
+5. Documentei que a página trata um pré-requisito excluído como satisfeito, e por isso a skill nunca apaga cartões. Não mudei o comportamento da página, só o texto.
+
+O PR #13 está pronto para novo merge.
