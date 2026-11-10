@@ -33,7 +33,7 @@ Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `
    ```
    gh pr list --repo lilianeperim-ifsp/Projeto_Final_INOO --state all --limit 100 --json number,title,headRefName,baseRefName,state,author,reviewRequests,reviews,mergedAt,url
    ```
-   **Plano B, só se o `gh` não existir ou falhar na autenticação** (acontece na rotina na nuvem, onde o `GH_TOKEN` do ambiente pode estar inválido). O repositório é público, então a API REST responde sem token (limite de 60 chamadas por hora por IP):
+   **Plano B, só se o `gh pr list` falhar** (por não existir, por autenticação inválida ou por bloqueio do GraphQL). Isso acontece na rotina na nuvem: o `GH_TOKEN` do ambiente é inválido e o GraphQL é bloqueado (HTTP 403). Nesse caso use `gh api` com os caminhos REST abaixo, ou `curl`. O repositório é público, então a API REST responde sem token (limite de 60 chamadas por hora por IP):
    - Lista: `curl -s "https://api.github.com/repos/lilianeperim-ifsp/Projeto_Final_INOO/pulls?state=all&per_page=100"`. Daqui saem `number`, `title`, `state`, `merged_at`, `html_url`, `user.login`, `head.ref`, `base.ref` e `requested_reviewers[].login` (pedidos pendentes).
    - Avaliações: `curl -s ".../pulls/<n>/reviews"` (campos `user.login` e `state`). Busque só dos PRs abertos, dos novos e dos que mudaram de estado em relação ao banco. Dos demais, reaproveite `revisoresPedidos` e `aprovadoPor` já gravados.
    - Estado: `state = open` → `aberto`; `state = closed` com `merged_at` preenchido → `mergeado`; `closed` sem `merged_at` → `fechado`.
