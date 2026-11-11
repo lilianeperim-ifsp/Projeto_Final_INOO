@@ -3,7 +3,7 @@ para: murilo
 de: liliane
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -19,3 +19,6 @@ WhatsApp, porque o repositório é público e o e-mail não deve ficar registrad
 - Preciso do acesso para acompanhar e mover os meus cartões (T04, T05, T08, T10, T13, T15, T20 e os da Etapa 2).
 
 ## Resposta
+
+Murilo, 2026-11-11: convite como Colaborador enviado e já aceito pela Liliane. Ela deve conseguir abrir o quadro e
+mover os cartões dela. (O e-mail não foi registrado aqui porque o repositório é público.)
