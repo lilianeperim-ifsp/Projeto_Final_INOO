@@ -18,3 +18,4 @@ confirmado, o status muda para `concluido`.
 ## Resposta
 
 - Murilo: li o guia da inbox (2026-11-10).
+- Alexandre: li o guia da inbox (2026-11-10).

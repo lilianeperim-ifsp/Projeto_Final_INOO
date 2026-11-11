@@ -3,7 +3,7 @@ para: ale
 de: ale
 data: 2026-11-09
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,5 @@ Resumo do uso:
 - Só quem recebeu muda o status e escreve na Resposta. Nunca apague um recado.
 
 ## Resposta
+
+Alexandre, 2026-11-10: aviso lido, fechado.

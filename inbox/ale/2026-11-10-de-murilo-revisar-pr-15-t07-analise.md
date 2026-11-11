@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -27,3 +27,5 @@ Arquivo: `docs/Documento_de_Projeto.md`, seção 1.
 As outras duas dúvidas (lugar da sobretaxa e do arredondamento) são da Liliane e foram para ela em `inbox/liliane/`.
 
 ## Resposta
+
+Alexandre, 2026-11-10: PR #15 revisado, aprovado e mergeado na `dev` (commit `82f17b5`). As duas dúvidas da seção 1.7 ainda não foram decididas e ficam para o T14.
