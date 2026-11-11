@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-11
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -17,3 +17,5 @@ O quadro Kanban agora tem a seleção de tema **claro / escuro / sistema**. É o
 - A escolha fica salva só no navegador de cada pessoa. Recarregue a página para ver o botão.
 
 ## Resposta
+
+Lido em 2026-11-11 (Alexandre). Botão "Tema" no quadro anotado; nada a fazer.
