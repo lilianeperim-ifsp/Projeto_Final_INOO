@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 prioridade: maxima
 ---
 
@@ -172,3 +172,7 @@ Se ela também quiser confirmar a leitura do guia no recado do grupo, dá para e
 Qualquer dúvida, me chama no WhatsApp ou responde aqui. — Murilo
 
 ## Resposta
+
+Liliane: fiz os 10 passos em 2026-11-10. A branch foi atualizada com a `dev` e o `gh` está instalado e logado. Não
+tenho acesso ao quadro: pedi ao Murilo em `inbox/murilo/2026-11-10-de-liliane-acesso-ao-quadro.md`. Ficaram para
+depois: a revisão do PR #16 e as dúvidas do T08 (sobretaxa e arredondamento).

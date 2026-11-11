@@ -3,7 +3,7 @@ para: grupo
 de: ale
 data: 2026-11-09
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -19,3 +19,4 @@ confirmado, o status muda para `concluido`.
 
 - Murilo: li o guia da inbox (2026-11-10).
 - Alexandre: li o guia da inbox (2026-11-10).
+- Liliane: li o guia da inbox (2026-11-10). Com os três confirmados, recado fechado.
