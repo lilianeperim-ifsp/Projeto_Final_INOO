@@ -17,3 +17,6 @@ PR #16: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/16
 Ele leva para a `main` o que já foi integrado na `dev` pelos PRs #7 a #15. São só documentação, skills e recados, sem código Java. Os principais arquivos são `docs/Documento_de_Projeto.md` (seção 1, T07), `docs/divisao-projeto.md` (T01) e `contexto/padroes-projeto/`.
 
 ## Resposta
+
+Liliane: PR #16 aprovado em 2026-11-10, com comentário sobre dois pontos da seção 1 (modal da encomenda e CO₂ no
+aviso), que vou tratar no T08.

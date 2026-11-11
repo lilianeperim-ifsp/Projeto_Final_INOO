@@ -25,3 +25,6 @@ O PR leva para a `main` o que entrou na `dev` pelos PRs #7 a #15. São só docum
 Para aprovar pela página: aba "Files changed" → "Review changes" → "Approve".
 
 ## Resposta
+
+Liliane: PR #16 aprovado em 2026-11-10, com comentário sobre dois pontos da seção 1 (modal da encomenda e CO₂ no
+aviso), que vou tratar no T08.
