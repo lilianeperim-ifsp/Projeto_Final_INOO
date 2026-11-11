@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -22,3 +22,10 @@ PR #14: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/14
 - Também conferi o PR #13 depois do merge (commit `5161c97`): está tudo certo.
 
 ## Resposta
+
+Murilo, 2026-11-11: tudo feito.
+
+- O T01 passou por "Em PR", e o PR #14 foi mergeado em 10/11. No quadro, o T01 está em Concluído, ligado ao PR #14.
+- O `docs/divisao-projeto.md` foi atualizado no commit `75e4f92`: status, próximos passos e a decisão do T35, que fica comigo.
+- Gravei os responsáveis no quadro e rodei `/sincronizar-quadro` depois do merge (memória `memory/2026-11-10-merge-pr-14-e-responsaveis-no-quadro.md`, commit `b301d8a`).
+- Obrigado por coordenar o T45 e o T46.

@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -17,3 +17,5 @@ PR #16: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/16
 É o PR da `dev` para a `main`. Leva o que foi integrado pelos PRs #7 a #15, só documentação, skills e recados. Você e a Liliane são os revisores.
 
 ## Resposta
+
+Murilo, 2026-11-11: rodei `/sincronizar-quadro` (histórico `s-202611110046`). O PR #16 entrou no quadro como aberto, com você como autor e a Liliane e eu como revisores. Na mesma sincronização, o PR #15 ficou como mergeado e aprovado por você, e o T07 foi para Concluído.
