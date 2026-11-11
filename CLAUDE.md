@@ -118,6 +118,15 @@ main                       versão estável (o que será entregue)
 - `/memory` é o comando interno do Claude Code (edita arquivos de memória do próprio Claude) e **não** grava nessa pasta.
 - No início de uma sessão nova, rodar `git pull origin dev` e ler os arquivos mais recentes de `memory/` para retomar de onde o grupo parou.
 
+## Inbox ao iniciar a sessão
+
+Na **primeira resposta de cada sessão**, antes de atender o pedido:
+
+1. Descobrir quem está usando pelo `git config user.name`: Liliane → `inbox/liliane/`, Murilo → `inbox/murilo/`, Alexandre → `inbox/ale/`. Se não der para saber, perguntar.
+2. Listar os recados com `status: pendente` dessa pasta e de `inbox/grupo/` (o guia é `inbox/README.md`).
+3. **Recado com `prioridade: maxima` vem antes de tudo:** mostrá-lo primeiro e seguir as instruções dele, a menos que o usuário peça outra coisa. Os demais recados pendentes aparecem numa lista curta, uma linha cada.
+4. Se a branch estiver atrás da `dev`, avisar que recados novos podem estar faltando e sugerir `/atualizar-branch`.
+
 ## Estrutura do repositório
 
 - `LogiTech/` — projeto IntelliJ (JDK 26), código em `LogiTech/src`. `Main.java` ainda é o template do IntelliJ.
