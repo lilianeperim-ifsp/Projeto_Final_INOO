@@ -3,7 +3,7 @@ para: liliane
 de: ale
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
