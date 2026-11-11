@@ -10,6 +10,7 @@ Trabalho final da disciplina Introdução à Orientação a Objetos (IFSP), feit
 | `contexto/especificacoes-tecnicas.md` | Restrições técnicas, cenários de evolução, padrões GoF, conteúdo da Etapa 1 e da Etapa 2, stress test, defesa |
 | `contexto/slides/` | O que foi ensinado em aula: um `.md` por PDF (`aula_01.md` … `aula_12.md`). Comece pelo `README.md`, que tem o índice e o resumo |
 | `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Consultar antes de escrever ou revisar código |
+| `contexto/padroes-projeto/` | Notas sobre os 11 padrões do enunciado (um `.md` por padrão; comece pelo `README.md`). Consultar **somente** ao codificar ou quando alguém perguntar sobre um padrão |
 | `contexto/pdfs/` | Originais em PDF (enunciado e slides). Em caso de divergência, o enunciado vale mais |
 | `memory/` | Histórico das sessões e decisões do grupo (ver "Memória do projeto") |
 | `docs/` | Documento de Projeto, `relatorio_ia_notas.md` e `COMO_EXECUTAR.md` (a criar) |
@@ -72,9 +73,10 @@ main                       versão estável (o que será entregue)
 ```
 
 - `main`: só recebe PR vindo da `dev`, depois de testado.
-- `dev`: só recebe PR vindo das branches `logitech/<usuario>`.
+- `dev`: só recebe PR vindo das branches `logitech/<usuario>` (única exceção: inbox e memória, ver abaixo).
 - `logitech/<usuario>`: cada integrante trabalha **só na própria branch**, criada a partir da `dev`.
 - **Nada de push direto em `main` ou `dev`.**
+- **Exceção da inbox e da memória:** um commit que altera **somente** arquivos de `inbox/`, de `memory/` ou `docs/relatorio_ia_notas.md` pode ir direto para a `dev`, sem PR (ver `inbox/README.md` e a skill `/salvar-memoria`). Esses arquivos chegam a todos no `git pull origin dev` e vão para a `main` no próximo PR da `dev`. Se o commit tocar em qualquer outro arquivo, segue o fluxo normal.
 
 ### Passo a passo
 
@@ -83,6 +85,8 @@ main                       versão estável (o que será entregue)
 3. Antes do PR, atualizar de novo com a `dev` (`git pull origin dev`), resolver conflitos e conferir que compila e que os testes passam.
 4. `git push` e abrir o PR para a `dev`:
    `gh pr create --base dev --head logitech/<usuario> --reviewer alexsant22`
+
+   Se quem abriu o PR foi o Alexandre ou a Liliane, deixar um recado em `inbox/murilo/` para ele rodar `/sincronizar-quadro` (ver "Quadro Kanban do grupo").
 5. Depois do merge e dos testes na `dev`, abrir o PR da `dev` para a `main`:
    `gh pr create --base main --head dev --reviewer alexsant22`
 
@@ -95,21 +99,33 @@ main                       versão estável (o que será entregue)
 ### Regras para o Claude
 
 - Só commitar, dar push ou abrir PR quando o usuário pedir.
-- Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`.
+- Antes de commitar, confirmar em qual branch está; nunca commitar em `main` ou `dev`, salvo commit na `dev` coberto pela exceção da inbox e da memória, e ainda assim apenas quando o usuário pedir. Rodar `/salvar-memoria` conta como pedido para enviar a memória da sessão.
 - Ao abrir PR, usar a base correta (`dev` para branch de integrante, `main` só a partir da `dev`) e sempre incluir o reviewer.
+- Ao abrir PR para o Alexandre ou a Liliane, criar também o recado em `inbox/murilo/` e enviá-lo para a `dev`, voltando depois para a branch de trabalho. Pedir para abrir o PR conta como pedido para enviar esse recado.
 - O `gh` foi instalado em `C:\Program Files\GitHub CLI\gh.exe`; se não estiver no PATH do terminal, use o caminho completo.
 
 ## Quadro Kanban do grupo
 
 - O grupo acompanha tarefas, responsáveis e PRs num artefato do claude.ai: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH (precisa de acesso de Colaborador ou superior para editar).
-- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Está planejada uma rotina na nuvem que roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), mas **ainda não está ativa** (falta conectar o GitHub à conta e levar a skill para a `main`). Por enquanto, **rode a skill depois de abrir ou mergear um PR**.
+- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), com alguns minutos de variação.
+- **Apenas o Murilo consegue rodar `/sincronizar-quadro`.** O Claude não deve sugerir que outro integrante a rode.
+- **Todo PR aberto pelo Alexandre ou pela Liliane gera um recado na inbox do Murilo** para ele rodar a skill: arquivo `inbox/murilo/AAAA-MM-DD-de-<autor>-sincronizar-quadro-pr-<numero>.md`, com `tipo: tarefa`, no modelo de `inbox/README.md`, citando o número e o link do PR. Depois de mergear um PR, avise o Murilo para rodar a skill.
 - A skill só lê o GitHub e escreve no banco do artefato: não faz commit, push nem abre PR.
 
 ## Memória do projeto
 
-- Ao fim de cada sessão, rodar **`/salvar-memoria`** (skill do projeto em `.claude/skills/salvar-memoria/`). Ela grava `memory/AAAA-MM-DD-assunto-principal.md` com resumo, decisões, erros da IA, pendências e próximos passos, e depois o arquivo é commitado.
+- Ao fim de cada sessão, rodar **`/salvar-memoria`** (skill do projeto em `.claude/skills/salvar-memoria/`). Ela grava `memory/AAAA-MM-DD-assunto-principal.md` com resumo, decisões, erros da IA, pendências e próximos passos, e a própria skill envia o arquivo direto para a `dev`.
 - `/memory` é o comando interno do Claude Code (edita arquivos de memória do próprio Claude) e **não** grava nessa pasta.
-- No início de uma sessão nova, ler os arquivos mais recentes de `memory/` para retomar de onde o grupo parou.
+- No início de uma sessão nova, rodar `git pull origin dev` e ler os arquivos mais recentes de `memory/` para retomar de onde o grupo parou.
+
+## Inbox ao iniciar a sessão
+
+Na **primeira resposta de cada sessão**, antes de atender o pedido:
+
+1. Descobrir quem está usando pelo `git config user.name`: Liliane → `inbox/liliane/`, Murilo → `inbox/murilo/`, Alexandre → `inbox/ale/`. Se não der para saber, perguntar.
+2. Listar os recados com `status: pendente` dessa pasta e de `inbox/grupo/` (o guia é `inbox/README.md`).
+3. **Recado com `prioridade: maxima` vem antes de tudo:** mostrá-lo primeiro e seguir as instruções dele, a menos que o usuário peça outra coisa. Os demais recados pendentes aparecem numa lista curta, uma linha cada.
+4. Se a branch estiver atrás da `dev`, avisar que recados novos podem estar faltando e sugerir `/atualizar-branch`.
 
 ## Estrutura do repositório
 
@@ -117,4 +133,8 @@ main                       versão estável (o que será entregue)
 - `contexto/` — regras em `.md`, `projeto-exemplo.md` (Livraria das aulas 10–12), `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
 - `memory/` — memória compartilhada das sessões
 - `docs/` — Documento de Projeto, notas do relatório de IA, `COMO_EXECUTAR.md`
-- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`)
+- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`, `atualizar-branch`, `documento`)
+
+## Documento de Projeto
+
+- O texto fica em **`docs/Documento_de_Projeto.md`** (Markdown). **Desde 2026-11-10 é o documento oficial** (começou com a seção 1, T07): **não pode ser apagado, renomeado nem substituído, apenas editado**, por PR. O Claude não deve apagá-lo nem recriá-lo do zero, mesmo a pedido de "começar de novo"; nesse caso, editar as seções. A skill **`/documento`** mostra o arquivo para conferência e, depois da aprovação, gera `docs/Documento_de_Projeto.pdf` pelo Chrome/Edge (precisa de internet; os diagramas Mermaid saem desenhados). Ela não edita o texto nem commita.

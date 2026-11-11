@@ -6,21 +6,23 @@ disable-model-invocation: true
 
 # Sincronizar o quadro com o GitHub
 
-O quadro do grupo é um artefato do claude.ai. A página dele não alcança a API do GitHub, então esta skill lê os PRs com o `gh` e grava o resultado no banco do artefato. A rotina agendada roda a mesma skill às 08:00, 12:00 e 18:00 (horário de Brasília). Qualquer integrante pode rodá-la na hora.
+O quadro do grupo é um artefato do claude.ai. A página dele não alcança a API do GitHub, então esta skill lê os PRs com o `gh` e grava o resultado no banco do artefato. A rotina agendada roda a mesma skill às 08:00, 12:00 e 18:00 (horário de Brasília). **Apenas o Murilo consegue rodá-la na hora.**
 
 - **Artefato:** https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH
 - **Repositório:** `lilianeperim-ifsp/Projeto_Final_INOO`
-- **Quem pode rodar:** quem tem acesso de Colaborador (Contributor) ou superior ao artefato. Sem isso as gravações são recusadas.
+- **Quem pode rodar:** apenas o Murilo e a rotina agendada. Gravar no quadro exige acesso de Colaborador (Contributor) ou superior ao artefato; sem isso as gravações são recusadas. Se o `git config user.name` indicar outro integrante, avise que quem sincroniza é o Murilo e pare, sem tentar gravar.
 
 ## Dados no banco do artefato
 
 | Coleção | Documento | Campos |
 |---|---|---|
-| `cartoes` | `t01` … (criados pela página) | `n, titulo, coluna, ordem, responsavel, pr, revisor, etapa, area, atualizadoPorId, atualizadoEm` |
+| `cartoes` | `t01` … (criados pela página) | `n, titulo, descricao, coluna, ordem, responsavel, pr, revisor, etapa, area, dependeDe[], atualizadoPorId, atualizadoEm` |
 | `prs` | `<número do PR>` (ex.: `2`) | `numero, titulo, branch, base, estado, autor, revisoresPedidos[], aprovadoPor[], url, mergeadoEm, sincronizadoEm` |
 | `sincronizacoes` | `s-AAAAMMDDhhmm` (UTC) | `quando, origem, por, resumo, mudancas[]` |
 
 Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `aberto`, `mergeado`, `fechado`. Valores de `origem`: `manual`, `agendada`.
+
+`dependeDe` é a lista de **ids de documento** dos cartões (os mesmos da coluna "Documento" acima, ex.: `["t07","t08"]`, não o número T-NN do campo `n`) que precisam estar em `feito` para o cartão sair de `fazer`. Quem aplica a regra é a página do quadro; esta skill não valida dependências e só move para `feito` cartões que estão em `pr` e têm PR mergeado. A página trata como satisfeito um pré-requisito que foi excluído, embora o texto da regra exija `feito`; por isso a skill nunca apaga cartões. Não apague nem altere o campo `dependeDe`: grave os cartões sempre com `update` (que mescla só os campos informados) e nunca com `set`, que substitui o documento inteiro e perderia esse campo.
 
 ## Passos
 
@@ -33,7 +35,7 @@ Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `
    ```
    gh pr list --repo lilianeperim-ifsp/Projeto_Final_INOO --state all --limit 100 --json number,title,headRefName,baseRefName,state,author,reviewRequests,reviews,mergedAt,url
    ```
-   **Plano B, só se o `gh` não existir ou falhar na autenticação** (acontece na rotina na nuvem, onde o `GH_TOKEN` do ambiente pode estar inválido). O repositório é público, então a API REST responde sem token (limite de 60 chamadas por hora por IP):
+   **Plano B, só se o `gh pr list` falhar** (por não existir, por autenticação inválida ou por bloqueio do GraphQL). Isso acontece na rotina na nuvem: o `GH_TOKEN` do ambiente é inválido e o GraphQL é bloqueado (HTTP 403). Nesse caso use `gh api` com os caminhos REST abaixo, ou `curl`. O repositório é público, então a API REST responde sem token (limite de 60 chamadas por hora por IP):
    - Lista: `curl -s "https://api.github.com/repos/lilianeperim-ifsp/Projeto_Final_INOO/pulls?state=all&per_page=100"`. Daqui saem `number`, `title`, `state`, `merged_at`, `html_url`, `user.login`, `head.ref`, `base.ref` e `requested_reviewers[].login` (pedidos pendentes).
    - Avaliações: `curl -s ".../pulls/<n>/reviews"` (campos `user.login` e `state`). Busque só dos PRs abertos, dos novos e dos que mudaram de estado em relação ao banco. Dos demais, reaproveite `revisoresPedidos` e `aprovadoPor` já gravados.
    - Estado: `state = open` → `aberto`; `state = closed` com `merged_at` preenchido → `mergeado`; `closed` sem `merged_at` → `fechado`.
@@ -51,11 +53,11 @@ Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `
    - `PR #3 aberto: <título>`
    - `PR #3: aberto → mergeado`
    - `PR #3 aprovado por Alexandre`
-7. **Vincular PR a cartão (sem adivinhar).** Para cada cartão em `coluna = pr` com `pr` vazio:
+7. **Vincular PR a cartão (sem adivinhar).** Para cada cartão em `coluna = pr` com `pr` vazio (grave com `update`, nunca com `set`):
    - Conte os PRs **abertos** cujo `autor` é igual ao `responsavel` do cartão (`liliane`, `murilo`, `alexandre`).
    - Se for **exatamente um**: preencha `pr` com o número e `revisor` com os `revisoresPedidos` separados por vírgula.
    - Se for zero ou mais de um: não altere o cartão e anote `T-NN em "Em PR" sem vínculo: <motivo>`.
-8. **Mover cartões de PR mergeado.** Para cada cartão cujo `pr` aponta para um PR `mergeado` e que ainda não está em `feito`: `coluna = feito`, `ordem` = maior `ordem` da coluna `feito` + 1. Anote `T-NN movido para Concluído (PR #n mergeado)`.
+8. **Mover cartões de PR mergeado.** Para cada cartão em `coluna = pr` cujo `pr` aponta para um PR `mergeado` (cartões em outras colunas não são movidos), grave com `update`, nunca com `set`: `coluna = feito`, `ordem` = maior `ordem` da coluna `feito` + 1. Anote `T-NN movido para Concluído (PR #n mergeado)`.
    - PR `fechado` sem merge: **não mova nada**; anote `PR #n fechado sem merge: decidir o que fazer com os cartões ligados`.
    - Em todo cartão alterado, grave também `atualizadoEm` (agora, ISO) e `atualizadoPorId: null`.
 9. **Registrar o histórico.** Crie `sincronizacoes/s-AAAAMMDDhhmm` (UTC; se o id existir, acrescente `-2`) com:
