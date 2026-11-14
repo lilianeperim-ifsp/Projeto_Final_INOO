@@ -9,7 +9,8 @@
 > | Seção | Cartão | Responsável | Situação |
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
-> | 2 a 8 | T08 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita, em revisão |
+> | 3 a 8 | T09 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -143,9 +144,247 @@ O checklist de `contexto/projeto-exemplo.md` (seção 10) orientou estas decisõ
 
 ### 1.7 Dúvidas para o grupo
 
-| Dúvida | Onde se resolve |
-|---|---|
-| A sobretaxa mora na abstração comum dos modais ou numa classe própria? | T08 e T10 (Liliane) |
-| O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) |
-| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) |
-| Onde mora o arredondamento, para que o cálculo normal e a simulação usem o mesmo ponto? | T10 (Liliane) |
+As dúvidas resolvidas continuam na tabela, para registro. A resposta fica na seção indicada, e esta análise não foi
+reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
+
+| Dúvida | Onde se resolve | Situação |
+|---|---|---|
+| A sobretaxa mora na abstração comum dos modais ou numa classe própria? | T08 e T10 (Alexandre) | **Resolvida em 2.1.1** |
+| O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) | **Resolvida em 2.1.4** (objeto próprio). O fluxo dos avisos continua no T14 |
+| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) | Aberta |
+| Onde mora o arredondamento, para que o cálculo normal e a simulação usem o mesmo ponto? | T10 (Alexandre) | **Resolvida em 2.1.2** |
+| Quem guarda o modal, se ele não aparece na encomenda nem no transporte (1.3)? Com qual perfil começa o perfil vigente? | T08 (Alexandre) | **Resolvida em 2.1.3** |
+| Como a auditoria soma o CO₂ do perfil vigente, se o aviso (1.2) só traz ID, status e coordenadas? | T08 e T14 (Alexandre) | **Resolvida em 2.1.4** |
+
+## 2. Catálogo de classes e interfaces
+
+> **Em revisão (T08, Alexandre).** A 2.1 resolve as dúvidas da seção 1.7 que travavam o catálogo, e a 2.2 traz cada
+> classe e interface com responsabilidade, atributos, métodos e colaboradores. As decisões só valem depois da revisão
+> do PR pelos 3, e as abstrações `Modal` e `Perfil` são combinadas entre os 3 antes de qualquer código.
+
+### 2.1 Decisões que destravam o catálogo
+
+#### 2.1.1 A sobretaxa fica na fórmula do frete, dentro da abstração dos modais
+
+- **Regra (RN 3):** se o peso passa de 1000 kg, o frete base é multiplicado por 1,05, em todos os modais e inclusive
+  com distância 0. O cenário "8% acima de 2000 kg" exige trocar a regra em um único ponto.
+- **Decisão:** `Modal` é uma **classe abstrata** que contém a fórmula do frete base, com a sobretaxa dentro dela. A
+  fórmula chama etapas abstratas (custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade),
+  e cada modal concreto só implementa essas etapas com os próprios números (Template Method, 2.2.1). O limite e o
+  fator ficam em duas constantes `static final` com nome, declaradas uma vez em `Modal`: `LIMITE_CARGA_PESADA_KG`
+  (1000) e `FATOR_SOBRETAXA` (1,05).
+- **Por quê:** a regra existe uma vez só e vale para qualquer modal novo, como o ferroviário, sem ele precisar saber
+  dela. O cenário dos 8% vira a troca de duas constantes num único arquivo. Evita o erro 5 da Livraria (regra copiada
+  em cada subclasse).
+- **Alternativa descartada:** uma classe própria `SobretaxaCargaPesada`, chamada depois do frete base. Ela também
+  deixa a regra num ponto só, mas só compensaria se a sobretaxa variasse (por perfil, por exemplo), e o enunciado não
+  pede isso. Seria uma classe e um colaborador a mais sem ganho.
+- **Em aberto:** marcar o método da fórmula como `final` impediria que uma subclasse o reescrevesse. Nos slides,
+  `final` aparece só em atributo (aula 6), então o grupo pergunta antes de usar. Sem `final`, a garantia é a combinação
+  do grupo mais os testes.
+
+#### 2.1.2 O arredondamento fica no resultado final, e os valores base não são arredondados
+
+- **Regra (RN 5):** frete, tempo e CO₂ são arredondados para 2 casas, HALF_UP, **depois** do perfil. Os agregados
+  somam os valores já arredondados.
+- **Decisão:** a regra de arredondamento (2 casas, HALF_UP) fica num único método `static`,
+  `ResultadoCalculo.arredondar(valor)`, chamado em dois momentos:
+  - no construtor do `ResultadoCalculo` (frete, tempo e CO₂). Todo resultado passa por ali, então o lote, o
+    transporte e a simulação arredondam no mesmo ponto;
+  - no `Relatorio.getTempoMedio()`, que arredonda a média só no fim, como pede a RN 5.
+
+  Os **valores base** (antes do perfil) não usam essa classe e andam sem arredondar. Se o grupo trocar a forma de
+  arredondar (ver "Em aberto"), a mudança é feita num só método.
+- **Por quê:** arredondar a base antes do perfil sai do gabarito. Exemplo com a encomenda 1 (rodoviário, 1000 km,
+  ECONOMICO):
+
+  | Caminho | Conta | Tempo final |
+  |---|---|---|
+  | Certo | 18,6667 × 1,25 = 23,3333 | **23,33** (gabarito) |
+  | Arredondando a base | 18,67 × 1,25 = 23,3375 | 23,34 |
+
+- **Alternativa descartada:** arredondar só na saída, com `String.format`. A auditoria e o relatório somam valores já
+  arredondados por encomenda, então eles também precisam do valor arredondado, e não só do texto impresso.
+- **Em aberto:** o HALF_UP exato é feito com `BigDecimal` e `RoundingMode.HALF_UP`. Nenhum dos dois aparece nos
+  slides, e `RoundingMode` é um `enum` da biblioteca do Java (o grupo proibiu **declarar** `enum`), então o grupo
+  pergunta antes de usar. A alternativa sem enum é `Math.round(valor * 100) / 100.0`, que pode errar casos como 1,005
+  pela representação do `double`. A tolerância de ±0,01 cobre essa diferença.
+
+#### 2.1.3 A encomenda guarda o modal e o perfil pedido, e o transporte guarda o perfil vigente
+
+- **Problema:** o modal não aparece na encomenda nem no transporte (1.3), e o lote calcula sem criar transporte
+  (RN 7: o lote "só calcula e imprime").
+- **Decisão:**
+  - A `Encomenda` guarda o **modal** e o **perfil pedido**, que vêm da linha da entrada. A validação de capacidade
+    pergunta ao modal, **antes** de criar a encomenda, se o peso excede a capacidade, sem testar qual modal é. Assim
+    nunca existe uma `Encomenda` inválida.
+  - A `Encomenda` tem o cálculo completo, que recebe o perfil a usar e devolve um `ResultadoCalculo`. O lote o chama
+    com o perfil pedido.
+  - O `Transporte` guarda a encomenda e o **perfil vigente**, que **começa igual ao perfil pedido da encomenda**.
+    Para os valores atuais, ele chama o cálculo da encomenda com o perfil vigente. Para simular, chama com o perfil
+    pedido na simulação, sem alterar o vigente.
+- **Por quê:** a regra de cálculo existe uma vez só e é reaproveitada pelo lote, pelo transporte e pela simulação,
+  como pede o cenário da simulação. A encomenda já tem todos os dados do cálculo.
+- **Alternativas descartadas:**
+  - O transporte guardar o modal: o lote não cria transporte, então o modal ficaria sem lugar no lote.
+  - Uma classe de serviço `CalculadoraFrete` à parte: funciona, mas a encomenda já tem os dados, e a classe a mais
+    não traria ganho.
+
+#### 2.1.4 O aviso é um objeto imutável que já leva o CO₂ do perfil vigente
+
+- **Problema:** a auditoria soma o CO₂ com o perfil vigente no momento do `ENTREGUE` (RN 8), mas o aviso descrito em
+  1.2 só traz ID, status e coordenadas.
+- **Decisão:** o aviso é uma classe própria (`Aviso`), **imutável**, com ID, status, posição e o **CO₂ calculado com o
+  perfil vigente no instante do aviso**. Quem monta o aviso, e calcula esse CO₂, é o transporte. A central de controle
+  e o cliente não usam o campo do CO₂.
+- **Por quê:** a auditoria recebe o valor certo sem precisar conhecer o transporte, e o valor não muda depois de
+  enviado, mesmo que o perfil mude.
+- **Alternativa descartada:** o aviso levar uma referência ao transporte, e a auditoria perguntar o CO₂ a ele. Isso
+  prende os interessados ao transporte e dá a eles acesso a métodos que mudam o estado: um interessado poderia mudar
+  o status no meio do aviso.
+- **Fica para o T11 e o T14:** a auditoria precisa saber se o aviso é de entrega sem comparar o texto do status. A
+  saída é polimórfica: o próprio status responde se aquele aviso conta para a auditoria. No cenário CANCELADO, o
+  status novo responde que não, e a auditoria não soma nada.
+
+### 2.2 Classes e interfaces
+
+São **31 tipos** em 6 grupos. Atributos são sempre `private`, e as constantes são `static final` com nome. As
+operações que podem ser rejeitadas aparecem como "aceita ou rejeita": o mecanismo (valor de retorno ou exceção)
+continua em aberto na 1.7 e se resolve no T12 e no T14.
+
+```
+Modal (classe abstrata)                    ← Rodoviario, Aereo, Aquaviario
+Perfil (interface)
+  └── PerfilPorMultiplicadores (abstrata)  ← Economico, Rapido, Ecologico
+Status (classe abstrata)                   ← Aguardando, EmTransito, Entregue
+InteressadoEmStatus (interface)            ← CentralDeControle, AuditoriaAmbiental, Cliente
+InteressadoEmPosicao (interface)           ← CentralDeControle
+
+Encomenda, Transporte, Posicao, ResultadoCalculo, Aviso, Rejeicao, Relatorio
+Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodigos, FormatadorDeSaida
+```
+
+#### 2.2.1 Cálculo
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Modal` (abstrata) | Calcula os valores base de um modal, com a sobretaxa em um único ponto (2.1.1) | nenhum de instância; constantes `LIMITE_CARGA_PESADA_KG` e `FATOR_SOBRETAXA` | `freteBase(peso, distancia)` (com a sobretaxa), `tempoBase(distancia)`, `co2Base(peso, distancia)`, `excedeCapacidade(peso)`; etapas abstratas `protected`: `custoPorKm()`, `custoPorKg()`, `velocidade()`, `manuseio()`, `fatorEmissao()`, `capacidadeMaxima()` | — |
+| `Rodoviario`, `Aereo`, `Aquaviario` | Fornecem os parâmetros do seu modal | nenhum próprio | as seis etapas de `Modal`, cada uma devolvendo um número da RN 2 | `Modal` |
+| `Perfil` (interface) | Contrato de um perfil de precificação | — | `aplicarFrete(base)`, `aplicarTempo(base)`, `aplicarCo2(base)` | — |
+| `PerfilPorMultiplicadores` (abstrata, `implements Perfil`) | Aplica três multiplicadores, escrevendo a multiplicação uma vez só | nenhum de instância | os três métodos de `Perfil`; etapas abstratas `protected`: `multiplicadorFrete()`, `multiplicadorTempo()`, `multiplicadorCo2()` | — |
+| `Economico`, `Rapido`, `Ecologico` | Fornecem os multiplicadores do seu perfil | nenhum próprio | as três etapas de `PerfilPorMultiplicadores`, cada uma devolvendo um número da RN 4 | `PerfilPorMultiplicadores` |
+| `ResultadoCalculo` | Guarda frete, tempo e CO₂ finais, já arredondados (2.1.2) | frete, tempo, CO₂ | construtor (que arredonda), getters e `static arredondar(valor)`, o único ponto do arredondamento | — |
+
+- **Template Method:** em `Modal`, o método-modelo é a fórmula (`freteBase`, `tempoBase` e `co2Base`), e as etapas
+  adiadas para as filhas são os seis parâmetros. Em `PerfilPorMultiplicadores`, o método-modelo é cada `aplicar...`,
+  e as etapas são os três multiplicadores. É o desenho do `Livro.calculaFrete()` abstrato da aula 11: cada filha
+  responde pelo próprio valor. O padrão é justificado no T11.
+- **Modal novo e perfil novo:** o ferroviário é uma classe que implementa as seis etapas, e o corporativo, uma classe
+  que implementa as três. Se faltar uma etapa, o código não compila, e o IntelliJ lista o que falta ("Implement
+  methods"). O PREMIUM estende `PerfilPorMultiplicadores`, implementa as três etapas e sobrescreve `aplicarFrete`,
+  chamando `super.aplicarFrete(base)` e aplicando o piso de R$ 50,00. Nenhum deles altera o que já existe.
+- **Critério para interface ou classe abstrata:** há interface quando o colaborador troca a implementação em
+  execução ou quando existe mais de um jeito de implementar o contrato.
+  - O **perfil** tem as duas coisas: troca no transporte e na simulação (Strategy, a justificar no T11), e o PREMIUM
+    muda comportamento, não só números. Por isso `Encomenda` e `Transporte` dependem do contrato `Perfil`, como a
+    Livraria faz com `Produto`, e a multiplicação fica escrita uma vez na classe abstrata, como a Livraria faz com
+    `Livro`.
+  - O **modal** não tem nenhuma das duas: é fixo na encomenda, e todo modal calcula do mesmo jeito, só com números
+    diferentes. A `Encomenda` depende da abstração `Modal`, e não de `Rodoviario`, então o baixo acoplamento se
+    mantém sem um segundo contrato.
+- **Alternativas descartadas para o perfil:**
+  - Só a interface: cada perfil repetiria `base × fator` nos três métodos (erro 5 da Livraria).
+  - Só a classe abstrata: os colaboradores dependeriam de uma classe e não de um contrato, e todo perfil seria
+    obrigado a ter multiplicadores.
+- **Alternativas descartadas para o modal:**
+  - Parâmetros recebidos pelo construtor de `Modal`, com cada filha só chamando `super(...)`: não há etapa abstrata,
+    então não é Template Method, e um construtor de seis `double` aceita dois números trocados (custo por km no lugar
+    do custo por kg) sem erro de compilação.
+  - Uma `Modal` concreta, sem subclasses, com os números passados pela `FabricaDeCodigos`: o cenário do ferroviário
+    pede que ele entre "criando classes novas", os números da RN 2 (regra de negócio) passariam a morar na camada de
+    entrada, e não haveria polimorfismo a mostrar.
+- **Alternativa descartada:** uma classe `ValoresBase` para levar os três valores até o perfil. Com três métodos
+  `aplicar...`, os valores base andam como `double`, sem arredondar, e a classe a mais não é necessária.
+- **Encapsulamento:** as etapas são `protected` (aula 6: "default + filhas"), e o modal não tem getter público dos
+  parâmetros. Quem precisa saber da capacidade chama `excedeCapacidade(peso)`.
+
+#### 2.2.2 Encomenda e transporte
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Encomenda` | Guarda os dados do pedido e calcula frete, tempo e CO₂ para um perfil (2.1.3) | id, modal, peso, distância, origem, destino e perfil pedido, que não mudam depois de criados | `calcular(perfil)` → `ResultadoCalculo`, getters | `Modal`, `Perfil`, `ResultadoCalculo` |
+| `Transporte` | Acompanha a entrega (status, posição e perfil vigente) e avisa os interessados | encomenda, status (começa `Aguardando`), posição (começa ausente), perfil vigente (começa igual ao pedido), uma lista de interessados em status e outra de interessados em posição | `iniciarTransito()`, `entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` (aceitam ou rejeitam); `simular(perfil)` e `calcularAtual()` → `ResultadoCalculo`; adicionar e remover interessado em cada lista; getters, sem devolver as listas | `Encomenda`, `Status`, `Posicao`, `Perfil`, `Aviso`, `InteressadoEmStatus`, `InteressadoEmPosicao` |
+| `Posicao` | Guarda um par válido de latitude e longitude | latitude, longitude | `static posicaoValida(lat, lon)` → `boolean`, que confere os intervalos da RN 7; `mesmaPosicao(outra)`, getters | — |
+
+- **Validar antes de criar:** a `Encomenda` e a `Posicao` só são criadas com dados válidos. O
+  `InterpretadorDeLinha` chama `modal.excedeCapacidade(peso)` antes de criar a encomenda, e o transporte chama
+  `Posicao.posicaoValida(lat, lon)` antes de criar a posição, como o `Livro.isbnValido` da aula 6. Assim nenhuma das
+  duas depende de exceção para recusar um dado, e nunca existe um objeto inválido, nem por um instante.
+- `simular` e `calcularAtual` só chamam `encomenda.calcular(...)`: um com o perfil recebido, o outro com o vigente.
+  A regra de cálculo existe uma vez só.
+- `trocarPerfil` pergunta ao status atual se a troca é permitida, sem testar qual status é.
+- O transporte só avisa quando o valor muda de fato: um status novo aceito, ou uma posição que não é a
+  `mesmaPosicao` da atual. A primeira posição sempre conta como mudança.
+
+#### 2.2.3 Status
+
+| Classe | Responsabilidade | Principais métodos | Colaboradores |
+|---|---|---|---|
+| `Status` (abstrata) | Decide quais transições e operações o transporte aceita no estado atual | `iniciarTransito()` e `entregar()`, que devolvem o próximo status ou indicam rejeição (por padrão, rejeitam); `permiteTrocaDePerfil()` (por padrão, sim); `contaParaAuditoria()` (por padrão, não); `getNome()`, usado só no texto do log e da mensagem | — |
+| `Aguardando` | Aceita só iniciar o trânsito | sobrescreve `iniciarTransito()` | `EmTransito` |
+| `EmTransito` | Aceita só a entrega | sobrescreve `entregar()` | `Entregue` |
+| `Entregue` | Não aceita transição nem troca de perfil, e conta para a auditoria | sobrescreve `permiteTrocaDePerfil()` (não) e `contaParaAuditoria()` (sim) | — |
+
+- **Por quê:** repetir o status atual ou pular uma etapa já sai rejeitado pelo comportamento padrão de `Status`, sem
+  nenhum `if` sobre qual é o status atual. O padrão (State) é justificado no T11.
+- **Fica para o T12 e o T14:** `iniciarTransito()` e `entregar()` devolvem um `Status`, então a rejeição não pode
+  ser um `boolean`. Devolver `null` repete o risco do erro 13 da Livraria. As saídas possíveis são uma exceção ou um
+  método à parte que pergunta se a operação é aceita. Esse desenho já restringe o mecanismo em aberto na 1.7.
+- **Cenário CANCELADO:** cria-se a classe `Cancelado` e entra um método `cancelar()` em `Status`, que rejeita por
+  padrão. `Aguardando` e `EmTransito` o sobrescrevem. `Cancelado` não permite troca de perfil e não conta para a
+  auditoria. O `Transporte` também é alterado, porque ganha o `cancelar()` que o operador chama. Classes criadas:
+  `Cancelado`. Classes alteradas: `Status`, `Aguardando`, `EmTransito` e `Transporte` (para o T15 e o T16).
+- **Alternativa descartada:** um método genérico `mudarStatus(Status novo)`. Para saber se a transição vale, o
+  status atual precisaria descobrir o tipo de `novo`, o que exige `instanceof` ou comparação de texto.
+
+#### 2.2.4 Avisos
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Aviso` | Retrato imutável de uma mudança (2.1.4) | id, status, posição (pode estar ausente), CO₂ do perfil vigente | getters | `Status`, `Posicao` |
+| `InteressadoEmStatus` (interface) | Recebe os avisos de mudança de status | — | `statusMudou(aviso)` | `Aviso` |
+| `InteressadoEmPosicao` (interface) | Recebe os avisos de mudança de posição | — | `posicaoMudou(aviso)` | `Aviso` |
+| `CentralDeControle` (implementa as duas) | Registra uma linha de log por evento | lista de linhas | `statusMudou` e `posicaoMudou` escrevem no log (ID, status e coordenadas, ou a falta delas); `getLog()` devolve uma cópia | `Aviso` |
+| `AuditoriaAmbiental` (implementa `InteressadoEmStatus`) | Soma o CO₂ das entregas | CO₂ auditado | `statusMudou` soma `aviso.getCo2()` quando `aviso.getStatus().contaParaAuditoria()`; getter | `Aviso`, `Status` |
+| `Cliente` (implementa `InteressadoEmStatus`) | Recebe uma mensagem por mudança de status | lista de mensagens | `statusMudou` guarda a mensagem; `getMensagens()` devolve uma cópia | `Aviso` |
+
+- **Por que duas interfaces:** cada interessado assina só o que lhe interessa, e nenhum implementa um método vazio
+  (erro 23 da Livraria). O SMS por região vira uma classe nova que implementa só `InteressadoEmPosicao`. O padrão
+  (Observer) é justificado no T11, e o fluxo dos avisos é o T14.
+- **Alternativas descartadas:**
+  - Uma interface só, com os dois métodos: `Cliente` e `AuditoriaAmbiental` teriam `posicaoMudou` vazio (erro 23).
+  - Uma interface só, com um método e um campo "tipo do evento" no aviso: cada interessado teria que testar esse
+    campo.
+
+#### 2.2.5 Lote e relatório
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Rejeicao` | Guarda o identificador (ID ou `LINHA<n>`) e o motivo de uma linha inválida | identificador, motivo | getters | — |
+| `Relatorio` | Acumula os totais em uma única passagem | custo total, soma dos tempos, CO₂ total, válidas, rejeitadas | `registrarValida(resultado)`, `registrarRejeitada()`, `getTempoMedio()` (0 sem válidas; arredonda só no fim, com `ResultadoCalculo.arredondar`), getters | `ResultadoCalculo` |
+
+#### 2.2.6 Camada de entrada e saída
+
+| Classe | Responsabilidade | Principais métodos | Colaboradores |
+|---|---|---|---|
+| `Main` | Lê `System.in` para uma `List<String>`, chama o processador e imprime o que ele devolve | `main(String[] args)` | `ProcessadorDeLote` |
+| `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Relatorio`, `FormatadorDeSaida` |
+| `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Modal` (capacidade, antes de criar a encomenda), `Encomenda`, `Rejeicao` |
+| `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `criarModal(codigo)` e `criarPerfil(codigo)`, que indicam código inexistente | modais e perfis concretos |
+| `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
+
+- **Alternativa descartada para a `LinhaInterpretada`:** lançar uma exceção quando a linha é inválida. A seção 1.2 já
+  descartou isso: a rejeição é um conceito, e não uma exceção no fluxo normal do lote.
+- **A conferir pelo Murilo:** os nomes e as responsabilidades deste grupo, porque é ele quem descreve o fluxo do lote
+  (T12) e implementa a entrada e a saída.
