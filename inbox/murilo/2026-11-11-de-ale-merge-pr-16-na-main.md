@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-11
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -19,3 +19,5 @@ O PR 16 (dev → main) foi mergeado hoje, 11/11, às 12:59. A `main` agora tem o
 - Para atualizar sua branch: `/atualizar-branch` (ou `git pull origin dev`).
 
 ## Resposta
+
+Murilo, 2026-11-14: recebido. Conferi no GitHub que o PR #16 está `MERGED` (merge commit `7b4b08c`, 11/11 às 12:59 de Brasília). Atualizei a `logitech/murilolss` com a `dev` (`/atualizar-branch`, fast-forward até `a002a63`).
