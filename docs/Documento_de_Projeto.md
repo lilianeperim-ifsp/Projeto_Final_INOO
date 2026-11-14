@@ -9,8 +9,9 @@
 > | Seção | Cartão | Responsável | Situação |
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
-> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita, em revisão |
-> | 3 a 8 | T09 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
+> | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita, em revisão |
+> | 3 a 5, 6.2, 6.3, 7 e 8 | T09 a T11 e T13 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -151,7 +152,7 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 |---|---|---|
 | A sobretaxa mora na abstração comum dos modais ou numa classe própria? | T08 e T10 (Alexandre) | **Resolvida em 2.1.1** |
 | O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) | **Resolvida em 2.1.4** (objeto próprio). O fluxo dos avisos continua no T14 |
-| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) | Aberta |
+| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) | **Resolvida para o lote em 6.1** (valor). No `Status` e no `Transporte`, segue aberta para o T14 |
 | Onde mora o arredondamento, para que o cálculo normal e a simulação usem o mesmo ponto? | T10 (Alexandre) | **Resolvida em 2.1.2** |
 | Quem guarda o modal, se ele não aparece na encomenda nem no transporte (1.3)? Com qual perfil começa o perfil vigente? | T08 (Alexandre) | **Resolvida em 2.1.3** |
 | Como a auditoria soma o CO₂ do perfil vigente, se o aviso (1.2) só traz ID, status e coordenadas? | T08 e T14 (Alexandre) | **Resolvida em 2.1.4** |
@@ -249,8 +250,8 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 ### 2.2 Classes e interfaces
 
 São **31 tipos** em 6 grupos. Atributos são sempre `private`, e as constantes são `static final` com nome. As
-operações que podem ser rejeitadas aparecem como "aceita ou rejeita": o mecanismo (valor de retorno ou exceção)
-continua em aberto na 1.7 e se resolve no T12 e no T14.
+operações que podem ser rejeitadas aparecem como "aceita ou rejeita": o mecanismo (valor de retorno ou exceção) foi
+resolvido para o lote na 6.1 e, para o `Status` e o `Transporte`, se resolve no T14.
 
 ```
 Modal (classe abstrata)                    ← Rodoviario, Aereo, Aquaviario
@@ -381,10 +382,151 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 | `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Relatorio`, `FormatadorDeSaida` |
 | `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Modal` (capacidade, antes de criar a encomenda), `Encomenda`, `Rejeicao` |
 | `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
-| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `criarModal(codigo)` e `criarPerfil(codigo)`, que indicam código inexistente | modais e perfis concretos |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`, chamados antes de `criarModal(codigo)` e `criarPerfil(codigo)` (6.1) | modais e perfis concretos |
 | `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
 
 - **Alternativa descartada para a `LinhaInterpretada`:** lançar uma exceção quando a linha é inválida. A seção 1.2 já
   descartou isso: a rejeição é um conceito, e não uma exceção no fluxo normal do lote.
-- **A conferir pelo Murilo:** os nomes e as responsabilidades deste grupo, porque é ele quem descreve o fluxo do lote
-  (T12) e implementa a entrada e a saída.
+- **Conferida pelo Murilo no T12:** os nomes e as responsabilidades deste grupo foram usados no fluxo do lote (6.1). A
+  única mudança foi na `FabricaDeCodigos`, que ganhou `existeModal` e `existePerfil` para indicar o código inexistente
+  sem `null` nem exceção (ver a decisão na 6.1).
+
+## 6. Fluxos principais
+
+> As seções 3 a 5 (T09 a T11) entram antes desta. A 6.2 (troca de perfil, T13) e a 6.3 (mudança de status e avisos,
+> T14) entram depois da 6.1.
+
+### 6.1 Processamento de uma linha do lote
+
+O caminho de cada linha, da leitura até a saída. O lote só calcula e imprime: não cria transporte nem gera aviso
+(RN 7 e RN 11).
+
+```mermaid
+sequenceDiagram
+    participant M as Main
+    participant P as ProcessadorDeLote
+    participant I as InterpretadorDeLinha
+    participant F as FabricaDeCodigos
+    participant Mo as Modal
+    participant E as Encomenda
+    participant R as Relatorio
+    participant S as FormatadorDeSaida
+
+    M->>M: lê System.in para List#lt;String#gt;
+    M->>P: processar(linhas)
+    P->>R: new Relatorio()
+    loop cada linha, com n = número da linha física
+        P->>I: interpretar(linha, n)
+        I->>I: split por #59;, trim, 7 campos, parse de ID, peso e distância
+        I->>F: existeModal(codigo), existePerfil(codigo)
+        F-->>I: boolean
+        I->>F: criarModal(codigo), criarPerfil(codigo)
+        F-->>I: Modal, Perfil
+        I->>I: rota, peso > 0, distância ≥ 0
+        I->>Mo: excedeCapacidade(peso)
+        Mo-->>I: boolean
+        I->>E: new Encomenda(...) (só se tudo for válido)
+        I-->>P: LinhaInterpretada (válida, rejeitada ou em branco)
+        alt válida
+            P->>E: calcular(getPerfilPedido())
+            E-->>P: ResultadoCalculo (já arredondado)
+            P->>R: registrarValida(resultado)
+            P->>S: formatarValida(id, resultado)
+            S-->>P: linha VALIDA
+        else rejeitada
+            P->>R: registrarRejeitada()
+            P->>S: formatarRejeitada(rejeicao)
+            S-->>P: linha REJEITADA
+        else em branco
+            P->>P: ignora (não conta em nada)
+        end
+    end
+    P->>S: formatarRelatorio(relatorio)
+    S-->>P: linha RELATORIO
+    P-->>M: List#lt;String#gt; de saída
+    M->>M: imprime cada linha
+```
+
+O diagrama mostra o caminho completo de uma linha válida. Numa linha inválida, o `InterpretadorDeLinha` para no
+primeiro motivo (passo 5) e não chama o que vem depois.
+
+#### Passo a passo
+
+| # | Passo | Quem | Regra que limita |
+|---|---|---|---|
+| 1 | Lê `System.in` com `Scanner`, monta uma `List<String>` e chama `processar(linhas)` | `Main` | O núcleo não lê dados (RN 10) nem imprime |
+| 2 | Cria um `Relatorio` e uma lista de saída e percorre as linhas **uma vez**, com `n` = posição na lista + 1 | `ProcessadorDeLote` | Uma passagem, O(n). `n` conta também as linhas em branco (RN 11) |
+| 3 | Linha vazia ou só com espaços vira uma `LinhaInterpretada` em branco | `InterpretadorDeLinha` | Ignorada: não sai na saída e não entra em nenhuma contagem (RN 6) |
+| 4 | Separa com `split(";", -1)` e faz `trim` em cada campo. Escolhe o identificador de uma eventual rejeição: o ID, se o 1º campo for um inteiro; senão, `LINHA<n>` | `InterpretadorDeLinha` | O separador `;` existe só aqui. O ID vale **mesmo quando o número de campos está errado** (`5;AEREO` → `REJEITADA;5;formato invalido`) |
+| 5 | Valida na ordem da RN 6 e para no primeiro motivo: (a) 7 campos, ID inteiro, peso e distância numéricos e finitos → `formato invalido`; (b) `existeModal` e `existePerfil` → `codigo inexistente`; (c) origem e destino não vazios → `rota invalida`; (d) peso > 0 → `peso invalido`; (e) distância ≥ 0 → `distancia invalida`; (f) `modal.excedeCapacidade(peso)` → `capacidade excedida` | `InterpretadorDeLinha`, `FabricaDeCodigos`, `Modal` | Os números são lidos **antes** dos códigos, porque o formato vem primeiro. A capacidade pergunta ao modal, sem testar qual é (2.2.2) |
+| 6 | Tudo válido: cria a `Encomenda` com o modal e o perfil pedido e devolve uma `LinhaInterpretada` válida. Inválida: devolve uma `LinhaInterpretada` com a `Rejeicao` (identificador e motivo) | `InterpretadorDeLinha` | Nunca existe `Encomenda` inválida (2.2.2) |
+| 7 | Linha válida: `encomenda.calcular(encomenda.getPerfilPedido())` devolve o `ResultadoCalculo`, que vai para `relatorio.registrarValida(resultado)` e para `formatarValida` | `ProcessadorDeLote`, `Encomenda`, `Relatorio`, `FormatadorDeSaida` | O resultado já vem arredondado (2.1.2), e o relatório soma esses valores (RN 5) |
+| 8 | Linha rejeitada: `relatorio.registrarRejeitada()` e `formatarRejeitada(rejeicao)` | `ProcessadorDeLote`, `Relatorio`, `FormatadorDeSaida` | Não entra nos totais e não interrompe o lote (RN 6) |
+| 9 | Depois do laço: `formatarRelatorio(relatorio)` entra no fim da lista, que volta para o `Main`, e o `Main` imprime cada linha | `ProcessadorDeLote`, `FormatadorDeSaida`, `Main` | A média é arredondada só aqui e vale 0 sem válidas (RN 5 e RN 6). Números em `pt-BR` com 2 casas, num único método (2.2.6) |
+
+#### Decisão: no lote, a rejeição é um valor, não uma exceção
+
+Resolve, para o lote, a dúvida da 1.7. A parte do `Status` e do `Transporte` continua com o T14.
+
+- **Decisão:** o `InterpretadorDeLinha` sempre devolve uma `LinhaInterpretada`. A linha inválida leva uma `Rejeicao`
+  com o identificador e o motivo, e nenhuma exceção sai do `InterpretadorDeLinha`.
+  - **Números:** `Integer.parseInt` e `Double.parseDouble` lançam `NumberFormatException` quando o texto não é um
+    número. Essa é a única exceção do caminho: ela é capturada ali mesmo, campo a campo, e vira `formato invalido`,
+    como no `setValor` da Livraria (`contexto/projeto-exemplo.md`). `NaN` e `Infinity` passam no `parseDouble`, então
+    são barrados à parte, com `Double.isFinite`.
+  - **Códigos:** a `FabricaDeCodigos` responde `existeModal(codigo)` e `existePerfil(codigo)` antes de criar o objeto.
+    É o mesmo "validar antes de criar" de `Posicao.posicaoValida` e `modal.excedeCapacidade` (2.2.2).
+- **Por quê:** o enunciado exige que nenhuma exceção fique sem tratamento e que a linha inválida nunca interrompa o
+  lote. Com a rejeição como valor, o lote segue em frente sem `try/catch` no `ProcessadorDeLote`, e o motivo chega
+  pronto ao `FormatadorDeSaida`.
+- **Alternativas descartadas:**
+  - A fábrica devolver `null` para o código inexistente: quem esquecesse de testar o `null` causaria uma
+    `NullPointerException` (erro 13 da Livraria).
+  - O `InterpretadorDeLinha` lançar uma exceção para a linha inválida: já descartado na 1.2 e na 2.2.6, porque a
+    rejeição faz parte do fluxo normal do lote.
+  - Uma `LinhaInterpretada` polimórfica, com uma subclasse para cada tipo de linha, cada uma se registrando no
+    relatório e na saída: o `if (linha.ehValida())` do `ProcessadorDeLote` testa o **resultado da linha**, e não o
+    modal nem o perfil, então não fere a restrição de extensibilidade (ET 3.2). Três classes a mais não trariam ganho.
+
+#### Exemplo da RN 11 percorrido
+
+| Linha física | Conteúdo | Onde para | Saída |
+|---|---|---|---|
+| 1 | `1;RODOVIARIO;500;1000;Curitiba;Recife;ECONOMICO` | Válida (passo 7) | `VALIDA;1;1445,00;23,33;31,00` |
+| 2 | `2;AEREO;-5;1000;Sao Paulo;Manaus;RAPIDO` | Passo 5(d) | `REJEITADA;2;peso invalido` |
+| 3 | (em branco) | Passo 3 | nenhuma, mas o `n` avança |
+| 4 | `abc` | Passo 5(a): 1 campo, e o 1º campo não é inteiro | `REJEITADA;LINHA4;formato invalido` |
+| 5 | `3;AQUAVIARIO;2000;3000;Santos;Belem;ECOLOGICO` | Válida (passo 7) | `VALIDA;3;2425,50;136,40;67,20` |
+| fim | — | Passo 9 | `RELATORIO;3870,50;79,87;98,20;2;2` |
+
+O tempo médio é (23,33 + 136,40) / 2 = 79,865, arredondado só no fim para 79,87.
+
+#### Casos de borda do fluxo
+
+Servem também de base para o plano de testes (T19).
+
+| Entrada | Resultado | Por quê |
+|---|---|---|
+| `5;AEREO` | `REJEITADA;5;formato invalido` | Campos a menos, mas o 1º campo é inteiro, então sai o ID |
+| `x;RODOVIARIO;10;10;A;B;ECONOMICO` | `REJEITADA;LINHA<n>;formato invalido` | ID não inteiro |
+| `7;ZZZ;NaN;10;A;B;ECONOMICO` | `REJEITADA;7;formato invalido` | O formato vem antes do código inexistente |
+| `7;rodoviario;10;10;A;B;ECONOMICO` | `REJEITADA;7;codigo inexistente` | Os códigos diferenciam maiúsculas de minúsculas |
+| `7;RODOVIARIO;10;10;   ;B;ECONOMICO` | `REJEITADA;7;rota invalida` | Origem vazia depois do `trim` |
+| `7;RODOVIARIO;0;10;A;B;ECONOMICO` | `REJEITADA;7;peso invalido` | Peso ≤ 0 |
+| `7;AQUAVIARIO;2000;0;A;B;ECONOMICO` | `VALIDA;7;267,75;30,00;0,00` | Distância 0 é válida, com sobretaxa (RN 12) |
+| `7;AEREO;5000;10;A;B;ECONOMICO` | `VALIDA;...` | Peso igual à capacidade é válido |
+| entrada vazia | só `RELATORIO;0,00;0,00;0,00;0;0` | Lista vazia, sem divisão por zero |
+
+#### Eficiência
+
+Uma única passagem pela lista, O(n). Cada linha custa um tempo fixo: são 7 campos, e a fábrica percorre uma lista de
+tamanho fixo (os códigos conhecidos). Não há varredura aninhada nem ordenação.
+
+#### Onde os cenários de evolução tocam este fluxo
+
+Ganchos para os cenários (T16 e T17), que dizem as classes criadas e alteradas:
+
+- **Separador `,` na entrada:** muda só o separador do passo 4, no `InterpretadorDeLinha`.
+- **Peso mínimo de 0,5 kg:** uma verificação nova no passo 5, logo depois de `peso invalido`.
+- **Modal vindo de configuração externa:** muda só a `FabricaDeCodigos`. O resto do fluxo recebe um `Modal` e não
+  sabe de onde ele veio.
