@@ -168,10 +168,11 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 
 - **Regra (RN 3):** se o peso passa de 1000 kg, o frete base é multiplicado por 1,05, em todos os modais e inclusive
   com distância 0. O cenário "8% acima de 2000 kg" exige trocar a regra em um único ponto.
-- **Decisão:** `Modal` é uma **classe abstrata** que contém a fórmula do frete base, com a sobretaxa dentro dela. Cada
-  modal concreto fornece só os próprios parâmetros (custo por km, custo por kg, velocidade, manuseio, fator de
-  emissão e capacidade). O limite e o fator ficam em duas constantes `static final` com nome, declaradas uma vez em
-  `Modal`: `LIMITE_CARGA_PESADA_KG` (1000) e `FATOR_SOBRETAXA` (1,05).
+- **Decisão:** `Modal` é uma **classe abstrata** que contém a fórmula do frete base, com a sobretaxa dentro dela. A
+  fórmula chama etapas abstratas (custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade),
+  e cada modal concreto só implementa essas etapas com os próprios números (Template Method, 2.2.1). O limite e o
+  fator ficam em duas constantes `static final` com nome, declaradas uma vez em `Modal`: `LIMITE_CARGA_PESADA_KG`
+  (1000) e `FATOR_SOBRETAXA` (1,05).
 - **Por quê:** a regra existe uma vez só e vale para qualquer modal novo, como o ferroviário, sem ele precisar saber
   dela. O cenário dos 8% vira a troca de duas constantes num único arquivo. Evita o erro 5 da Livraria (regra copiada
   em cada subclasse).
@@ -186,9 +187,14 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 
 - **Regra (RN 5):** frete, tempo e CO₂ são arredondados para 2 casas, HALF_UP, **depois** do perfil. Os agregados
   somam os valores já arredondados.
-- **Decisão:** o arredondamento fica no construtor da classe do resultado (`ResultadoCalculo`: frete, tempo e CO₂).
-  Todo resultado passa por ali, então o lote, o transporte e a simulação arredondam no mesmo ponto. Os **valores base**
-  (antes do perfil) não usam essa classe e andam sem arredondar.
+- **Decisão:** a regra de arredondamento (2 casas, HALF_UP) fica num único método `static`,
+  `ResultadoCalculo.arredondar(valor)`, chamado em dois momentos:
+  - no construtor do `ResultadoCalculo` (frete, tempo e CO₂). Todo resultado passa por ali, então o lote, o
+    transporte e a simulação arredondam no mesmo ponto;
+  - no `Relatorio.getTempoMedio()`, que arredonda a média só no fim, como pede a RN 5.
+
+  Os **valores base** (antes do perfil) não usam essa classe e andam sem arredondar. Se o grupo trocar a forma de
+  arredondar (ver "Em aberto"), a mudança é feita num só método.
 - **Por quê:** arredondar a base antes do perfil sai do gabarito. Exemplo com a encomenda 1 (rodoviário, 1000 km,
   ECONOMICO):
 
@@ -210,7 +216,8 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
   (RN 7: o lote "só calcula e imprime").
 - **Decisão:**
   - A `Encomenda` guarda o **modal** e o **perfil pedido**, que vêm da linha da entrada. A validação de capacidade
-    pergunta ao modal a capacidade máxima, sem testar qual modal é.
+    pergunta ao modal, **antes** de criar a encomenda, se o peso excede a capacidade, sem testar qual modal é. Assim
+    nunca existe uma `Encomenda` inválida.
   - A `Encomenda` tem o cálculo completo, que recebe o perfil a usar e devolve um `ResultadoCalculo`. O lote o chama
     com o perfil pedido.
   - O `Transporte` guarda a encomenda e o **perfil vigente**, que **começa igual ao perfil pedido da encomenda**.
@@ -261,37 +268,58 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 
 | Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
 |---|---|---|---|---|
-| `Modal` (abstrata) | Calcula os valores base de um modal, com a sobretaxa em um único ponto (2.1.1) | custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade, recebidos pelo construtor; constantes `LIMITE_CARGA_PESADA_KG` e `FATOR_SOBRETAXA` | `freteBase(peso, distancia)` (com a sobretaxa), `tempoBase(distancia)`, `co2Base(peso, distancia)`, `excedeCapacidade(peso)` | — |
-| `Rodoviario`, `Aereo`, `Aquaviario` | Fornecem os parâmetros do seu modal | nenhum próprio | só o construtor, que chama `super(...)` com os números da RN 2 | `Modal` |
+| `Modal` (abstrata) | Calcula os valores base de um modal, com a sobretaxa em um único ponto (2.1.1) | nenhum de instância; constantes `LIMITE_CARGA_PESADA_KG` e `FATOR_SOBRETAXA` | `freteBase(peso, distancia)` (com a sobretaxa), `tempoBase(distancia)`, `co2Base(peso, distancia)`, `excedeCapacidade(peso)`; etapas abstratas `protected`: `custoPorKm()`, `custoPorKg()`, `velocidade()`, `manuseio()`, `fatorEmissao()`, `capacidadeMaxima()` | — |
+| `Rodoviario`, `Aereo`, `Aquaviario` | Fornecem os parâmetros do seu modal | nenhum próprio | as seis etapas de `Modal`, cada uma devolvendo um número da RN 2 | `Modal` |
 | `Perfil` (interface) | Contrato de um perfil de precificação | — | `aplicarFrete(base)`, `aplicarTempo(base)`, `aplicarCo2(base)` | — |
-| `PerfilPorMultiplicadores` (abstrata, `implements Perfil`) | Aplica três multiplicadores, escrevendo a multiplicação uma vez só | multiplicadores de frete, tempo e CO₂, recebidos pelo construtor | os três métodos de `Perfil` | — |
-| `Economico`, `Rapido`, `Ecologico` | Fornecem os multiplicadores do seu perfil | nenhum próprio | só o construtor, que chama `super(...)` com os números da RN 4 | `PerfilPorMultiplicadores` |
-| `ResultadoCalculo` | Guarda frete, tempo e CO₂ finais, já arredondados (2.1.2) | frete, tempo, CO₂ | construtor (que arredonda) e getters | — |
+| `PerfilPorMultiplicadores` (abstrata, `implements Perfil`) | Aplica três multiplicadores, escrevendo a multiplicação uma vez só | nenhum de instância | os três métodos de `Perfil`; etapas abstratas `protected`: `multiplicadorFrete()`, `multiplicadorTempo()`, `multiplicadorCo2()` | — |
+| `Economico`, `Rapido`, `Ecologico` | Fornecem os multiplicadores do seu perfil | nenhum próprio | as três etapas de `PerfilPorMultiplicadores`, cada uma devolvendo um número da RN 4 | `PerfilPorMultiplicadores` |
+| `ResultadoCalculo` | Guarda frete, tempo e CO₂ finais, já arredondados (2.1.2) | frete, tempo, CO₂ | construtor (que arredonda), getters e `static arredondar(valor)`, o único ponto do arredondamento | — |
 
-- **Modal novo e perfil novo:** o ferroviário é uma classe com um construtor só. O corporativo também. O PREMIUM
-  estende `PerfilPorMultiplicadores` e sobrescreve só `aplicarFrete`, para aplicar o piso de R$ 50,00. Nenhum deles
-  altera o que já existe.
-- **Por que `Perfil` é interface com uma classe abstrata embaixo:** quem usa o perfil (`Encomenda` e `Transporte`)
-  depende só do contrato, como a Livraria faz com `Produto`, e a multiplicação fica escrita uma vez, como a Livraria
-  faz com `Livro`. Alternativas descartadas:
+- **Template Method:** em `Modal`, o método-modelo é a fórmula (`freteBase`, `tempoBase` e `co2Base`), e as etapas
+  adiadas para as filhas são os seis parâmetros. Em `PerfilPorMultiplicadores`, o método-modelo é cada `aplicar...`,
+  e as etapas são os três multiplicadores. É o desenho do `Livro.calculaFrete()` abstrato da aula 11: cada filha
+  responde pelo próprio valor. O padrão é justificado no T11.
+- **Modal novo e perfil novo:** o ferroviário é uma classe que implementa as seis etapas, e o corporativo, uma classe
+  que implementa as três. Se faltar uma etapa, o código não compila, e o IntelliJ lista o que falta ("Implement
+  methods"). O PREMIUM estende `PerfilPorMultiplicadores`, implementa as três etapas e sobrescreve `aplicarFrete`,
+  chamando `super.aplicarFrete(base)` e aplicando o piso de R$ 50,00. Nenhum deles altera o que já existe.
+- **Critério para interface ou classe abstrata:** há interface quando o colaborador troca a implementação em
+  execução ou quando existe mais de um jeito de implementar o contrato.
+  - O **perfil** tem as duas coisas: troca no transporte e na simulação (Strategy, a justificar no T11), e o PREMIUM
+    muda comportamento, não só números. Por isso `Encomenda` e `Transporte` dependem do contrato `Perfil`, como a
+    Livraria faz com `Produto`, e a multiplicação fica escrita uma vez na classe abstrata, como a Livraria faz com
+    `Livro`.
+  - O **modal** não tem nenhuma das duas: é fixo na encomenda, e todo modal calcula do mesmo jeito, só com números
+    diferentes. A `Encomenda` depende da abstração `Modal`, e não de `Rodoviario`, então o baixo acoplamento se
+    mantém sem um segundo contrato.
+- **Alternativas descartadas para o perfil:**
   - Só a interface: cada perfil repetiria `base × fator` nos três métodos (erro 5 da Livraria).
   - Só a classe abstrata: os colaboradores dependeriam de uma classe e não de um contrato, e todo perfil seria
     obrigado a ter multiplicadores.
-- **Por que `Modal` não tem interface por cima:** o Template Method precisa da fórmula numa classe (2.1.1), e não há
-  outro jeito de calcular um modal que justifique um segundo contrato.
+- **Alternativas descartadas para o modal:**
+  - Parâmetros recebidos pelo construtor de `Modal`, com cada filha só chamando `super(...)`: não há etapa abstrata,
+    então não é Template Method, e um construtor de seis `double` aceita dois números trocados (custo por km no lugar
+    do custo por kg) sem erro de compilação.
+  - Uma `Modal` concreta, sem subclasses, com os números passados pela `FabricaDeCodigos`: o cenário do ferroviário
+    pede que ele entre "criando classes novas", os números da RN 2 (regra de negócio) passariam a morar na camada de
+    entrada, e não haveria polimorfismo a mostrar.
 - **Alternativa descartada:** uma classe `ValoresBase` para levar os três valores até o perfil. Com três métodos
   `aplicar...`, os valores base andam como `double`, sem arredondar, e a classe a mais não é necessária.
-- **Encapsulamento:** os parâmetros do modal não têm getter. Quem precisa saber da capacidade chama
-  `excedeCapacidade(peso)`.
+- **Encapsulamento:** as etapas são `protected` (aula 6: "default + filhas"), e o modal não tem getter público dos
+  parâmetros. Quem precisa saber da capacidade chama `excedeCapacidade(peso)`.
 
 #### 2.2.2 Encomenda e transporte
 
 | Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
 |---|---|---|---|---|
-| `Encomenda` | Guarda os dados do pedido e calcula frete, tempo e CO₂ para um perfil (2.1.3) | id, modal, peso, distância, origem, destino e perfil pedido, que não mudam depois de criados | `calcular(perfil)` → `ResultadoCalculo`, `excedeCapacidade()`, getters | `Modal`, `Perfil`, `ResultadoCalculo` |
+| `Encomenda` | Guarda os dados do pedido e calcula frete, tempo e CO₂ para um perfil (2.1.3) | id, modal, peso, distância, origem, destino e perfil pedido, que não mudam depois de criados | `calcular(perfil)` → `ResultadoCalculo`, getters | `Modal`, `Perfil`, `ResultadoCalculo` |
 | `Transporte` | Acompanha a entrega (status, posição e perfil vigente) e avisa os interessados | encomenda, status (começa `Aguardando`), posição (começa ausente), perfil vigente (começa igual ao pedido), uma lista de interessados em status e outra de interessados em posição | `iniciarTransito()`, `entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` (aceitam ou rejeitam); `simular(perfil)` e `calcularAtual()` → `ResultadoCalculo`; adicionar e remover interessado em cada lista; getters, sem devolver as listas | `Encomenda`, `Status`, `Posicao`, `Perfil`, `Aviso`, `InteressadoEmStatus`, `InteressadoEmPosicao` |
-| `Posicao` | Guarda um par válido de latitude e longitude | latitude, longitude | `mesmaPosicao(outra)`, getters; recusa um par fora dos intervalos da RN 7 (aceita ou rejeita) | — |
+| `Posicao` | Guarda um par válido de latitude e longitude | latitude, longitude | `static posicaoValida(lat, lon)` → `boolean`, que confere os intervalos da RN 7; `mesmaPosicao(outra)`, getters | — |
 
+- **Validar antes de criar:** a `Encomenda` e a `Posicao` só são criadas com dados válidos. O
+  `InterpretadorDeLinha` chama `modal.excedeCapacidade(peso)` antes de criar a encomenda, e o transporte chama
+  `Posicao.posicaoValida(lat, lon)` antes de criar a posição, como o `Livro.isbnValido` da aula 6. Assim nenhuma das
+  duas depende de exceção para recusar um dado, e nunca existe um objeto inválido, nem por um instante.
 - `simular` e `calcularAtual` só chamam `encomenda.calcular(...)`: um com o perfil recebido, o outro com o vigente.
   A regra de cálculo existe uma vez só.
 - `trocarPerfil` pergunta ao status atual se a troca é permitida, sem testar qual status é.
@@ -309,9 +337,13 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 
 - **Por quê:** repetir o status atual ou pular uma etapa já sai rejeitado pelo comportamento padrão de `Status`, sem
   nenhum `if` sobre qual é o status atual. O padrão (State) é justificado no T11.
+- **Fica para o T12 e o T14:** `iniciarTransito()` e `entregar()` devolvem um `Status`, então a rejeição não pode
+  ser um `boolean`. Devolver `null` repete o risco do erro 13 da Livraria. As saídas possíveis são uma exceção ou um
+  método à parte que pergunta se a operação é aceita. Esse desenho já restringe o mecanismo em aberto na 1.7.
 - **Cenário CANCELADO:** cria-se a classe `Cancelado` e entra um método `cancelar()` em `Status`, que rejeita por
   padrão. `Aguardando` e `EmTransito` o sobrescrevem. `Cancelado` não permite troca de perfil e não conta para a
-  auditoria.
+  auditoria. O `Transporte` também é alterado, porque ganha o `cancelar()` que o operador chama. Classes criadas:
+  `Cancelado`. Classes alteradas: `Status`, `Aguardando`, `EmTransito` e `Transporte` (para o T15 e o T16).
 - **Alternativa descartada:** um método genérico `mudarStatus(Status novo)`. Para saber se a transição vale, o
   status atual precisaria descobrir o tipo de `novo`, o que exige `instanceof` ou comparação de texto.
 
@@ -339,7 +371,7 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 | Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
 |---|---|---|---|---|
 | `Rejeicao` | Guarda o identificador (ID ou `LINHA<n>`) e o motivo de uma linha inválida | identificador, motivo | getters | — |
-| `Relatorio` | Acumula os totais em uma única passagem | custo total, soma dos tempos, CO₂ total, válidas, rejeitadas | `registrarValida(resultado)`, `registrarRejeitada()`, `getTempoMedio()` (0 sem válidas; arredonda só no fim), getters | `ResultadoCalculo` |
+| `Relatorio` | Acumula os totais em uma única passagem | custo total, soma dos tempos, CO₂ total, válidas, rejeitadas | `registrarValida(resultado)`, `registrarRejeitada()`, `getTempoMedio()` (0 sem válidas; arredonda só no fim, com `ResultadoCalculo.arredondar`), getters | `ResultadoCalculo` |
 
 #### 2.2.6 Camada de entrada e saída
 
@@ -347,9 +379,9 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 |---|---|---|---|
 | `Main` | Lê `System.in` para uma `List<String>`, chama o processador e imprime o que ele devolve | `main(String[] args)` | `ProcessadorDeLote` |
 | `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Relatorio`, `FormatadorDeSaida` |
-| `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Encomenda`, `Rejeicao` |
+| `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Modal` (capacidade, antes de criar a encomenda), `Encomenda`, `Rejeicao` |
 | `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
-| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, a justificar no T11) | `criarModal(codigo)` e `criarPerfil(codigo)`, que indicam código inexistente | modais e perfis concretos |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `criarModal(codigo)` e `criarPerfil(codigo)`, que indicam código inexistente | modais e perfis concretos |
 | `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
 
 - **Alternativa descartada para a `LinhaInterpretada`:** lançar uma exceção quando a linha é inválida. A seção 1.2 já
