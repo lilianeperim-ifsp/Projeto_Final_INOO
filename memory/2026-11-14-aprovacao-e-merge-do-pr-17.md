@@ -30,6 +30,9 @@ O Alexandre atualizou a branch, analisou a proposta de redistribuição das tare
 - **Merge com commit de merge, mantendo a branch do Murilo.**
   - Por quê: é o mesmo método dos PRs anteriores na `dev`, e a branch é de trabalho fixo do integrante.
   - Alternativa descartada: squash ou apagar a branch.
+- **A rejeição dos ajustes ao PR #17 fica registrada em `docs/relatorio_ia_notas.md`** (decisão tomada depois do primeiro envio desta memória).
+  - Por quê: o Alexandre confirmou que a linha deve ficar. O caso conta para a exigência mínima de 1 rejeição no relatório final.
+  - Alternativa descartada: tirar a linha, como fez o Murilo com um erro na sessão de 14/11 (`memory/2026-11-14-redistribuicao-das-tarefas.md`).
 
 ## Erros e rejeições da IA
 - **Erro (processo):** o Claude tentou ler o banco do quadro Kanban (coleção `cartoes`) para conferir o campo `dependeDe`. O acesso do Alexandre ao quadro está bloqueado, e isso já estava registrado em `memory/` e em `docs/relatorio_ia_notas.md` (2026-11-10). A primeira tentativa foi recusada pela pasta de destino. A segunda falhou porque o quadro é compartilhado de outra organização. Nada foi gravado. O Claude avisou que a análise seguiria só pelo `docs/divisao-projeto.md` e marcou como não confirmadas as dependências dos ajustes que sugeriu. Este erro repete o de 2026-11-10.
