@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: decisao
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -55,3 +55,5 @@ As dependências vêm do campo `dependeDe` dos cartões do quadro.
 3. Eu aviso a Liliane na inbox dela.
 
 ## Resposta
+
+**Alexandre, 2026-11-14:** aprovado como está, no PR #17 (review "Approve"). Fico com o T08 e com as dúvidas que vêm junto: onde ficam a sobretaxa e o arredondamento, e os dois pontos do PR #16 (quem guarda o modal e o CO₂ no aviso). Os riscos anotados no documento (a Liliane com um só cartão de código para a defesa ao vivo e a carga dela concentrada perto de 04/12) seguem em acompanhamento. Pode atualizar o quadro e avisar a Liliane.

@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -20,3 +20,5 @@ PR #17: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/17
 - Depois do merge, eu atualizo o responsável dos cartões no quadro e aviso a Liliane.
 
 ## Resposta
+
+**Alexandre, 2026-11-14:** revisado e aprovado (review "Approve" no PR #17), sem pedidos de ajuste. A resposta à proposta está no recado `inbox/ale/2026-11-14-de-murilo-redistribuicao-das-tarefas.md`. O merge fica com você.
