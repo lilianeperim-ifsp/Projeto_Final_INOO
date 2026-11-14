@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-14
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -40,4 +40,9 @@ Duas coisas para ter em mente:
 Se discordar de algo, comente no PR #18 ou responda aqui.
 
 ## Resposta
+
+2026-11-14, Murilo: conferido. Os nomes e as responsabilidades da 2.2.6 servem para o T12. A revisão está na seção 4
+do comentário do PR #18. Um cuidado para o T12: numa linha com número errado de campos cujo primeiro campo é inteiro,
+a saída usa o ID, e não `LINHA<n>` (RN 11), então o `InterpretadorDeLinha` precisa tentar ler o ID mesmo com
+`formato invalido`. Os outros ajustes do catálogo estão em `inbox/ale/2026-11-14-de-murilo-ajustes-pr-18-t08.md`.
 

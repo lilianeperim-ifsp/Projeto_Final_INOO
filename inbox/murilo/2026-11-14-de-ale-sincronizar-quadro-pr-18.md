@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-14
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -26,4 +26,8 @@ interfaces): as seções 2.1 e 2.2 do `docs/Documento_de_Projeto.md`, a tabela 1
 Depois do merge, rode a skill de novo para o T08 ir para Concluído.
 
 ## Resposta
+
+2026-11-14, Murilo: feito. O T08 foi movido para "Em PR" com `update`, sem mexer em `dependeDe`, e ligado ao PR #18
+(revisor: Liliane, Murilo) na sincronização `s-202611142122`. Depois do merge, rodo a skill de novo para o T08 ir
+para Concluído.
 
