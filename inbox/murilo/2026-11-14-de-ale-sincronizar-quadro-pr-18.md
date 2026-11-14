@@ -8,7 +8,12 @@ status: pendente
 
 ## O que é
 
-Rodar `/sincronizar-quadro` para o quadro Kanban refletir o PR #18 e ligar o PR ao cartão T08.
+Mover o cartão **T08** para a coluna **"Em PR"** e depois rodar `/sincronizar-quadro`, para o quadro refletir o PR #18
+e ligar o PR ao cartão.
+
+O Alexandre não tem acesso ao quadro. A skill só liga PRs a cartões que **já estão** em "Em PR" (passo 7 do
+`SKILL.md`), então o T08 precisa ser movido antes, na página do quadro ou pelo seu Claude, gravando com `update` e sem
+mexer em `dependeDe`.
 
 ## Contexto
 
