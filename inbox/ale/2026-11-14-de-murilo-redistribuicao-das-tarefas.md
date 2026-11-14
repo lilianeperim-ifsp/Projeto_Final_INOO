@@ -41,7 +41,7 @@ As dependências vêm do campo `dependeDe` dos cartões do quadro.
 
 ### Pontos de atenção
 
-- **A Liliane fica sem código de produção** e sem documento da Etapa 1. Na defesa individual ela precisa alterar o código ao vivo. Os testes (T37 a T40), o T43 ("Do projeto ao código") e o ensaio (T45) dão a ela contato com o código, mas fica a ressalva.
+- **A Liliane fica com só um cartão de código de produção (T31, rastreamento)** e sem documento da Etapa 1. Na defesa individual ela precisa alterar o código ao vivo. Os testes (T37 a T40), o T43 ("Do projeto ao código") e o ensaio (T45) dão a ela contato com o código, mas fica a ressalva.
 - **Você passa a ter 8 cartões da Etapa 1** (entrega em 27/11), contra 5 meus e 3 da Liliane. Em troca, você sai dos cartões finais (T43 a T46), que antes concentravam a sua carga em 04/12.
 - **O critério da fatia vertical do T01 deixa de valer.** O novo critério é "quem trava a cadeia somos nós dois".
 - O **T35 continua comigo**, como você decidiu no PR #14.
