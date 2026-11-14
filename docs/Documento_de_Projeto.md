@@ -9,7 +9,7 @@
 > | Seção | Cartão | Responsável | Situação |
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
-> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Em escrita (2.1 escrita) |
+> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita, em revisão |
 > | 3 a 8 | T09 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
@@ -158,10 +158,9 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 
 ## 2. Catálogo de classes e interfaces
 
-> **Em escrita (T08, Alexandre).** Esta primeira parte resolve as dúvidas da seção 1.7 que travavam o catálogo. As
-> tabelas de cada classe (responsabilidade, atributos, métodos e colaboradores) vêm a seguir, no mesmo cartão. As
-> decisões abaixo só valem depois da revisão do PR pelos 3, e as abstrações `Modal` e `Perfil` são combinadas entre
-> os 3 antes de qualquer código.
+> **Em revisão (T08, Alexandre).** A 2.1 resolve as dúvidas da seção 1.7 que travavam o catálogo, e a 2.2 traz cada
+> classe e interface com responsabilidade, atributos, métodos e colaboradores. As decisões só valem depois da revisão
+> do PR pelos 3, e as abstrações `Modal` e `Perfil` são combinadas entre os 3 antes de qualquer código.
 
 ### 2.1 Decisões que destravam o catálogo
 
@@ -239,3 +238,121 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 - **Fica para o T11 e o T14:** a auditoria precisa saber se o aviso é de entrega sem comparar o texto do status. A
   saída é polimórfica: o próprio status responde se aquele aviso conta para a auditoria. No cenário CANCELADO, o
   status novo responde que não, e a auditoria não soma nada.
+
+### 2.2 Classes e interfaces
+
+São **31 tipos** em 6 grupos. Atributos são sempre `private`, e as constantes são `static final` com nome. As
+operações que podem ser rejeitadas aparecem como "aceita ou rejeita": o mecanismo (valor de retorno ou exceção)
+continua em aberto na 1.7 e se resolve no T12 e no T14.
+
+```
+Modal (classe abstrata)                    ← Rodoviario, Aereo, Aquaviario
+Perfil (interface)
+  └── PerfilPorMultiplicadores (abstrata)  ← Economico, Rapido, Ecologico
+Status (classe abstrata)                   ← Aguardando, EmTransito, Entregue
+InteressadoEmStatus (interface)            ← CentralDeControle, AuditoriaAmbiental, Cliente
+InteressadoEmPosicao (interface)           ← CentralDeControle
+
+Encomenda, Transporte, Posicao, ResultadoCalculo, Aviso, Rejeicao, Relatorio
+Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodigos, FormatadorDeSaida
+```
+
+#### 2.2.1 Cálculo
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Modal` (abstrata) | Calcula os valores base de um modal, com a sobretaxa em um único ponto (2.1.1) | custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade, recebidos pelo construtor; constantes `LIMITE_CARGA_PESADA_KG` e `FATOR_SOBRETAXA` | `freteBase(peso, distancia)` (com a sobretaxa), `tempoBase(distancia)`, `co2Base(peso, distancia)`, `excedeCapacidade(peso)` | — |
+| `Rodoviario`, `Aereo`, `Aquaviario` | Fornecem os parâmetros do seu modal | nenhum próprio | só o construtor, que chama `super(...)` com os números da RN 2 | `Modal` |
+| `Perfil` (interface) | Contrato de um perfil de precificação | — | `aplicarFrete(base)`, `aplicarTempo(base)`, `aplicarCo2(base)` | — |
+| `PerfilPorMultiplicadores` (abstrata, `implements Perfil`) | Aplica três multiplicadores, escrevendo a multiplicação uma vez só | multiplicadores de frete, tempo e CO₂, recebidos pelo construtor | os três métodos de `Perfil` | — |
+| `Economico`, `Rapido`, `Ecologico` | Fornecem os multiplicadores do seu perfil | nenhum próprio | só o construtor, que chama `super(...)` com os números da RN 4 | `PerfilPorMultiplicadores` |
+| `ResultadoCalculo` | Guarda frete, tempo e CO₂ finais, já arredondados (2.1.2) | frete, tempo, CO₂ | construtor (que arredonda) e getters | — |
+
+- **Modal novo e perfil novo:** o ferroviário é uma classe com um construtor só. O corporativo também. O PREMIUM
+  estende `PerfilPorMultiplicadores` e sobrescreve só `aplicarFrete`, para aplicar o piso de R$ 50,00. Nenhum deles
+  altera o que já existe.
+- **Por que `Perfil` é interface com uma classe abstrata embaixo:** quem usa o perfil (`Encomenda` e `Transporte`)
+  depende só do contrato, como a Livraria faz com `Produto`, e a multiplicação fica escrita uma vez, como a Livraria
+  faz com `Livro`. Alternativas descartadas:
+  - Só a interface: cada perfil repetiria `base × fator` nos três métodos (erro 5 da Livraria).
+  - Só a classe abstrata: os colaboradores dependeriam de uma classe e não de um contrato, e todo perfil seria
+    obrigado a ter multiplicadores.
+- **Por que `Modal` não tem interface por cima:** o Template Method precisa da fórmula numa classe (2.1.1), e não há
+  outro jeito de calcular um modal que justifique um segundo contrato.
+- **Alternativa descartada:** uma classe `ValoresBase` para levar os três valores até o perfil. Com três métodos
+  `aplicar...`, os valores base andam como `double`, sem arredondar, e a classe a mais não é necessária.
+- **Encapsulamento:** os parâmetros do modal não têm getter. Quem precisa saber da capacidade chama
+  `excedeCapacidade(peso)`.
+
+#### 2.2.2 Encomenda e transporte
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Encomenda` | Guarda os dados do pedido e calcula frete, tempo e CO₂ para um perfil (2.1.3) | id, modal, peso, distância, origem, destino e perfil pedido, que não mudam depois de criados | `calcular(perfil)` → `ResultadoCalculo`, `excedeCapacidade()`, getters | `Modal`, `Perfil`, `ResultadoCalculo` |
+| `Transporte` | Acompanha a entrega (status, posição e perfil vigente) e avisa os interessados | encomenda, status (começa `Aguardando`), posição (começa ausente), perfil vigente (começa igual ao pedido), uma lista de interessados em status e outra de interessados em posição | `iniciarTransito()`, `entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` (aceitam ou rejeitam); `simular(perfil)` e `calcularAtual()` → `ResultadoCalculo`; adicionar e remover interessado em cada lista; getters, sem devolver as listas | `Encomenda`, `Status`, `Posicao`, `Perfil`, `Aviso`, `InteressadoEmStatus`, `InteressadoEmPosicao` |
+| `Posicao` | Guarda um par válido de latitude e longitude | latitude, longitude | `mesmaPosicao(outra)`, getters; recusa um par fora dos intervalos da RN 7 (aceita ou rejeita) | — |
+
+- `simular` e `calcularAtual` só chamam `encomenda.calcular(...)`: um com o perfil recebido, o outro com o vigente.
+  A regra de cálculo existe uma vez só.
+- `trocarPerfil` pergunta ao status atual se a troca é permitida, sem testar qual status é.
+- O transporte só avisa quando o valor muda de fato: um status novo aceito, ou uma posição que não é a
+  `mesmaPosicao` da atual. A primeira posição sempre conta como mudança.
+
+#### 2.2.3 Status
+
+| Classe | Responsabilidade | Principais métodos | Colaboradores |
+|---|---|---|---|
+| `Status` (abstrata) | Decide quais transições e operações o transporte aceita no estado atual | `iniciarTransito()` e `entregar()`, que devolvem o próximo status ou indicam rejeição (por padrão, rejeitam); `permiteTrocaDePerfil()` (por padrão, sim); `contaParaAuditoria()` (por padrão, não); `getNome()`, usado só no texto do log e da mensagem | — |
+| `Aguardando` | Aceita só iniciar o trânsito | sobrescreve `iniciarTransito()` | `EmTransito` |
+| `EmTransito` | Aceita só a entrega | sobrescreve `entregar()` | `Entregue` |
+| `Entregue` | Não aceita transição nem troca de perfil, e conta para a auditoria | sobrescreve `permiteTrocaDePerfil()` (não) e `contaParaAuditoria()` (sim) | — |
+
+- **Por quê:** repetir o status atual ou pular uma etapa já sai rejeitado pelo comportamento padrão de `Status`, sem
+  nenhum `if` sobre qual é o status atual. O padrão (State) é justificado no T11.
+- **Cenário CANCELADO:** cria-se a classe `Cancelado` e entra um método `cancelar()` em `Status`, que rejeita por
+  padrão. `Aguardando` e `EmTransito` o sobrescrevem. `Cancelado` não permite troca de perfil e não conta para a
+  auditoria.
+- **Alternativa descartada:** um método genérico `mudarStatus(Status novo)`. Para saber se a transição vale, o
+  status atual precisaria descobrir o tipo de `novo`, o que exige `instanceof` ou comparação de texto.
+
+#### 2.2.4 Avisos
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Aviso` | Retrato imutável de uma mudança (2.1.4) | id, status, posição (pode estar ausente), CO₂ do perfil vigente | getters | `Status`, `Posicao` |
+| `InteressadoEmStatus` (interface) | Recebe os avisos de mudança de status | — | `statusMudou(aviso)` | `Aviso` |
+| `InteressadoEmPosicao` (interface) | Recebe os avisos de mudança de posição | — | `posicaoMudou(aviso)` | `Aviso` |
+| `CentralDeControle` (implementa as duas) | Registra uma linha de log por evento | lista de linhas | `statusMudou` e `posicaoMudou` escrevem no log (ID, status e coordenadas, ou a falta delas); `getLog()` devolve uma cópia | `Aviso` |
+| `AuditoriaAmbiental` (implementa `InteressadoEmStatus`) | Soma o CO₂ das entregas | CO₂ auditado | `statusMudou` soma `aviso.getCo2()` quando `aviso.getStatus().contaParaAuditoria()`; getter | `Aviso`, `Status` |
+| `Cliente` (implementa `InteressadoEmStatus`) | Recebe uma mensagem por mudança de status | lista de mensagens | `statusMudou` guarda a mensagem; `getMensagens()` devolve uma cópia | `Aviso` |
+
+- **Por que duas interfaces:** cada interessado assina só o que lhe interessa, e nenhum implementa um método vazio
+  (erro 23 da Livraria). O SMS por região vira uma classe nova que implementa só `InteressadoEmPosicao`. O padrão
+  (Observer) é justificado no T11, e o fluxo dos avisos é o T14.
+- **Alternativas descartadas:**
+  - Uma interface só, com os dois métodos: `Cliente` e `AuditoriaAmbiental` teriam `posicaoMudou` vazio (erro 23).
+  - Uma interface só, com um método e um campo "tipo do evento" no aviso: cada interessado teria que testar esse
+    campo.
+
+#### 2.2.5 Lote e relatório
+
+| Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
+|---|---|---|---|---|
+| `Rejeicao` | Guarda o identificador (ID ou `LINHA<n>`) e o motivo de uma linha inválida | identificador, motivo | getters | — |
+| `Relatorio` | Acumula os totais em uma única passagem | custo total, soma dos tempos, CO₂ total, válidas, rejeitadas | `registrarValida(resultado)`, `registrarRejeitada()`, `getTempoMedio()` (0 sem válidas; arredonda só no fim), getters | `ResultadoCalculo` |
+
+#### 2.2.6 Camada de entrada e saída
+
+| Classe | Responsabilidade | Principais métodos | Colaboradores |
+|---|---|---|---|
+| `Main` | Lê `System.in` para uma `List<String>`, chama o processador e imprime o que ele devolve | `main(String[] args)` | `ProcessadorDeLote` |
+| `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Relatorio`, `FormatadorDeSaida` |
+| `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Encomenda`, `Rejeicao` |
+| `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, a justificar no T11) | `criarModal(codigo)` e `criarPerfil(codigo)`, que indicam código inexistente | modais e perfis concretos |
+| `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
+
+- **Alternativa descartada para a `LinhaInterpretada`:** lançar uma exceção quando a linha é inválida. A seção 1.2 já
+  descartou isso: a rejeição é um conceito, e não uma exceção no fluxo normal do lote.
+- **A conferir pelo Murilo:** os nomes e as responsabilidades deste grupo, porque é ele quem descreve o fluxo do lote
+  (T12) e implementa a entrada e a saída.
