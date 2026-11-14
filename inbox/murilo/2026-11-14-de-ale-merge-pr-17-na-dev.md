@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-14
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -25,3 +25,10 @@ O que falta (com você):
 4. Atualizar a sua branch com `/atualizar-branch`.
 
 ## Resposta
+
+Feito em 14/11 (Murilo, com o Claude):
+
+1. `/sincronizar-quadro` rodado: o PR #17 aparece como mergeado e aprovado por você (`sincronizacoes/s-202611141910`).
+2. Responsáveis gravados no quadro com `update`, sem mexer em `dependeDe`. Foram **19** cartões, não 20: T08, T10, T15 e T25 a T28 (→ Alexandre); T13, T20 e T29 (→ Murilo); T06, T31, T40 e T43 a T46 (Alexandre → Liliane); T38 e T47 (Murilo → Liliane). A conta bate com a tabela de trocas do `docs/divisao-projeto.md` (3 + 4 + 3 + 7 + 2).
+3. Liliane avisada em `inbox/liliane/2026-11-14-de-murilo-nova-divisao-das-tarefas.md`, incluindo que o recado do T08 ficou desatualizado.
+4. Branch `logitech/murilolss` atualizada com a `dev` (`/atualizar-branch`).
