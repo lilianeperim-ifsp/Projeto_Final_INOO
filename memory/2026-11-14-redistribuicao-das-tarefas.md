@@ -37,7 +37,7 @@ O Murilo atualizou a branch, fechou o aviso de merge do PR #16 e decidiu que o P
 
 ## Erros e rejeições da IA
 - **Erro (dados):** no recado da redistribuição (`0c0409b`), o Claude escreveu que a Liliane ficaria "sem código de produção". O T31 (Rastreamento do transporte), que passou para ela, é de Implementação. O Claude percebeu ao contar as áreas por integrante para o `docs/divisao-projeto.md`, conferiu com um script e corrigiu o recado na `dev` (`2128549`).
-- Na hora, o Murilo recusou a edição que registrava esse erro em `docs/relatorio_ia_notas.md` e perguntou se faltava algo na redistribuição. O registro foi retomado neste `/salvar-memoria`, como a skill pede.
+- O Murilo preferiu não registrar esse erro em `docs/relatorio_ia_notas.md`: a edição foi recusada durante a sessão, e a linha que o `/salvar-memoria` acrescentou (`7989239`) foi removida a pedido dele.
 
 ## Pendências
 - **Alexandre:** revisar e aprovar o PR #17, ou propor ajustes. Isso também responde ao recado `inbox/ale/2026-11-14-de-murilo-redistribuicao-das-tarefas.md`.
