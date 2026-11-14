@@ -9,7 +9,8 @@
 > | Seção | Cartão | Responsável | Situação |
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
-> | 2 a 8 | T08 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Em escrita (2.1 escrita) |
+> | 3 a 8 | T09 a T19 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -143,9 +144,98 @@ O checklist de `contexto/projeto-exemplo.md` (seção 10) orientou estas decisõ
 
 ### 1.7 Dúvidas para o grupo
 
-| Dúvida | Onde se resolve |
-|---|---|
-| A sobretaxa mora na abstração comum dos modais ou numa classe própria? | T08 e T10 (Liliane) |
-| O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) |
-| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) |
-| Onde mora o arredondamento, para que o cálculo normal e a simulação usem o mesmo ponto? | T10 (Liliane) |
+As dúvidas resolvidas continuam na tabela, para registro. A resposta fica na seção indicada, e esta análise não foi
+reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
+
+| Dúvida | Onde se resolve | Situação |
+|---|---|---|
+| A sobretaxa mora na abstração comum dos modais ou numa classe própria? | T08 e T10 (Alexandre) | **Resolvida em 2.1.1** |
+| O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) | **Resolvida em 2.1.4** (objeto próprio). O fluxo dos avisos continua no T14 |
+| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) | Aberta |
+| Onde mora o arredondamento, para que o cálculo normal e a simulação usem o mesmo ponto? | T10 (Alexandre) | **Resolvida em 2.1.2** |
+| Quem guarda o modal, se ele não aparece na encomenda nem no transporte (1.3)? Com qual perfil começa o perfil vigente? | T08 (Alexandre) | **Resolvida em 2.1.3** |
+| Como a auditoria soma o CO₂ do perfil vigente, se o aviso (1.2) só traz ID, status e coordenadas? | T08 e T14 (Alexandre) | **Resolvida em 2.1.4** |
+
+## 2. Catálogo de classes e interfaces
+
+> **Em escrita (T08, Alexandre).** Esta primeira parte resolve as dúvidas da seção 1.7 que travavam o catálogo. As
+> tabelas de cada classe (responsabilidade, atributos, métodos e colaboradores) vêm a seguir, no mesmo cartão. As
+> decisões abaixo só valem depois da revisão do PR pelos 3, e as abstrações `Modal` e `Perfil` são combinadas entre
+> os 3 antes de qualquer código.
+
+### 2.1 Decisões que destravam o catálogo
+
+#### 2.1.1 A sobretaxa fica na fórmula do frete, dentro da abstração dos modais
+
+- **Regra (RN 3):** se o peso passa de 1000 kg, o frete base é multiplicado por 1,05, em todos os modais e inclusive
+  com distância 0. O cenário "8% acima de 2000 kg" exige trocar a regra em um único ponto.
+- **Decisão:** `Modal` é uma **classe abstrata** que contém a fórmula do frete base, com a sobretaxa dentro dela. Cada
+  modal concreto fornece só os próprios parâmetros (custo por km, custo por kg, velocidade, manuseio, fator de
+  emissão e capacidade). O limite e o fator ficam em duas constantes `static final` com nome, declaradas uma vez em
+  `Modal`: `LIMITE_CARGA_PESADA_KG` (1000) e `FATOR_SOBRETAXA` (1,05).
+- **Por quê:** a regra existe uma vez só e vale para qualquer modal novo, como o ferroviário, sem ele precisar saber
+  dela. O cenário dos 8% vira a troca de duas constantes num único arquivo. Evita o erro 5 da Livraria (regra copiada
+  em cada subclasse).
+- **Alternativa descartada:** uma classe própria `SobretaxaCargaPesada`, chamada depois do frete base. Ela também
+  deixa a regra num ponto só, mas só compensaria se a sobretaxa variasse (por perfil, por exemplo), e o enunciado não
+  pede isso. Seria uma classe e um colaborador a mais sem ganho.
+- **Em aberto:** marcar o método da fórmula como `final` impediria que uma subclasse o reescrevesse. Nos slides,
+  `final` aparece só em atributo (aula 6), então o grupo pergunta antes de usar. Sem `final`, a garantia é a combinação
+  do grupo mais os testes.
+
+#### 2.1.2 O arredondamento fica no resultado final, e os valores base não são arredondados
+
+- **Regra (RN 5):** frete, tempo e CO₂ são arredondados para 2 casas, HALF_UP, **depois** do perfil. Os agregados
+  somam os valores já arredondados.
+- **Decisão:** o arredondamento fica no construtor da classe do resultado (`ResultadoCalculo`: frete, tempo e CO₂).
+  Todo resultado passa por ali, então o lote, o transporte e a simulação arredondam no mesmo ponto. Os **valores base**
+  (antes do perfil) não usam essa classe e andam sem arredondar.
+- **Por quê:** arredondar a base antes do perfil sai do gabarito. Exemplo com a encomenda 1 (rodoviário, 1000 km,
+  ECONOMICO):
+
+  | Caminho | Conta | Tempo final |
+  |---|---|---|
+  | Certo | 18,6667 × 1,25 = 23,3333 | **23,33** (gabarito) |
+  | Arredondando a base | 18,67 × 1,25 = 23,3375 | 23,34 |
+
+- **Alternativa descartada:** arredondar só na saída, com `String.format`. A auditoria e o relatório somam valores já
+  arredondados por encomenda, então eles também precisam do valor arredondado, e não só do texto impresso.
+- **Em aberto:** o HALF_UP exato é feito com `BigDecimal` e `RoundingMode.HALF_UP`. Nenhum dos dois aparece nos
+  slides, e `RoundingMode` é um `enum` da biblioteca do Java (o grupo proibiu **declarar** `enum`), então o grupo
+  pergunta antes de usar. A alternativa sem enum é `Math.round(valor * 100) / 100.0`, que pode errar casos como 1,005
+  pela representação do `double`. A tolerância de ±0,01 cobre essa diferença.
+
+#### 2.1.3 A encomenda guarda o modal e o perfil pedido, e o transporte guarda o perfil vigente
+
+- **Problema:** o modal não aparece na encomenda nem no transporte (1.3), e o lote calcula sem criar transporte
+  (RN 7: o lote "só calcula e imprime").
+- **Decisão:**
+  - A `Encomenda` guarda o **modal** e o **perfil pedido**, que vêm da linha da entrada. A validação de capacidade
+    pergunta ao modal a capacidade máxima, sem testar qual modal é.
+  - A `Encomenda` tem o cálculo completo, que recebe o perfil a usar e devolve um `ResultadoCalculo`. O lote o chama
+    com o perfil pedido.
+  - O `Transporte` guarda a encomenda e o **perfil vigente**, que **começa igual ao perfil pedido da encomenda**.
+    Para os valores atuais, ele chama o cálculo da encomenda com o perfil vigente. Para simular, chama com o perfil
+    pedido na simulação, sem alterar o vigente.
+- **Por quê:** a regra de cálculo existe uma vez só e é reaproveitada pelo lote, pelo transporte e pela simulação,
+  como pede o cenário da simulação. A encomenda já tem todos os dados do cálculo.
+- **Alternativas descartadas:**
+  - O transporte guardar o modal: o lote não cria transporte, então o modal ficaria sem lugar no lote.
+  - Uma classe de serviço `CalculadoraFrete` à parte: funciona, mas a encomenda já tem os dados, e a classe a mais
+    não traria ganho.
+
+#### 2.1.4 O aviso é um objeto imutável que já leva o CO₂ do perfil vigente
+
+- **Problema:** a auditoria soma o CO₂ com o perfil vigente no momento do `ENTREGUE` (RN 8), mas o aviso descrito em
+  1.2 só traz ID, status e coordenadas.
+- **Decisão:** o aviso é uma classe própria (`Aviso`), **imutável**, com ID, status, posição e o **CO₂ calculado com o
+  perfil vigente no instante do aviso**. Quem monta o aviso, e calcula esse CO₂, é o transporte. A central de controle
+  e o cliente não usam o campo do CO₂.
+- **Por quê:** a auditoria recebe o valor certo sem precisar conhecer o transporte, e o valor não muda depois de
+  enviado, mesmo que o perfil mude.
+- **Alternativa descartada:** o aviso levar uma referência ao transporte, e a auditoria perguntar o CO₂ a ele. Isso
+  prende os interessados ao transporte e dá a eles acesso a métodos que mudam o estado: um interessado poderia mudar
+  o status no meio do aviso.
+- **Fica para o T11 e o T14:** a auditoria precisa saber se o aviso é de entrega sem comparar o texto do status. A
+  saída é polimórfica: o próprio status responde se aquele aviso conta para a auditoria. No cenário CANCELADO, o
+  status novo responde que não, e a auditoria não soma nada.
