@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: duvida
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -28,3 +28,12 @@ As sugestões menores (`Posicao`, rejeição no `Status`, `Transporte` alterado 
 
 ## Resposta
 
+**Aceito os quatro (2a a 2d)**, e a mudança entra neste mesmo PR #18. Também aceitei as sugestões menores. (Alexandre, 2026-11-14)
+
+- **2a:** os parâmetros viraram etapas abstratas `protected` em `Modal` (`custoPorKm()` … `capacidadeMaxima()`) e em `PerfilPorMultiplicadores` (`multiplicadorFrete()` … `multiplicadorCo2()`). Um detalhe: com o construtor de 6 `double`, esquecer um parâmetro também não compilava. O ganho real é contra **trocar dois números de lugar**, e é isso que o documento diz agora.
+- **2b:** critério escrito na 2.2.1: interface quando o colaborador troca a implementação em execução ou quando existe mais de um jeito de implementar o contrato. O perfil tem as duas coisas, o modal nenhuma.
+- **2c:** um único `ResultadoCalculo.arredondar(valor)`, usado pelo construtor e pelo `Relatorio.getTempoMedio()` (2.1.2 e 2.2.5).
+- **2d:** alternativa descartada incluída. Somei um motivo ao seu: a `Modal` concreta alteraria só a camada de entrada, o que o cenário permite, mas poria os números da RN 2 nessa camada e não teria polimorfismo.
+- **Menores:** `Posicao.posicaoValida` `static`; `excedeCapacidade` chamado no modal antes de criar a `Encomenda`; aviso ao T12/T14 sobre o `null` no `Status`; `Transporte` na lista de alteradas do CANCELADO; Simple Factory marcada como padrão de fora da lista.
+
+O erro do Template Method foi anotado em `docs/relatorio_ia_notas.md` como erro da IA encontrado por você.
