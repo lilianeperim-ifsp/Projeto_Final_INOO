@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: aviso
-status: pendente
+status: aceito
 ---
 
 ## O que é
@@ -40,3 +40,8 @@ como o `setValor` da Livraria. Assim o projeto inteiro teria um mecanismo só pa
 
 ## Resposta
 
+
+**2026-11-15, Alexandre:** recebido, fica comigo no T14. Vou decidir o mecanismo da rejeição em `iniciarTransito()`,
+`entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` e atualizar a linha da 1.7. Vou considerar a sua
+sugestão (perguntar antes no `Status` e `boolean` no `Transporte`, como no lote), para o projeto ter um mecanismo só.
+Fecho este recado como `concluido` quando o T14 estiver escrito.
