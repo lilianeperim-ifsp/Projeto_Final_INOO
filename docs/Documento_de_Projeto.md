@@ -379,17 +379,22 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 | Classe | Responsabilidade | Principais métodos | Colaboradores |
 |---|---|---|---|
 | `Main` | Lê `System.in` para uma `List<String>`, chama o processador e imprime o que ele devolve | `main(String[] args)` | `ProcessadorDeLote` |
-| `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Relatorio`, `FormatadorDeSaida` |
+| `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Encomenda`, `ResultadoCalculo`, `Relatorio`, `FormatadorDeSaida` |
 | `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Modal` (capacidade, antes de criar a encomenda), `Encomenda`, `Rejeicao` |
 | `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
-| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`, chamados antes de `criarModal(codigo)` e `criarPerfil(codigo)` (6.1) | modais e perfis concretos |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`; `criarModal(codigo)` e `criarPerfil(codigo)`, com a pré-condição de que `existe*` devolveu `true` (se violada, lançam `IllegalArgumentException`; ver 6.1). Os quatro consultam a mesma lista de códigos conhecidos | modais e perfis concretos |
 | `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
 
 - **Alternativa descartada para a `LinhaInterpretada`:** lançar uma exceção quando a linha é inválida. A seção 1.2 já
   descartou isso: a rejeição é um conceito, e não uma exceção no fluxo normal do lote.
+- **Lista única de códigos na `FabricaDeCodigos`:** `existe*` e `criar*` consultam a mesma lista de códigos
+  conhecidos. Um modal ou perfil novo (como o ferroviário) é **uma entrada nova** nessa lista, num único lugar.
+  - Alternativa descartada: cada método com as próprias comparações. Esquecer uma delas faria `existeModal` dizer
+    `true` e `criarModal` lançar a exceção, um risco a mais para a alteração ao vivo da defesa.
 - **Conferida pelo Murilo no T12:** os nomes e as responsabilidades deste grupo foram usados no fluxo do lote (6.1). A
   única mudança foi na `FabricaDeCodigos`, que ganhou `existeModal` e `existePerfil` para indicar o código inexistente
-  sem `null` nem exceção (ver a decisão na 6.1).
+  sem `null` nem exceção (ver a decisão na 6.1). Na revisão do PR #19, o Alexandre (dono da 2.2.6) definiu a
+  pré-condição do `criar*` e a lista única de códigos.
 
 ## 6. Fluxos principais
 
@@ -442,6 +447,8 @@ sequenceDiagram
         end
     end
     P->>S: formatarRelatorio(relatorio)
+    S->>R: getTempoMedio()
+    R-->>S: média já arredondada
     S-->>P: linha RELATORIO
     P-->>M: List#lt;String#gt; de saída
     M->>M: imprime cada linha
@@ -462,7 +469,7 @@ primeiro motivo (passo 5) e não chama o que vem depois.
 | 6 | Tudo válido: cria a `Encomenda` com o modal e o perfil pedido e devolve uma `LinhaInterpretada` válida. Inválida: devolve uma `LinhaInterpretada` com a `Rejeicao` (identificador e motivo) | `InterpretadorDeLinha` | Nunca existe `Encomenda` inválida (2.2.2) |
 | 7 | Linha válida: `encomenda.calcular(encomenda.getPerfilPedido())` devolve o `ResultadoCalculo`, que vai para `relatorio.registrarValida(resultado)` e para `formatarValida` | `ProcessadorDeLote`, `Encomenda`, `Relatorio`, `FormatadorDeSaida` | O resultado já vem arredondado (2.1.2), e o relatório soma esses valores (RN 5) |
 | 8 | Linha rejeitada: `relatorio.registrarRejeitada()` e `formatarRejeitada(rejeicao)` | `ProcessadorDeLote`, `Relatorio`, `FormatadorDeSaida` | Não entra nos totais e não interrompe o lote (RN 6) |
-| 9 | Depois do laço: `formatarRelatorio(relatorio)` entra no fim da lista, que volta para o `Main`, e o `Main` imprime cada linha | `ProcessadorDeLote`, `FormatadorDeSaida`, `Main` | A média é arredondada só aqui e vale 0 sem válidas (RN 5 e RN 6). Números em `pt-BR` com 2 casas, num único método (2.2.6) |
+| 9 | Depois do laço: `formatarRelatorio(relatorio)` entra no fim da lista, que volta para o `Main`, e o `Main` imprime cada linha | `ProcessadorDeLote`, `FormatadorDeSaida`, `Relatorio`, `Main` | A média é arredondada só aqui, por `relatorio.getTempoMedio()` com `ResultadoCalculo.arredondar` (2.1.2), e vale 0 sem válidas (RN 5 e RN 6). O `FormatadorDeSaida` não arredonda: só escreve em `pt-BR` com 2 casas, num único método (2.2.6) |
 
 #### Decisão: no lote, a rejeição é um valor, não uma exceção
 
@@ -471,17 +478,24 @@ Resolve, para o lote, a dúvida da 1.7. A parte do `Status` e do `Transporte` co
 - **Decisão:** o `InterpretadorDeLinha` sempre devolve uma `LinhaInterpretada`. A linha inválida leva uma `Rejeicao`
   com o identificador e o motivo, e nenhuma exceção sai do `InterpretadorDeLinha`.
   - **Números:** `Integer.parseInt` e `Double.parseDouble` lançam `NumberFormatException` quando o texto não é um
-    número. Essa é a única exceção do caminho: ela é capturada ali mesmo, campo a campo, e vira `formato invalido`,
-    como no `setValor` da Livraria (`contexto/projeto-exemplo.md`). `NaN` e `Infinity` passam no `parseDouble`, então
-    são barrados à parte, com `Double.isFinite`.
+    número. Essa é a única exceção que o lote encontra: ela é capturada ali mesmo, campo a campo, e vira
+    `formato invalido`, como no `setValor` da Livraria (`contexto/projeto-exemplo.md`). `NaN` e `Infinity` passam no
+    `parseDouble`, então são barrados à parte, com `Double.isFinite`.
   - **Códigos:** a `FabricaDeCodigos` responde `existeModal(codigo)` e `existePerfil(codigo)` antes de criar o objeto.
     É o mesmo "validar antes de criar" de `Posicao.posicaoValida` e `modal.excedeCapacidade` (2.2.2).
+  - **Contrato do `criar*`:** `criarModal` e `criarPerfil` têm como **pré-condição** que `existe*` já devolveu `true`.
+    Se alguém os chamar com um código inexistente, lançam `IllegalArgumentException`. Isso é um erro de programação,
+    não uma linha inválida, e nunca acontece no lote, porque o `InterpretadorDeLinha` sempre pergunta antes. Por isso
+    não contradiz a regra de que nenhuma exceção sai do `InterpretadorDeLinha`: a exceção existe para denunciar um uso
+    errado da fábrica, e não para rejeitar linhas.
 - **Por quê:** o enunciado exige que nenhuma exceção fique sem tratamento e que a linha inválida nunca interrompa o
   lote. Com a rejeição como valor, o lote segue em frente sem `try/catch` no `ProcessadorDeLote`, e o motivo chega
   pronto ao `FormatadorDeSaida`.
 - **Alternativas descartadas:**
   - A fábrica devolver `null` para o código inexistente: quem esquecesse de testar o `null` causaria uma
     `NullPointerException` (erro 13 da Livraria).
+  - Deixar sem definição o que o `criar*` faz com um código inexistente: o erro de quem pulou o `existe*` só
+    apareceria longe dali.
   - O `InterpretadorDeLinha` lançar uma exceção para a linha inválida: já descartado na 1.2 e na 2.2.6, porque a
     rejeição faz parte do fluxo normal do lote.
   - Uma `LinhaInterpretada` polimórfica, com uma subclasse para cada tipo de linha, cada uma se registrando no
@@ -508,13 +522,18 @@ Servem também de base para o plano de testes (T19).
 | Entrada | Resultado | Por quê |
 |---|---|---|
 | `5;AEREO` | `REJEITADA;5;formato invalido` | Campos a menos, mas o 1º campo é inteiro, então sai o ID |
+| `7;RODOVIARIO;10;10;A;B;ECONOMICO;` | `REJEITADA;7;formato invalido` | 8 campos: o `split(";", -1)` mantém o campo vazio do fim |
 | `x;RODOVIARIO;10;10;A;B;ECONOMICO` | `REJEITADA;LINHA<n>;formato invalido` | ID não inteiro |
 | `7;ZZZ;NaN;10;A;B;ECONOMICO` | `REJEITADA;7;formato invalido` | O formato vem antes do código inexistente |
+| `7;RODOVIARIO;Infinity;10;A;B;ECONOMICO` | `REJEITADA;7;formato invalido` | Passa no `parseDouble`, mas não é finito |
+| `7;RODOVIARIO;10,5;10;A;B;ECONOMICO` | `REJEITADA;7;formato invalido` | A entrada usa ponto decimal (RN 10) |
 | `7;rodoviario;10;10;A;B;ECONOMICO` | `REJEITADA;7;codigo inexistente` | Os códigos diferenciam maiúsculas de minúsculas |
 | `7;RODOVIARIO;10;10;   ;B;ECONOMICO` | `REJEITADA;7;rota invalida` | Origem vazia depois do `trim` |
 | `7;RODOVIARIO;0;10;A;B;ECONOMICO` | `REJEITADA;7;peso invalido` | Peso ≤ 0 |
+| `7;RODOVIARIO;10;-1;A;B;ECONOMICO` | `REJEITADA;7;distancia invalida` | Distância < 0 |
 | `7;AQUAVIARIO;2000;0;A;B;ECONOMICO` | `VALIDA;7;267,75;30,00;0,00` | Distância 0 é válida, com sobretaxa (RN 12) |
-| `7;AEREO;5000;10;A;B;ECONOMICO` | `VALIDA;...` | Peso igual à capacidade é válido |
+| `7;AEREO;5000;10;A;B;ECONOMICO` | `VALIDA;7;11191,95;7,52;30,10` | Peso igual à capacidade é válido. Em `double`, o frete dá `11191.949999999999`: o arredondamento escolhido na 2.1.2 precisa chegar a 11191,95 |
+| `7;AEREO;5001;10;A;B;ECONOMICO` | `REJEITADA;7;capacidade excedida` | Acima da capacidade do aéreo |
 | entrada vazia | só `RELATORIO;0,00;0,00;0,00;0;0` | Lista vazia, sem divisão por zero |
 
 #### Eficiência
@@ -526,6 +545,8 @@ tamanho fixo (os códigos conhecidos). Não há varredura aninhada nem ordenaç�
 
 Ganchos para os cenários (T16 e T17), que dizem as classes criadas e alteradas:
 
+- **Novo modal ou perfil (como o ferroviário):** as classes novas e uma entrada nova na lista de códigos da
+  `FabricaDeCodigos`. O resto do fluxo não muda.
 - **Separador `,` na entrada:** muda só o separador do passo 4, no `InterpretadorDeLinha`.
 - **Peso mínimo de 0,5 kg:** uma verificação nova no passo 5, logo depois de `peso invalido`.
 - **Modal vindo de configuração externa:** muda só a `FabricaDeCodigos`. O resto do fluxo recebe um `Modal` e não
