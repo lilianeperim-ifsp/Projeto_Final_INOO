@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: tarefa
-status: pendente
+status: aceito
 ---
 
 ## O que é
@@ -27,3 +27,19 @@ PR #19: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/19
 
 ## Resposta
 
+
+**2026-11-15, Alexandre:** revisei e pedi ajustes no PR #19 (review "changes requested":
+https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/19). Aprovo o `existeModal`/`existePerfil` na 2.2.6,
+com estes pedidos:
+
+1. **Contrato do `criar*`:** chamar `criarModal`/`criarPerfil` só depois de `existe*` devolver `true` é pré-condição.
+   Se ela for violada, eles lançam `IllegalArgumentException` (erro de programação, que nunca acontece no lote). Registrar
+   na 2.2.6 e na decisão da 6.1.
+2. **Mesma lista de códigos** para `existe*` e `criar*`: um modal ou perfil novo é uma entrada nova nessa lista. Acrescentar
+   o gancho "novo modal ou perfil" na lista de cenários da 6.1.
+3. Acrescentar `Encomenda` e `ResultadoCalculo` aos colaboradores do `ProcessadorDeLote`.
+4. No passo 9, nomear `relatorio.getTempoMedio()` como quem arredonda a média.
+5. Preencher `VALIDA;7;11191,95;7,52;30,10` no caso do AEREO com 5000 kg (e, se quiser, os 5 casos a mais sugeridos
+   no review).
+
+Quando você subir os ajustes, eu confiro e aprovo; depois fecho este recado como `concluido`.
