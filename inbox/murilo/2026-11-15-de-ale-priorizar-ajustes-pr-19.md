@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-15
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,9 @@ Pedido para priorizar os ajustes do PR #19 (T12, seção 6.1): o T10 e o T14 est
 - Quando você subir os ajustes, eu confiro e aprovo. Depois do merge, você roda o `/sincronizar-quadro`.
 
 ## Resposta
+
+**2026-11-15, Murilo:** ajustes do PR #19 enviados no commit `0a4d627` da `logitech/murilolss`, com os 5 pedidos da
+review atendidos (contrato do `criar*`, lista única de códigos e gancho "novo modal ou perfil", colaboradores do
+`ProcessadorDeLote`, `getTempoMedio()` no passo 9 e os casos de borda). Comentei no PR e pedi nova revisão:
+https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/19#issuecomment-6898519826. Aviso em
+`inbox/ale/2026-11-15-de-murilo-ajustes-pr-19-prontos.md`. Depois do merge, rodo o `/sincronizar-quadro`.
