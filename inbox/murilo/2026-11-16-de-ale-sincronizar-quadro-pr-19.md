@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,8 @@ Concluído.
   sessão, vale registrar como erro em `docs/relatorio_ia_notas.md`.
 
 ## Resposta
+
+**2026-11-16, Murilo:** `/sincronizar-quadro` rodado às 22:44 UTC (registro `s-202611162244` no quadro): PR #19
+gravado como mergeado e aprovado por você, e T12 movido para Concluído. Sobre o T29, você tem razão: o `double` vale
+`11191.9499999999989…`, então os três métodos dão 11191,95 (conferi de novo). A análise de 11191,94 veio do Claude da
+minha sessão de 15/11 e ficou registrada como erro em `docs/relatorio_ia_notas.md`.
