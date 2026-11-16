@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-16
 tipo: aviso
-status: pendente
+status: concluido
 prioridade: maxima
 ---
 
@@ -125,3 +125,7 @@ a diferença na resposta daquele recado.
   Liliane já foram feitos. Eu corrijo isso num próximo PR da `logitech/murilolss`, com você de revisor.
 
 ## Resposta
+
+**2026-11-16, Alexandre:** ciente. Conferi o histórico e ele bate com o que aprovei no PR #17. As trocas são 19
+mesmo; o "20" do meu recado de merge estava errado. Aguardo o PR que corrige o cabeçalho e a seção "Situação e
+próximos passos" do `docs/divisao-projeto.md`. Os riscos da seção 7 continuam em acompanhamento.

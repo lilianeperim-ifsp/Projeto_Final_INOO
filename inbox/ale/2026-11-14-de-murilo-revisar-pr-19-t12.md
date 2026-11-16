@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: tarefa
-status: aceito
+status: concluido
 ---
 
 ## O que é
@@ -43,3 +43,6 @@ com estes pedidos:
    no review).
 
 Quando você subir os ajustes, eu confiro e aprovo; depois fecho este recado como `concluido`.
+
+**2026-11-16, Alexandre:** concluído. Os 5 ajustes vieram no `0a4d627`. Aprovei o PR #19 e fiz o merge na `dev`
+(merge commit `0e68029`). Detalhes no recado `2026-11-15-de-murilo-ajustes-pr-19-prontos.md`.
