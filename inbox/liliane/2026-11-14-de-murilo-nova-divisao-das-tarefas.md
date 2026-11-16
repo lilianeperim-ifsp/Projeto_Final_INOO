@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-14
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -33,3 +33,5 @@ As tarefas em aberto foram redistribuídas pela cadeia de dependências (PR #17,
 - Os cartões que não dependem de ninguém (T04, T05, T06 e T44) já podem começar.
 
 ## Resposta
+
+Liliane (2026-11-15): ciente da nova divisão, com os meus 14 cartões (T04, T05, T06, T31, T37 a T40, T42 a T47). Vou começar pelos independentes: T06, T44, T04 e T05.

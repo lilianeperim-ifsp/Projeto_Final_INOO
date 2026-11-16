@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-10
 tipo: aviso
-status: pendente
+status: descartado
 ---
 
 ## O que é
@@ -28,3 +28,5 @@ Arquivo: `docs/Documento_de_Projeto.md`, seção 1.
 As outras duas dúvidas (objeto de aviso e operação rejeitada) foram para o Alexandre em `inbox/ale/`.
 
 ## Resposta
+
+Liliane (2026-11-15): descartado, como o Murilo pediu em `2026-11-14-de-murilo-nova-divisao-das-tarefas.md`. O T08 passou para o Alexandre, junto com as duas dúvidas (sobretaxa e arredondamento).
