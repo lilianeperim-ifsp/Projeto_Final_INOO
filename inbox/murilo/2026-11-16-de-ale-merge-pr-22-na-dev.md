@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -22,3 +22,6 @@ Aprovei e mesclei o PR #22 (divisão da Etapa 1 em partes iguais e ajustes da se
   mudam.
 
 ## Resposta
+
+2026-11-17 (Murilo): o quadro já mostra o PR #22 como mergeado. A sincronização manual de 17/11 às 10:07
+(`s-202611171307`) conferiu os 23 PRs e não achou diferença. A data da divisão foi corrigida no PR #23.

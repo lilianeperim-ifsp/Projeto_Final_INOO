@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,6 @@ Mesclei o PR #21 (T08: `arredondar` público e `getNome()` usado nos testes, se�
 - O #22 já pode entrar, porque a 2.2.3 nova está na `dev`. Ainda falta eu revisar o #22 de novo.
 
 ## Resposta
+
+2026-11-17 (Murilo): o quadro já mostra o PR #21 como mergeado. A sincronização manual de 17/11 às 10:07
+(`s-202611171307`) conferiu os 23 PRs e não achou diferença.
