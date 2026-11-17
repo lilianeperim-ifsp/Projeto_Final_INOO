@@ -3,7 +3,7 @@ para: liliane
 de: ale
 data: 2026-11-11
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -19,3 +19,5 @@ O PR 16 (dev → main) foi mergeado hoje, 11/11, às 12:59. A `main` agora tem o
 - Para atualizar sua branch: `/atualizar-branch` (ou `git pull origin dev`).
 
 ## Resposta
+
+Liliane (2026-11-15): ciente. Branch `logitech/lilianeperim-ifsp` atualizada com a `dev` hoje.
