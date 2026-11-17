@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,7 @@ PR #23: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/23
   `2026-11-16-de-ale-merge-pr-21-na-dev.md` e `2026-11-16-de-ale-merge-pr-22-na-dev.md`).
 
 ## Resposta
+
+2026-11-17 (Murilo): o quadro já mostra o PR #23 como mergeado. A sincronização manual de 17/11 às 10:07
+(`s-202611171307`) conferiu os 23 PRs e não achou diferença. A nota da linha 69 do `docs/relatorio_ia_notas.md`
+foi completada com a correção do PR #23.

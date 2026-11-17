@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,6 @@ PR #21: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/21
   o T21) e, na 8.5, que o teste confere o status pelo `getNome()`.
 
 ## Resposta
+
+2026-11-17 (Murilo): o quadro já mostra o PR #21 como mergeado. A sincronização manual de 17/11 às 10:07
+(`s-202611171307`) conferiu os 23 PRs e não achou diferença.

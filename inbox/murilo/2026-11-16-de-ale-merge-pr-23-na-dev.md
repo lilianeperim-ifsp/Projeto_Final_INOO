@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,7 @@ também os merges do #21 e do #22.
   ainda diz "Ainda não corrigido". A correção entrou no PR #23. Os nomes dos recados com 17/11 continuam como estão.
 
 ## Resposta
+
+2026-11-17 (Murilo): o quadro já mostra o PR #23 como mergeado. A sincronização manual de 17/11 às 10:07
+(`s-202611171307`) conferiu os 23 PRs e não achou diferença. A nota da linha 69 do `docs/relatorio_ia_notas.md`
+foi completada com a correção do PR #23.
