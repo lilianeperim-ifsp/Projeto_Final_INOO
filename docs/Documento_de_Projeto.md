@@ -568,7 +568,7 @@ vazia e entradas inválidas.
 
 | Nível | O que testa | Como roda | Cartão |
 |---|---|---|---|
-| Unidade | Cada classe do catálogo (seção 2.2), sozinha ou com poucos colaboradores | JUnit 5, uma classe `...Test` por classe testada, no pacote `testes` | T21 configura; cada cartão de código traz os seus testes |
+| Unidade | Cada classe do catálogo (seção 2.2), sozinha ou com poucos colaboradores | JUnit 5, uma classe `...Test` por classe testada, no pacote `testes` (pasta `LogiTech/test/testes`) | T21 configura; cada cartão de código traz os seus testes |
 | Lote | O programa inteiro, como a banca vai rodar | `java Main < entrada.txt`, com a saída comparada com um arquivo `saida_esperada.txt` (`fc` no Windows, `diff` no Linux) | T41 |
 
 O nível do lote é o "checkpoint" das aulas 11 e 12 ("rode o teste e compare com a saída esperada"), mas com a
@@ -592,6 +592,10 @@ comparação feita por um comando, e não pelo olho.
 - Os testes ficam no pacote `testes`, separado do código (aula 6). Assim eles só usam o que é `public`, como qualquer
   outro cliente das classes. As etapas `protected` do `Modal` e do `PerfilPorMultiplicadores` são testadas pelos
   métodos públicos que as chamam.
+- **O pacote `testes` fica numa pasta separada do código:** `LogiTech/test/testes`, marcada no IntelliJ como pasta de
+  testes, enquanto o código fica em `LogiTech/src`. Assim o `src` compila sozinho, sem o JAR do JUnit, e é só ele que
+  o `COMO_EXECUTAR.md` manda compilar para rodar `java Main < entrada.txt`. Alternativa descartada: os testes em
+  `LogiTech/src/testes`, em que um `javac` de todo o `src` falharia sem o JUnit.
 - **Testes de regressão:** num cenário de evolução, inclusive o da defesa ao vivo, todos os testes que já existem
   continuam passando. Isso prova que a mudança só criou classes, sem reescrever a lógica que já existia (ET 3.2).
 
@@ -690,6 +694,8 @@ abaixo, `<n>` é o número da linha física.
 | `7;RODOVIARIO;10;Infinity;A;B;ECONOMICO` e `-Infinity` | `REJEITADA;7;formato invalido` | Não é finito, mesmo sendo negativo |
 | `7;RODOVIARIO;10,5;10;A;B;ECONOMICO` | `REJEITADA;7;formato invalido` | A entrada usa ponto decimal (RN 10) |
 | `7;RODOVIARIO;1e3;10;A;B;ECONOMICO` | `VALIDA;7;...` (peso 1000) | O `parseDouble` aceita notação científica, e a RN 10 manda usá-lo |
+| `7;RODOVIARIO;10d;10f;A;B;ECONOMICO` | `VALIDA;7;...` (peso 10 e distância 10) | O `parseDouble` aceita os sufixos `d` e `f` do Java, pelo mesmo motivo do `1e3` |
+| `7;RODOVIARIO;0x1p3;10;A;B;ECONOMICO` | `VALIDA;7;...` (peso 8) | O `parseDouble` aceita a notação hexadecimal: `0x1p3` é 1 × 2³ |
 | `  7 ; RODOVIARIO ; 10 ; 10 ; A ; B ; ECONOMICO ` | `VALIDA;7;...` | O `trim` de cada campo tira os espaços das pontas |
 
 **Bordas de valor:**
@@ -749,6 +755,9 @@ Classes: `Transporte`, `Status` e filhas, e `Posicao`. Testes: `TransporteTest`,
 | `entregar()` em `AGUARDANDO` | Rejeitada (pula uma etapa) |
 | `iniciarTransito()` em `EM_TRANSITO` | Rejeitada (repete o status atual) |
 | `iniciarTransito()` ou `entregar()` em `ENTREGUE` | Rejeitadas (voltar ou repetir) |
+
+O teste confere em que status o transporte está pelo `getNome()` do `Status` (2.2.3), comparando o texto devolvido
+com o nome esperado. Assim o teste não usa `instanceof`, e o `Status` não ganha um método que só o teste chamaria.
 
 Em toda rejeição, o teste confere três coisas: quem pediu fica sabendo, o status continua o mesmo e nenhum
 interessado recebe aviso. Não há operação para voltar de `EM_TRANSITO` para `AGUARDANDO`: o desenho de `Status`
