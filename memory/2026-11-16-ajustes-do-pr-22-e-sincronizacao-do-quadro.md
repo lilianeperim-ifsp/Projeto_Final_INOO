@@ -22,13 +22,12 @@ Depois o Murilo rodou o `/sincronizar-quadro` (entrada `s-202611170105`): o PR #
 
 ## Pendências
 - **Alexandre:** revisar de novo o PR #22 e dizer se prefere só o `T08` na linha "Já concluídos". A aprovação dele continua valendo como resposta ao recado da divisão da Etapa 1.
-- **Liliane:** revisar o PR #21, que já tem a aprovação do Murilo.
-- **Merge:** o #21 entra antes do #22, ou junto.
-- **Murilo:** rodar o `/sincronizar-quadro` depois do merge do #21 e do #22. O recado `inbox/murilo/2026-11-16-de-ale-sincronizar-quadro-pr-21.md` continua pendente até a sincronização depois do merge.
+- **PR #21 mergeado na `dev`** em 16/11 às 22h08 (horário de Brasília), poucos minutos depois da sincronização desta sessão. A condição de ordem de merge do #22 está cumprida. O quadro ainda mostra o #21 como aberto.
+- **Murilo:** rodar de novo o `/sincronizar-quadro`, para o merge do #21 aparecer no quadro, e outra vez depois do merge do #22. O recado `inbox/murilo/2026-11-16-de-ale-sincronizar-quadro-pr-21.md` continua pendente até essa sincronização.
 - **Grupo:** decidir se a data "2026-11-17" do ajuste é corrigida para 2026-11-16 em `docs/divisao-projeto.md`. Os nomes dos recados não mudam, porque recado não é renomeado.
 - `docs/Documento_de_Projeto.pdf` continua fora do git.
 
 ## Próximos passos
-- Depois da aprovação do Alexandre e do merge do #21, mergear o #22 e sincronizar o quadro.
+- Sincronizar o quadro (merge do #21). Depois da aprovação do Alexandre, mergear o #22 e sincronizar de novo.
 - Seguir com os cartões do Murilo na Etapa 1: T13 (fluxo da troca de perfil), T17 (cenários 9 a 12, que depende do T16 da Liliane) e T20 (revisão cruzada, que depende do T18 dela).
 - No T21, criar a pasta `LogiTech/test` como pasta de testes, com o JUnit ligado só a ela.
