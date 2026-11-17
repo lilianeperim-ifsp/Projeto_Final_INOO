@@ -1,9 +1,9 @@
 # Divisão do projeto entre os 3 (T01)
 
-**Status:** redistribuída em 2026-11-14. A proposta está em `inbox/ale/2026-11-14-de-murilo-redistribuicao-das-tarefas.md`
-e aguarda a aprovação do Alexandre neste PR. A divisão original (2026-11-10, PR #14) está resumida em
-"Histórico", no fim deste arquivo.
-**Autor:** Murilo, com o Claude. **Data:** 2026-11-10, revisada em 2026-11-14.
+**Status:** redistribuída em 2026-11-14 (PR #17) e ajustada em 2026-11-17, quando os cartões da Etapa 1 em
+"A fazer" foram divididos em partes iguais (ver "Ajuste de 2026-11-17"). A divisão original (2026-11-10, PR #14)
+está resumida em "Histórico", no fim deste arquivo.
+**Autor:** Murilo, com o Claude. **Data:** 2026-11-10, revisada em 2026-11-14 e em 2026-11-17.
 
 ## O que foi dividido
 
@@ -12,7 +12,8 @@ Os **43 cartões em aberto** do quadro: de T04 a T47, sem o T07. Ficaram de fora
 - **T01** (esta divisão), **T02** (formato do Documento de Projeto), **T03** (aviso da regra dos 5 minutos) e
   **T07** (análise do problema), todos do Murilo.
 
-Resultado: **Murilo 14, Alexandre 15, Liliane 14.**
+Resultado em 2026-11-14: **Murilo 14, Alexandre 15, Liliane 14.** Depois do ajuste de 2026-11-17: **Murilo 14,
+Alexandre 12, Liliane 17.**
 
 ## Critério: quem trava a cadeia são o Murilo e o Alexandre
 
@@ -23,8 +24,12 @@ Quase todo cartão está numa cadeia de dependências (campo `dependeDe` do quad
 - **Liliane** fica com os cartões **independentes** e com os do **fim da cadeia**, que dependem do trabalho do Murilo e do
   Alexandre e só travam outros cartões dela.
 
-Na prática, **nenhum cartão do Murilo ou do Alexandre depende de um cartão da Liliane**. Os pré-requisitos dos
-cartões dela são do Murilo, do Alexandre ou dela mesma (T37 a T40 → T45 → T46, e T42, T43 e T44 → T47).
+Na divisão de 2026-11-14, **nenhum cartão do Murilo ou do Alexandre dependia de um cartão da Liliane**. Os
+pré-requisitos dos cartões dela são do Murilo, do Alexandre ou dela mesma (T37 a T40 → T45 → T46, e T42, T43 e T44 →
+T47).
+
+**Exceção desde 2026-11-17, só na Etapa 1:** o T16 da Liliane trava o T17 do Murilo, e o T18 dela trava o T20 do
+Murilo. Na Etapa 2 o critério continua valendo.
 
 ## Cartões de cada um
 
@@ -47,18 +52,15 @@ cartões dela são do Murilo, do Alexandre ou dela mesma (T37 a T40 → T45 → 
 | T35 | Tratar linha inválida sem interromper o lote | 2 | Implementação |
 | T41 | Simular o stress test com java Main < entrada.txt | 2 | Testes |
 
-### Alexandre (15)
+### Alexandre (12)
 
 | Cartão | Título | Etapa | Área |
 |---|---|---|---|
 | T08 | Catálogo de classes e interfaces | 1 | Documento |
-| T09 | Diagrama de classes UML | 1 | Documento |
 | T10 | Estratégia de resolução dos pontos de variação | 1 | Documento |
 | T11 | Padrões escolhidos e descartados | 1 | Documento |
 | T14 | Fluxo: mudança de status e avisos | 1 | Documento |
 | T15 | Cenários de evolução 1 a 4 | 1 | Documento |
-| T16 | Cenários de evolução 5 a 8 | 1 | Documento |
-| T18 | Conferir se cada cenário cabe em 5 minutos | 1 | Documento |
 | T25 | Modais rodoviário, aéreo e aquaviário | 2 | Implementação |
 | T26 | Valores base de frete, tempo e CO₂ | 2 | Implementação |
 | T27 | Sobretaxa de carga pesada em um único ponto | 2 | Implementação |
@@ -67,13 +69,16 @@ cartões dela são do Murilo, do Alexandre ou dela mesma (T37 a T40 → T45 → 
 | T32 | Avisos automáticos aos interessados | 2 | Implementação |
 | T36 | Encapsulamento: atributos private e getters seguros | 2 | Implementação |
 
-### Liliane (14)
+### Liliane (17)
 
 | Cartão | Título | Etapa | Área | Depende de |
 |---|---|---|---|---|
 | T04 | Atualizar a branch e ler o projeto de exemplo | 1 | Organização | — |
 | T05 | Conferir se o diagrama Mermaid do exemplo renderiza | 1 | Organização | — |
 | T06 | Confirmar com o professor o que as aulas 8 e 9 permitem | 1 | Organização | — |
+| T09 | Diagrama de classes UML | 1 | Documento | T08 (Alexandre, concluído) |
+| T16 | Cenários de evolução 5 a 8 | 1 | Documento | T15 (Alexandre) |
+| T18 | Conferir se cada cenário cabe em 5 minutos | 1 | Documento | T15 (Alexandre), T16 (Liliane), T17 (Murilo) |
 | T31 | Rastreamento do transporte | 2 | Implementação | T30 (Alexandre) |
 | T37 | Testes dos cálculos com o gabarito | 2 | Testes | T26, T27, T28 (Alexandre), T29 (Murilo) |
 | T38 | Testes de borda da validação | 2 | Testes | T24, T35 (Murilo) |
@@ -99,12 +104,42 @@ cartões dela são do Murilo, do Alexandre ou dela mesma (T37 a T40 → T45 → 
 Continuam com o dono anterior: T12, T17, T19, T21 a T24, T33 a T35 e T41 (Murilo); T09, T11, T14, T16, T18, T30, T32
 e T36 (Alexandre); T04, T05, T37, T39 e T42 (Liliane).
 
+## Ajuste de 2026-11-17: Etapa 1 em partes iguais
+
+O Murilo pediu que os cartões da Etapa 1 em "A fazer" fossem divididos em partes iguais. Eram 10, e a divisão
+estava em Alexandre 6, Murilo 3 e Liliane 1, com o T10 do Alexandre em andamento.
+
+| Integrante | Cartões "A fazer" da Etapa 1 |
+|---|---|
+| Alexandre (3, mais o T10 em andamento) | T11, T14, T15 |
+| Murilo (3) | T13, T17, T20 |
+| Liliane (4) | T06, T09, T16, T18 |
+
+Trocas de dono (todas do Alexandre para a Liliane):
+
+| Cartão | Por quê |
+|---|---|
+| T09 | Só dependia do T08, já concluído, e pode começar na hora. O diagrama dá à Liliane uma visão do modelo inteiro para a defesa |
+| T16 | Os cenários de evolução ficam um bloco para cada um: 1 a 4 com o Alexandre, 5 a 8 com a Liliane e 9 a 12 com o Murilo |
+| T18 | Combina com o T45 (ensaiar os cenários ao vivo), que já é dela |
+
+Ficam com o Alexandre o T11 e o T15, que vêm em sequência depois do T10, e o T14, que já tem com ele a decisão
+pendente da operação rejeitada (`inbox/ale/2026-11-14-de-murilo-operacao-rejeitada-no-t14.md`). A Liliane fica com 4
+porque o T06 é pequeno, e o ajuste reduz o risco de ela chegar à defesa sem ter escrito o documento da Etapa 1.
+
+- **Alternativa descartada:** o T18 com o Murilo, que faz o T17 e o T20 em seguida (Alexandre 3, Murilo 4, Liliane 3).
+  A Liliane travaria só o T17, mas ficaria com menos documento da Etapa 1.
+- **Consequência:** o critério de 2026-11-14 deixa de valer na Etapa 1 (ver "Critério"). No total do projeto, a
+  Liliane passa a ter mais cartões (17) que o Murilo (14) e o Alexandre (12). A Etapa 2 não foi redistribuída.
+
 ## Distribuição
+
+Contagem depois do ajuste de 2026-11-17 (a de 2026-11-14 entre parênteses, quando mudou).
 
 | Medida | Murilo | Liliane | Alexandre |
 |---|---|---|---|
-| Cartões em aberto | 14 | 14 | 15 |
-| Etapa 1 (documento, sem código) | 5 | 3 | 8 |
+| Cartões da divisão | 14 | 17 (14) | 12 (15) |
+| Etapa 1 (documento, sem código) | 5 | 6 (3) | 5 (8) |
 | Etapa 2 (código, testes, entrega, defesa) | 9 | 11 | 7 |
 | Cartões de código (Implementação) | 8 | 1 | 7 |
 | Cartões de testes | 1 | 4 | 0 |
@@ -113,11 +148,13 @@ e T36 (Alexandre); T04, T05, T37, T39 e T42 (Liliane).
 
 Pontos de atenção:
 
-- **A Liliane tem só um cartão de código de produção (T31)** e nenhum documento da Etapa 1. Na defesa individual ela
-  precisa alterar o código ao vivo. Os testes (T37 a T40), o T43 ("Do projeto ao código") e o ensaio (T45) dão
-  a ela contato com o código de todos, e a regra "todos precisam entender tudo" continua valendo.
-- **O Alexandre concentra a Etapa 1** (8 cartões até 27/11). Em troca, ele sai dos cartões finais (T43 a T46), que
-  antes acumulavam a carga dele em 04/12, somada à revisão de todos os PRs.
+- **A Liliane tem só um cartão de código de produção (T31).** Na defesa individual ela precisa alterar o código ao
+  vivo. Os testes (T37 a T40), o T43 ("Do projeto ao código") e o ensaio (T45) dão a ela contato com o código de
+  todos, e a regra "todos precisam entender tudo" continua valendo. Desde 2026-11-17 ela também escreve partes do
+  documento da Etapa 1 (T09 e T16).
+- **O Alexandre concentrava a Etapa 1** (8 cartões até 27/11). O ajuste de 2026-11-17 passou 3 deles para a
+  Liliane. Ele também saiu dos cartões finais (T43 a T46), que antes acumulavam a carga dele em 04/12, somada à
+  revisão de todos os PRs.
 - **T35:** continua com o Murilo, como o Alexandre decidiu na revisão do PR #14. Tratar linha inválida faz parte
   da camada de entrada e validação.
 - **T08:** as duas dúvidas do recado `inbox/liliane/2026-11-10-de-murilo-t07-pronto-para-o-t08.md` (onde ficam a
@@ -160,11 +197,14 @@ os três fizeram:
   cartões para cada um: Liliane com o cálculo (modais, perfis, sobretaxa, arredondamento), Alexandre com a vida do
   transporte (status, rastreamento, avisos) e Murilo com a entrada, a validação, o relatório e a saída. Naquela
   divisão, a alternativa descartada foi a divisão por tipo de trabalho (um escreve, um programa, um testa).
-- **2026-11-14:** redistribuição pelo critério da cadeia de dependências, descrito acima.
+- **2026-11-14 (PR #17):** redistribuição pelo critério da cadeia de dependências, descrito acima.
+- **2026-11-17:** os 10 cartões da Etapa 1 em "A fazer" divididos em partes iguais. T09, T16 e T18 passam do
+  Alexandre para a Liliane (ver "Ajuste de 2026-11-17").
 
 ## Situação e próximos passos
 
-1. **Feito:** proposta enviada ao Alexandre em `inbox/ale/2026-11-14-de-murilo-redistribuicao-das-tarefas.md`.
-2. Falta a aprovação do Alexandre no PR que leva este arquivo para a `dev`.
-3. Depois da aprovação, o Murilo atualiza o responsável de cada cartão no quadro e avisa a Liliane na inbox.
+1. **Feito:** a divisão de 2026-11-14 foi aprovada no PR #17 e gravada no quadro.
+2. **Feito (2026-11-17):** o quadro já mostra a Liliane como responsável pelo T09, pelo T16 e pelo T18. O Alexandre e
+   a Liliane receberam recados na inbox.
+3. Falta a aprovação do Alexandre no PR que leva este ajuste para a `dev`.
 4. Qualquer troca de dono daqui em diante é combinada na inbox e anotada neste arquivo.
