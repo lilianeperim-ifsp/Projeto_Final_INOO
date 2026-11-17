@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-17
 tipo: decisao
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -34,3 +34,7 @@ O ajuste está registrado em `docs/divisao-projeto.md`, seção "Ajuste de 2026-
 com você de revisor. A aprovação do PR vale como resposta a este recado. Se preferir outra troca, me diga aqui ou no PR.
 
 ## Resposta
+
+Aceito a nova divisão (Alexandre, 16/11). Aprovei e mesclei o PR #22 na `dev` (merge commit `0953609`). Fico com o
+T10, o T11, o T14 e o T15 na Etapa 1. A data "2026-11-17" do `docs/divisao-projeto.md` eu corrijo para 2026-11-16
+num PR meu.

@@ -1,9 +1,9 @@
 # Divisão do projeto entre os 3 (T01)
 
-**Status:** redistribuída em 2026-11-14 (PR #17) e ajustada em 2026-11-17, quando os cartões da Etapa 1 em
-"A fazer" foram divididos em partes iguais (ver "Ajuste de 2026-11-17"). A divisão original (2026-11-10, PR #14)
+**Status:** redistribuída em 2026-11-14 (PR #17) e ajustada em 2026-11-16, quando os cartões da Etapa 1 em
+"A fazer" foram divididos em partes iguais (ver "Ajuste de 2026-11-16"). A divisão original (2026-11-10, PR #14)
 está resumida em "Histórico", no fim deste arquivo.
-**Autor:** Murilo, com o Claude. **Data:** 2026-11-10, revisada em 2026-11-14 e em 2026-11-17.
+**Autor:** Murilo, com o Claude. **Data:** 2026-11-10, revisada em 2026-11-14 e em 2026-11-16.
 
 ## O que foi dividido
 
@@ -12,7 +12,7 @@ Os **43 cartões em aberto** do quadro: de T04 a T47, sem o T07. Ficaram de fora
 - **T01** (esta divisão), **T02** (formato do Documento de Projeto), **T03** (aviso da regra dos 5 minutos) e
   **T07** (análise do problema), todos do Murilo.
 
-Resultado em 2026-11-14: **Murilo 14, Alexandre 15, Liliane 14.** Depois do ajuste de 2026-11-17: **Murilo 14,
+Resultado em 2026-11-14: **Murilo 14, Alexandre 15, Liliane 14.** Depois do ajuste de 2026-11-16: **Murilo 14,
 Alexandre 12, Liliane 17.**
 
 ## Critério: quem trava a cadeia são o Murilo e o Alexandre
@@ -28,7 +28,7 @@ Na divisão de 2026-11-14, **nenhum cartão do Murilo ou do Alexandre dependia d
 pré-requisitos dos cartões dela são do Murilo, do Alexandre ou dela mesma (T37 a T40 → T45 → T46, e T42, T43 e T44 →
 T47).
 
-**Exceção desde 2026-11-17, só na Etapa 1:** o T16 da Liliane trava o T17 do Murilo, e o T18 dela trava o T20 do
+**Exceção desde 2026-11-16, só na Etapa 1:** o T16 da Liliane trava o T17 do Murilo, e o T18 dela trava o T20 do
 Murilo. Na Etapa 2 o critério continua valendo.
 
 ## Cartões de cada um
@@ -95,7 +95,7 @@ Murilo. Na Etapa 2 o critério continua valendo.
 
 | De → Para | Cartões | Por quê |
 |---|---|---|
-| Liliane → Alexandre | T08, T10, T15 | Cada um vinha logo antes de um cartão do Alexandre (T09, T11, T16). O T09 e o T16 passaram para a Liliane em 2026-11-17 |
+| Liliane → Alexandre | T08, T10, T15 | Cada um vinha logo antes de um cartão do Alexandre (T09, T11, T16). O T09 e o T16 passaram para a Liliane em 2026-11-16 |
 | Liliane → Alexandre | T25, T26, T27, T28 | Núcleo do cálculo, que trava o T33 e os testes |
 | Liliane → Murilo | T13, T20, T29 | O T13 vem depois do T12, o T20 é a revisão cruzada da Etapa 1, e o T29 está ligado à saída do T34 |
 | Alexandre → Liliane | T06, T31, T40, T43, T44, T45, T46 | Independentes ou no fim da cadeia |
@@ -104,10 +104,14 @@ Murilo. Na Etapa 2 o critério continua valendo.
 Continuam com o dono anterior: T12, T17, T19, T21 a T24, T33 a T35 e T41 (Murilo); T09, T11, T14, T16, T18, T30, T32
 e T36 (Alexandre); T04, T05, T37, T39 e T42 (Liliane).
 
-**Nota (2026-11-17):** esta seção registra a divisão de 2026-11-14. O T09, o T16 e o T18, que aparecem aqui como
-cartões do Alexandre, passaram para a Liliane em 2026-11-17 (ver "Ajuste de 2026-11-17").
+**Nota (2026-11-16):** esta seção registra a divisão de 2026-11-14. O T09, o T16 e o T18, que aparecem aqui como
+cartões do Alexandre, passaram para a Liliane em 2026-11-16 (ver "Ajuste de 2026-11-16").
 
-## Ajuste de 2026-11-17: Etapa 1 em partes iguais
+## Ajuste de 2026-11-16: Etapa 1 em partes iguais
+
+> Até o PR que corrigiu a data, esta seção se chamava "Ajuste de 2026-11-17". O ajuste foi feito em 2026-11-16; a
+> data 17/11 era a de UTC. Os recados `inbox/ale/2026-11-17-de-murilo-etapa-1-em-partes-iguais.md` e
+> `inbox/liliane/2026-11-17-de-murilo-novos-cartoes-da-etapa-1.md` mantêm o nome e citam esta seção pelo título antigo.
 
 O Murilo pediu que os cartões da Etapa 1 em "A fazer" fossem divididos em partes iguais. Eram 10, e a divisão
 estava em Alexandre 6, Murilo 3 e Liliane 1, com o T10 do Alexandre em andamento.
@@ -137,7 +141,7 @@ porque o T06 é pequeno, e o ajuste reduz o risco de ela chegar à defesa sem te
 
 ## Distribuição
 
-Contagem depois do ajuste de 2026-11-17 (a de 2026-11-14 entre parênteses, quando mudou).
+Contagem depois do ajuste de 2026-11-16 (a de 2026-11-14 entre parênteses, quando mudou).
 
 | Medida | Murilo | Liliane | Alexandre |
 |---|---|---|---|
@@ -153,9 +157,9 @@ Pontos de atenção:
 
 - **A Liliane tem só um cartão de código de produção (T31).** Na defesa individual ela precisa alterar o código ao
   vivo. Os testes (T37 a T40), o T43 ("Do projeto ao código") e o ensaio (T45) dão a ela contato com o código de
-  todos, e a regra "todos precisam entender tudo" continua valendo. Desde 2026-11-17 ela também escreve partes do
+  todos, e a regra "todos precisam entender tudo" continua valendo. Desde 2026-11-16 ela também escreve partes do
   documento da Etapa 1 (T09 e T16).
-- **O Alexandre concentrava a Etapa 1** (8 cartões até 27/11). O ajuste de 2026-11-17 passou 3 deles para a
+- **O Alexandre concentrava a Etapa 1** (8 cartões até 27/11). O ajuste de 2026-11-16 passou 3 deles para a
   Liliane. Ele também saiu dos cartões finais (T43 a T46), que antes acumulavam a carga dele em 04/12, somada à
   revisão de todos os PRs.
 - **T35:** continua com o Murilo, como o Alexandre decidiu na revisão do PR #14. Tratar linha inválida faz parte
@@ -201,13 +205,13 @@ os três fizeram:
   transporte (status, rastreamento, avisos) e Murilo com a entrada, a validação, o relatório e a saída. Naquela
   divisão, a alternativa descartada foi a divisão por tipo de trabalho (um escreve, um programa, um testa).
 - **2026-11-14 (PR #17):** redistribuição pelo critério da cadeia de dependências, descrito acima.
-- **2026-11-17:** os 10 cartões da Etapa 1 em "A fazer" divididos em partes iguais. T09, T16 e T18 passam do
-  Alexandre para a Liliane (ver "Ajuste de 2026-11-17").
+- **2026-11-16:** os 10 cartões da Etapa 1 em "A fazer" divididos em partes iguais. T09, T16 e T18 passam do
+  Alexandre para a Liliane (ver "Ajuste de 2026-11-16").
 
 ## Situação e próximos passos
 
 1. **Feito:** a divisão de 2026-11-14 foi aprovada no PR #17 e gravada no quadro.
-2. **Feito (2026-11-17):** o quadro já mostra a Liliane como responsável pelo T09, pelo T16 e pelo T18. O Alexandre e
+2. **Feito (2026-11-16):** o quadro já mostra a Liliane como responsável pelo T09, pelo T16 e pelo T18. O Alexandre e
    a Liliane receberam recados na inbox.
 3. Falta a aprovação do Alexandre no PR que leva este ajuste para a `dev`.
 4. Qualquer troca de dono daqui em diante é combinada na inbox e anotada neste arquivo.
