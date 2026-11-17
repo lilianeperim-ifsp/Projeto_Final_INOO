@@ -95,7 +95,7 @@ Murilo. Na Etapa 2 o critério continua valendo.
 
 | De → Para | Cartões | Por quê |
 |---|---|---|
-| Liliane → Alexandre | T08, T10, T15 | Cada um vem logo antes de um cartão do Alexandre (T09, T11, T16) |
+| Liliane → Alexandre | T08, T10, T15 | Cada um vinha logo antes de um cartão do Alexandre (T09, T11, T16). O T09 e o T16 passaram para a Liliane em 2026-11-17 |
 | Liliane → Alexandre | T25, T26, T27, T28 | Núcleo do cálculo, que trava o T33 e os testes |
 | Liliane → Murilo | T13, T20, T29 | O T13 vem depois do T12, o T20 é a revisão cruzada da Etapa 1, e o T29 está ligado à saída do T34 |
 | Alexandre → Liliane | T06, T31, T40, T43, T44, T45, T46 | Independentes ou no fim da cadeia |
@@ -103,6 +103,9 @@ Murilo. Na Etapa 2 o critério continua valendo.
 
 Continuam com o dono anterior: T12, T17, T19, T21 a T24, T33 a T35 e T41 (Murilo); T09, T11, T14, T16, T18, T30, T32
 e T36 (Alexandre); T04, T05, T37, T39 e T42 (Liliane).
+
+**Nota (2026-11-17):** esta seção registra a divisão de 2026-11-14. O T09, o T16 e o T18, que aparecem aqui como
+cartões do Alexandre, passaram para a Liliane em 2026-11-17 (ver "Ajuste de 2026-11-17").
 
 ## Ajuste de 2026-11-17: Etapa 1 em partes iguais
 
@@ -144,7 +147,7 @@ Contagem depois do ajuste de 2026-11-17 (a de 2026-11-14 entre parênteses, quan
 | Cartões de código (Implementação) | 8 | 1 | 7 |
 | Cartões de testes | 1 | 4 | 0 |
 | Cartões de entrega e defesa (Etapa 2) | 0 | 6 | 0 |
-| Já concluídos | T01, T02, T03, T07 | nenhum | nenhum |
+| Já concluídos | T01, T02, T03, T07, T12, T19 | T04, T05 | T08 |
 
 Pontos de atenção:
 
