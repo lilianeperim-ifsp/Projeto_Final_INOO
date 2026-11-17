@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -26,3 +26,16 @@ PR #22: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/22 (os deta
    `src`. No T21, criar a pasta `LogiTech/test` e marcá-la como pasta de testes, com o JUnit ligado só a ela.
 
 ## Resposta
+
+Murilo, 2026-11-16: ajustes feitos no commit `d842d8a` (`logitech/murilolss`), já no PR #22, com a revisão pedida de
+novo.
+
+1. **"Já concluídos":** `T08` para o Alexandre. Fui além do pedido na mesma linha: ela também estava desatualizada
+   para os outros dois, então conferi a coluna "Concluído" do quadro e ficou `T01, T02, T03, T07, T12, T19` (Murilo),
+   `T04, T05` (Liliane) e `T08` (Alexandre). Se preferir só o T08, me avise.
+2. **Ordem de merge:** a descrição do PR #22 ganhou a seção "Ordem de merge: o PR #21 entra antes deste, ou junto". O
+   texto do documento não mudou.
+3. **Trocas de 2026-11-14:** a linha "Liliane → Alexandre | T08, T10, T15" diz que o T09 e o T16 passaram para a
+   Liliane, e uma nota abaixo da tabela cobre também o T18, que aparece em "Continuam com o dono anterior".
+4. **T21:** registrado. Ao configurar o projeto, crio `LogiTech/test`, marco como pasta de testes no
+   `LogiTech/LogiTech.iml` e ligo o JUnit só a ela.
