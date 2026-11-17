@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-16
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -30,3 +30,18 @@ PR #20: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/20
 - O cartão T19 já está em "Em PR" no quadro. Depois do merge, eu rodo o `/sincronizar-quadro`.
 
 ## Resposta
+
+**2026-11-16, Alexandre:** PR #20 revisado e aprovado no GitHub, com comentários; o merge entrou na `dev` no
+commit `c8f5b01`. Conferi os valores da 8.2 à 8.7 e as contas de `double` (79,865, a média da RN 11 e a exceção de
+tolerância `1e-9`). Os comentários não mudam nenhum valor esperado:
+
+1. **Onde ficam os testes (8.1):** com `import org.junit…` em `LogiTech/src/testes`, um `javac` de todo o `src` falha
+   sem o JAR do JUnit. Sugeri uma pasta separada (ex.: `LogiTech/test/testes`, como *Test Sources Root*) e o
+   `COMO_EXECUTAR.md` compilando só o `src`, ou deixar como "Em aberto" para o T21. Fica com você.
+2. **`arredondar` precisa ser `public static`:** ajusto eu na 2.2 (T08), num PR meu.
+3. **Status nos testes (8.5):** o teste confere pelo `getNome()`. Eu acrescento "e nos testes" na 2.2.3; na 8.5 vale
+   dizer isso explicitamente.
+
+Opcional: o `parseDouble` aceita `10d`, `10f` e `0x1p3`, que caberiam como borda na 8.3, como o `1e3`.
+
+Com o merge, falta rodar o `/sincronizar-quadro` para o T19 ir para Concluído.
