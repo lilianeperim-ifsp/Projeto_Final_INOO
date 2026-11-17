@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-16
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,5 @@ PDF, rode `/documento` na sua máquina.
 - Um diagrama com erro de sintaxe aparece no PDF como uma caixa vermelha, e o script não avisa. Vale abrir e conferir.
 
 ## Resposta
+
+**2026-11-17, Liliane:** concluído. Instalei o Node.js (v26.13.1) e gerei o `docs/Documento_de_Projeto.pdf` (918 KB) com `/documento`, depois de atualizar a branch com a `dev`. O PDF ficou fora do git. Conferi a página que vira o PDF: o diagrama da 6.1 saiu desenhado, sem caixa de erro.
