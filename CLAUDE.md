@@ -127,6 +127,10 @@ Na **primeira resposta de cada sessão**, antes de atender o pedido:
 3. **Recado com `prioridade: maxima` vem antes de tudo:** mostrá-lo primeiro e seguir as instruções dele, a menos que o usuário peça outra coisa. Os demais recados pendentes aparecem numa lista curta, uma linha cada.
 4. Se a branch estiver atrás da `dev`, avisar que recados novos podem estar faltando e sugerir `/atualizar-branch`.
 
+As issues com o rótulo `inbox` são abertas e fechadas automaticamente pelo workflow `.github/workflows/inbox-avisos.yml`
+(ver "Avisos no GitHub" em `inbox/README.md`). Elas são só o aviso e não substituem a leitura da inbox: o status e a
+resposta continuam no arquivo do recado.
+
 ## Estrutura do repositório
 
 - `LogiTech/` — projeto IntelliJ (JDK 26), código em `LogiTech/src`. `Main.java` ainda é o template do IntelliJ.
