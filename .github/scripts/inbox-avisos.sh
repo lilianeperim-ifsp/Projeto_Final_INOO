@@ -10,6 +10,9 @@
 # A chave que liga recado e issue é o título "Inbox <pasta>: <arquivo sem .md>".
 # Por isso o script pode rodar quantas vezes for preciso sem duplicar issue.
 #
+# Se abrir ou fechar uma issue falhar, o script registra o erro, continua com os outros
+# recados e termina com código 1, para a rodada aparecer vermelha no Actions.
+#
 # Uso:
 #   GH_REPO=dono/repo bash .github/scripts/inbox-avisos.sh            (de verdade)
 #   DRY_RUN=1 GH_REPO=dono/repo bash .github/scripts/inbox-avisos.sh  (só mostra o que faria)
@@ -66,6 +69,13 @@ existentes="$(gh issue list --label inbox --state all --limit 500 \
 
 abertas=0
 fechadas=0
+falhas=0
+
+# Registra o erro e segue para o próximo recado. "::error::" destaca a linha no log do Actions.
+registrar_falha() {
+  echo "::error::$1"
+  falhas=$((falhas + 1))
+}
 
 for arquivo in inbox/ale/*.md inbox/murilo/*.md inbox/liliane/*.md inbox/grupo/*.md; do
   [ -f "$arquivo" ] || continue
@@ -105,19 +115,28 @@ Responda no arquivo da inbox, não nesta issue. Ela fecha sozinha quando o recad
 
     if [ "$DRY_RUN" = "1" ]; then
       echo "criaria: \"$titulo\" para $(responsaveis "$pasta") ${rotulos[*]}"
+      abertas=$((abertas + 1))
+    elif gh issue create --title "$titulo" --body "$corpo" --assignee "$(responsaveis "$pasta")" "${rotulos[@]}"; then
+      abertas=$((abertas + 1))
     else
-      gh issue create --title "$titulo" --body "$corpo" --assignee "$(responsaveis "$pasta")" "${rotulos[@]}"
+      registrar_falha "não consegui abrir a issue \"$titulo\""
     fi
-    abertas=$((abertas + 1))
 
   elif { [ "$status" = "concluido" ] || [ "$status" = "descartado" ]; } && [ "$estado" = "OPEN" ]; then
     if [ "$DRY_RUN" = "1" ]; then
       echo "fecharia: #$numero \"$titulo\" (recado $status)"
+      fechadas=$((fechadas + 1))
+    elif gh issue close "$numero" --comment "Recado marcado como \`$status\` na inbox."; then
+      fechadas=$((fechadas + 1))
     else
-      gh issue close "$numero" --comment "Recado marcado como \`$status\` na inbox."
+      registrar_falha "não consegui fechar a issue #$numero \"$titulo\""
     fi
-    fechadas=$((fechadas + 1))
   fi
 done
 
-echo "Issues abertas: $abertas. Issues fechadas: $fechadas."
+echo "Issues abertas: $abertas. Issues fechadas: $fechadas. Falhas: $falhas."
+
+# Uma falha não interrompe os outros recados, mas deixa a rodada vermelha no Actions.
+if [ "$falhas" -gt 0 ]; then
+  exit 1
+fi
