@@ -50,3 +50,5 @@ ligados (web, e-mail ou o app GitHub Mobile). Uma issue atribuída a você conta
 
 
 **2026-11-17, Liliane:** concordo com o workflow que abre uma issue para cada recado novo da inbox, com o repositório público.
+
+**2026-11-17, Alexandre:** concordo com o workflow, com o repositório público, e reviso o PR dele.
