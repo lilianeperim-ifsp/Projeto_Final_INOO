@@ -3,7 +3,7 @@ para: grupo
 de: murilo
 data: 2026-11-17
 tipo: decisao
-status: pendente
+status: concluido
 prioridade: maxima
 ---
 
@@ -52,3 +52,7 @@ ligados (web, e-mail ou o app GitHub Mobile). Uma issue atribuída a você conta
 **2026-11-17, Liliane:** concordo com o workflow que abre uma issue para cada recado novo da inbox, com o repositório público.
 
 **2026-11-17, Alexandre:** concordo com o workflow, com o repositório público, e reviso o PR dele.
+
+**2026-11-17, Murilo:** concluído. O workflow entrou na `dev` pelo PR #25 (merge `6571ec1`), revisado pelo Alexandre e
+conferido pela Liliane. A primeira rodada abriu as issues #26 a #30, uma por recado pendente. Este fechamento é o teste
+de que a issue do recado (#30) fecha sozinha.
