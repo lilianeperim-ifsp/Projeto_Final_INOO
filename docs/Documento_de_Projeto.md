@@ -579,7 +579,7 @@ sequenceDiagram
     alt permite (AGUARDANDO ou EM_TRANSITO)
         T->>T: perfil vigente passa a ser o novo
         T-->>O: aceita
-    else não permite (ENTREGUE)
+    else não permite (hoje, só ENTREGUE)
         T-->>O: rejeita, e nada muda
     end
     Note over T: nenhum aviso, aceita ou rejeitada
@@ -611,7 +611,7 @@ sequenceDiagram
 | 1 | O operador obtém um `Perfil` e chama `transporte.trocarPerfil(novo)` | Operador | Fora da entrada, ninguém compara código: o transporte recebe o objeto, e não o texto `RAPIDO` (1.3) |
 | 2 | O transporte pergunta `status.permiteTrocaDePerfil()` ao status atual | `Transporte`, `Status` | Sem testar qual status é (2.2.2). Por padrão o `Status` responde sim, e só `Entregue` responde não (2.2.3 e RN 7) |
 | 3 | Se a troca é permitida, o perfil vigente passa a ser o novo. A encomenda, o status, a posição e os interessados continuam os mesmos | `Transporte` | Sem recriar o transporte (ET 4). Nenhum valor é gravado, só o perfil |
-| 4 | Se a troca não é permitida, ela é rejeitada: o perfil vigente não muda, e quem pediu fica sabendo | `Transporte` | O mecanismo (valor de retorno ou exceção) é decidido no T14. O efeito é o da 8.6 |
+| 4 | Se a troca não é permitida, ela é rejeitada: o perfil vigente não muda, e quem pediu fica sabendo | `Transporte` | O mecanismo (valor de retorno ou exceção) é decidido no T14. O efeito é o da RN 7 ("Operação rejeitada"), conferido no teste (8.1) |
 | 5 | Aceita ou rejeitada, a troca não avisa ninguém | `Transporte` | A RN 8 só avisa mudança de status ou de posição |
 | 6 | `calcularAtual()` chama `encomenda.calcular(perfilVigente)` | `Transporte`, `Encomenda` | A regra de cálculo existe uma vez só (2.1.3) |
 | 7 | A encomenda pede os valores base ao modal, aplica o perfil e cria o `ResultadoCalculo`, que arredonda | `Encomenda`, `Modal`, `Perfil`, `ResultadoCalculo` | A base anda sem arredondar, e o arredondamento vem depois do perfil (2.1.2 e RN 5) |
@@ -627,12 +627,14 @@ sequenceDiagram
      antigo.
 2. **Quem decide se a troca pode é o status.** O transporte só pergunta, e cada status responde por si.
    - **Alternativa descartada:** o `Transporte` testar se o status é `Entregue`, com `instanceof` ou comparando o
-     `getNome()`. A ET 3.2 proíbe isso, e o cenário CANCELADO obrigaria a mexer nesse teste.
+     `getNome()`. Isso contraria a 2.2.3, em que nenhum código pergunta qual é o status atual, e o cenário CANCELADO
+     obrigaria a mexer nesse teste dentro do `Transporte`.
 3. **Troca e simulação não avisam ninguém.** O perfil não é status nem posição, e a RN 8 só avisa essas duas mudanças.
    A troca aparece no aviso seguinte: o aviso de `ENTREGUE` leva o CO₂ do perfil vigente naquele instante (2.1.4,
    passos 5 e 6 da 8.7). O fluxo desse aviso é a 6.3.
-   - **Alternativa descartada:** avisar na troca de perfil. Exigiria uma terceira interface de interessado, que
-     nenhum interessado do enunciado assinaria.
+   - **Alternativa descartada:** avisar na troca de perfil. Contraria a RN 8, que só avisa mudança de status ou de
+     posição, e faria falhar o caso da 8.6 "Nenhum aviso a ninguém". Também exigiria uma terceira interface de
+     interessado, que nenhum interessado do enunciado assinaria.
 4. **A troca não cria um transporte novo.** O mesmo objeto continua com o status, a posição e os interessados que já
    tinha.
    - **Alternativa descartada:** criar um transporte novo com o perfil novo. Perderia o status, a posição e as
@@ -661,7 +663,8 @@ Completam a 8.6, que traz os testes.
 
 | Caso | Resultado | Por quê |
 |---|---|---|
-| Trocar para o próprio perfil vigente | Aceita. Os valores ficam iguais e ninguém é avisado | O transporte não compara perfis, e a troca só muda a referência |
+| Trocar para o próprio perfil vigente, em `AGUARDANDO` ou `EM_TRANSITO` | Aceita. Os valores ficam iguais e ninguém é avisado | O transporte não compara perfis, e a troca só muda a referência |
+| `trocarPerfil(null)` | Fica com o T14, junto com o mecanismo da rejeição | Se fosse aceito, o erro só apareceria no próximo `calcularAtual()`, longe da causa |
 | Duas trocas seguidas | Vale a última | O transporte guarda só um perfil vigente |
 | `trocarPerfil(...)` em `ENTREGUE` | Rejeitada. O perfil vigente e o `calcularAtual()` não mudam | RN 7: o CO₂ que a auditoria já somou não pode ficar inconsistente |
 | `simular(...)` em `ENTREGUE` | Permitida | RN 7. A simulação não altera nada, então não pergunta ao status |
@@ -676,6 +679,9 @@ valores base e três multiplicações. Nada percorre listas.
 #### Onde os cenários de evolução tocam este fluxo
 
 Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
+
+- **O operador muda o perfil ativo (cenário 3):** é a seção inteira. A troca usa `trocarPerfil`, sem recriar o
+  transporte (ET 4), e nenhuma classe muda.
 
 - **Perfil corporativo e PREMIUM:** a troca funciona com eles sem alterar o `Transporte`, porque ele depende só de
   `Perfil`. O piso de R$ 50,00 do PREMIUM entra no passo 7, dentro do próprio perfil (2.2.1).
