@@ -159,6 +159,30 @@ git push
 git switch logitech/<usuario>
 ```
 
+## Avisos no GitHub
+
+A cada push na `dev` que mexe na inbox, o workflow `.github/workflows/inbox-avisos.yml` confere os recados e avisa
+quem recebe, sem ninguém precisar abrir a pasta:
+
+- **Recado `pendente` novo:** o workflow abre uma issue com o título `Inbox <pasta>: <nome do arquivo>`, o rótulo
+  `inbox` e, se for o caso, o rótulo `prioridade-maxima`. A issue é atribuída a quem recebe: `murilo/` → `Murilolss`,
+  `liliane/` → `lilianeperim-ifsp`, `ale/` → `alexsant22` e `grupo/` → os três.
+- **Recado `concluido` ou `descartado`:** o workflow fecha a issue com um comentário.
+- **Recado `aceito`:** a issue continua aberta até o recado ser fechado.
+
+A issue é **só o aviso**: responda e mude o status no arquivo da inbox, como sempre. Uma resposta escrita na issue não
+chega ao recado.
+
+**Para receber os avisos:** em github.com/settings/notifications, ligue os avisos de "Participating" (na web, por
+e-mail ou no app GitHub Mobile). Uma issue atribuída a você conta como "Participating".
+
+A lógica fica em `.github/scripts/inbox-avisos.sh`. Para ver o que ele faria sem abrir nem fechar nada (no Git Bash,
+com o `gh` logado):
+
+```bash
+DRY_RUN=1 GH_REPO=lilianeperim-ifsp/Projeto_Final_INOO bash .github/scripts/inbox-avisos.sh
+```
+
 ## Regras combinadas
 
 1. **Recado de inbox vai direto na `dev`**, sem pull request, em commit que altera somente arquivos de `inbox/`.

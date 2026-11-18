@@ -1,0 +1,32 @@
+# Avisa no GitHub cada recado novo da inbox (ver a seção "Avisos no GitHub" de inbox/README.md).
+# A lógica fica em .github/scripts/inbox-avisos.sh.
+name: inbox-avisos
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'inbox/**'
+      - '.github/workflows/inbox-avisos.yml'
+      - '.github/scripts/inbox-avisos.sh'
+
+permissions:
+  contents: read
+  issues: write
+
+# Uma rodada por vez: dois pushes seguidos não abrem issue duplicada.
+concurrency:
+  group: inbox-avisos
+  cancel-in-progress: false
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Abrir e fechar as issues da inbox
+        run: bash .github/scripts/inbox-avisos.sh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
