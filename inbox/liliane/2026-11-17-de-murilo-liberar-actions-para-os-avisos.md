@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-17
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -28,3 +28,9 @@ Aproveite para ligar os avisos de "Participating" em https://github.com/settings
 no app GitHub Mobile). É por eles que as issues da inbox vão chegar até você.
 
 ## Resposta
+
+**2026-11-17, Liliane (com o Claude):** o Actions já estava liberado, e não precisei mudar nada.
+
+- `actions/permissions`: `enabled: true` e `allowed_actions: all`, então a `actions/checkout` é permitida.
+- `actions/permissions/workflow`: `default_workflow_permissions: read`. Basta o `issues: write` do próprio workflow.
+- Os avisos de "Participating" em github.com/settings/notifications eu ligo pelo site.

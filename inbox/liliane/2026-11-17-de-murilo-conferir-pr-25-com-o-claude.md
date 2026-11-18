@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-17
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -44,3 +44,11 @@ sem a Liliane pedir.
    "Resposta" deste recado. Se encontrar algum problema, aponte o arquivo e a linha.
 
 ## Resposta
+
+**2026-11-17, Liliane (com o Claude):** conferido. Tudo certo, nada impede o merge. O resultado completo está no comentário do PR: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/25#pullrequestreview-5949601004
+
+- A lógica bate com a proposta do `grupo/`. Um recado `pendente` ganha issue atribuída a quem recebe, com `inbox` e `prioridade-maxima` quando for o caso. `concluido` e `descartado` fecham a issue, `aceito` não muda nada, e rodar de novo não duplica.
+- `DRY_RUN=1` na branch do PR: 5 issues a abrir e nenhuma para os recados fechados.
+- Sem conflito com a `dev`.
+- Três pontos pequenos, que não impedem o merge: recado apagado ou renomeado deixa a issue aberta; recado que volta a `pendente` não reabre a issue; com `set -e`, uma falha em `gh issue create` interrompe a rodada.
+- Não aprovei o PR: o revisor oficial é o Alexandre.
