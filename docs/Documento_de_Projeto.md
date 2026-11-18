@@ -11,8 +11,9 @@
 > | 1. Análise do problema | T07 | Murilo | Escrita |
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
+> | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
-> | 3 a 5, 6.2, 6.3 e 7 | T09 a T11 e T13 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 3 a 5, 6.3 e 7 | T09 a T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -399,8 +400,7 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 
 ## 6. Fluxos principais
 
-> As seções 3 a 5 (T09 a T11) entram antes desta. A 6.2 (troca de perfil, T13) e a 6.3 (mudança de status e avisos,
-> T14) entram depois da 6.1.
+> As seções 3 a 5 (T09 a T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
 
 ### 6.1 Processamento de uma linha do lote
 
@@ -552,6 +552,141 @@ Ganchos para os cenários (T16 e T17), que dizem as classes criadas e alteradas:
 - **Peso mínimo de 0,5 kg:** uma verificação nova no passo 5, logo depois de `peso invalido`.
 - **Modal vindo de configuração externa:** muda só a `FabricaDeCodigos`. O resto do fluxo recebe um `Modal` e não
   sabe de onde ele veio.
+
+### 6.2 Troca de perfil em tempo de execução
+
+O operador troca o perfil de um transporte que já existe, e a partir daí os valores usam o perfil novo, sem recriar o
+transporte (ET 4). O operador é um ator externo (1.2): no código, quem chama é um teste ou uma demonstração. Ele
+entrega ao transporte um objeto `Perfil` pronto, criado pela `FabricaDeCodigos` ou com `new Rapido()`, e o `Transporte`
+só conhece a abstração `Perfil`. O lote (6.1) não troca perfil, porque não cria transporte.
+
+O diagrama mostra também a simulação, que usa o mesmo cálculo sem mexer no perfil vigente.
+
+```mermaid
+sequenceDiagram
+    participant O as Operador
+    participant T as Transporte
+    participant St as Status
+    participant E as Encomenda
+    participant Mo as Modal
+    participant Pe as Perfil
+    participant R as ResultadoCalculo
+
+    Note over O,St: 1. Troca de perfil
+    O->>T: trocarPerfil(novo)
+    T->>St: permiteTrocaDePerfil()
+    St-->>T: boolean
+    alt permite (AGUARDANDO ou EM_TRANSITO)
+        T->>T: perfil vigente passa a ser o novo
+        T-->>O: aceita
+    else não permite (hoje, só ENTREGUE)
+        T-->>O: rejeita, e nada muda
+    end
+    Note over T: nenhum aviso, aceita ou rejeitada
+
+    Note over O,R: 2. Valores atuais
+    O->>T: calcularAtual()
+    T->>E: calcular(perfil vigente)
+    E->>Mo: freteBase, tempoBase e co2Base
+    Mo-->>E: valores base, sem arredondar
+    E->>Pe: aplicarFrete, aplicarTempo e aplicarCo2
+    Pe-->>E: valores com o perfil, sem arredondar
+    E->>R: new ResultadoCalculo(frete, tempo, co2)
+    R-->>E: resultado já arredondado
+    E-->>T: ResultadoCalculo
+    T-->>O: ResultadoCalculo
+
+    Note over O,R: 3. Simulação
+    O->>T: simular(outro)
+    T->>E: calcular(outro)
+    E-->>T: ResultadoCalculo, pelo mesmo caminho do bloco 2
+    T-->>O: ResultadoCalculo
+    Note over T: perfil vigente intacto e nenhum aviso
+```
+
+#### Passo a passo
+
+| # | Passo | Quem | Regra que limita |
+|---|---|---|---|
+| 1 | O operador obtém um `Perfil` e chama `transporte.trocarPerfil(novo)` | Operador | Fora da entrada, ninguém compara código: o transporte recebe o objeto, e não o texto `RAPIDO` (1.3) |
+| 2 | O transporte pergunta `status.permiteTrocaDePerfil()` ao status atual | `Transporte`, `Status` | Sem testar qual status é (2.2.2). Por padrão o `Status` responde sim, e só `Entregue` responde não (2.2.3 e RN 7) |
+| 3 | Se a troca é permitida, o perfil vigente passa a ser o novo. A encomenda, o status, a posição e os interessados continuam os mesmos | `Transporte` | Sem recriar o transporte (ET 4). Nenhum valor é gravado, só o perfil |
+| 4 | Se a troca não é permitida, ela é rejeitada: o perfil vigente não muda, e quem pediu fica sabendo | `Transporte` | O mecanismo (valor de retorno ou exceção) é decidido no T14. O efeito é o da RN 7 ("Operação rejeitada"), conferido no teste (8.1) |
+| 5 | Aceita ou rejeitada, a troca não avisa ninguém | `Transporte` | A RN 8 só avisa mudança de status ou de posição |
+| 6 | `calcularAtual()` chama `encomenda.calcular(perfilVigente)` | `Transporte`, `Encomenda` | A regra de cálculo existe uma vez só (2.1.3) |
+| 7 | A encomenda pede os valores base ao modal, aplica o perfil e cria o `ResultadoCalculo`, que arredonda | `Encomenda`, `Modal`, `Perfil`, `ResultadoCalculo` | A base anda sem arredondar, e o arredondamento vem depois do perfil (2.1.2 e RN 5) |
+| 8 | `simular(outro)` chama `encomenda.calcular(outro)` e segue os passos 6 e 7 | `Transporte`, `Encomenda` | Não altera o perfil vigente, não gera aviso e é permitida em qualquer status, inclusive `ENTREGUE` (RN 7). Por isso não pergunta nada ao status |
+
+#### Decisões do fluxo
+
+1. **A troca grava só o perfil novo, e não os valores.** Frete, tempo e CO₂ são recalculados a cada pedido, a partir da
+   encomenda, que não muda (item 21 da Livraria, 1.6). Depois da troca, o próximo `calcularAtual()` já usa o perfil
+   novo, sem nenhum passo a mais.
+   - **Alternativa descartada:** guardar um `ResultadoCalculo` no transporte e recalculá-lo na troca. Seriam dois
+     estados para manter iguais (o perfil e o resultado), e uma troca que esquecesse de recalcular deixaria o valor
+     antigo.
+2. **Quem decide se a troca pode é o status.** O transporte só pergunta, e cada status responde por si.
+   - **Alternativa descartada:** o `Transporte` testar se o status é `Entregue`, com `instanceof` ou comparando o
+     `getNome()`. Isso contraria a 2.2.3, em que nenhum código pergunta qual é o status atual, e o cenário CANCELADO
+     obrigaria a mexer nesse teste dentro do `Transporte`.
+3. **Troca e simulação não avisam ninguém.** O perfil não é status nem posição, e a RN 8 só avisa essas duas mudanças.
+   A troca aparece no aviso seguinte: o aviso de `ENTREGUE` leva o CO₂ do perfil vigente naquele instante (2.1.4,
+   passos 5 e 6 da 8.7). O fluxo desse aviso é a 6.3.
+   - **Alternativa descartada:** avisar na troca de perfil. Contraria a RN 8, que só avisa mudança de status ou de
+     posição, e faria falhar o caso da 8.6 "Nenhum aviso a ninguém". Também exigiria uma terceira interface de
+     interessado, que nenhum interessado do enunciado assinaria.
+4. **A troca não cria um transporte novo.** O mesmo objeto continua com o status, a posição e os interessados que já
+   tinha.
+   - **Alternativa descartada:** criar um transporte novo com o perfil novo. Perderia o status, a posição e as
+     assinaturas, e contraria a ET 4 ("sem recriar o transporte").
+
+#### Exemplo percorrido
+
+A encomenda de exemplo da 8.6: rodoviário, 500 kg, 1000 km, pedida em ECONOMICO. Os valores são os da 8.2.
+
+| # | Ação | Resultado | Status | Perfil vigente | `calcularAtual()` |
+|---|---|---|---|---|---|
+| 1 | Criar o transporte | — | `AGUARDANDO` | ECONOMICO (o pedido) | 1445,00 / 23,33 / 31,00 |
+| 2 | `trocarPerfil(RAPIDO)` | Aceita | `AGUARDANDO` | RAPIDO | 2380,00 / 14,93 / 35,65 |
+| 3 | `iniciarTransito()` | Aceita (aviso: 6.3) | `EM_TRANSITO` | RAPIDO | 2380,00 / 14,93 / 35,65 |
+| 4 | `trocarPerfil(ECOLOGICO)` | Aceita | `EM_TRANSITO` | ECOLOGICO | 1870,00 / 20,53 / 21,70 |
+| 5 | `simular(RAPIDO)` | Devolve 2380,00 / 14,93 / 35,65 | `EM_TRANSITO` | ECOLOGICO (não muda) | 1870,00 / 20,53 / 21,70 |
+| 6 | `entregar()` | Aceita (aviso: 6.3; a auditoria soma 21,70) | `ENTREGUE` | ECOLOGICO | 1870,00 / 20,53 / 21,70 |
+| 7 | `trocarPerfil(RAPIDO)` | Rejeitada | `ENTREGUE` | ECOLOGICO (não muda) | 1870,00 / 20,53 / 21,70 |
+| 8 | `simular(ECONOMICO)` | Permitida: devolve 1445,00 / 23,33 / 31,00 | `ENTREGUE` | ECOLOGICO (não muda) | 1870,00 / 20,53 / 21,70 |
+
+Nenhuma das linhas 2, 4, 5, 7 e 8 gera aviso.
+
+#### Casos de borda do fluxo
+
+Completam a 8.6, que traz os testes.
+
+| Caso | Resultado | Por quê |
+|---|---|---|
+| Trocar para o próprio perfil vigente, em `AGUARDANDO` ou `EM_TRANSITO` | Aceita. Os valores ficam iguais e ninguém é avisado | O transporte não compara perfis, e a troca só muda a referência |
+| `trocarPerfil(null)` | Fica com o T14, junto com o mecanismo da rejeição | Se fosse aceito, o erro só apareceria no próximo `calcularAtual()`, longe da causa |
+| Duas trocas seguidas | Vale a última | O transporte guarda só um perfil vigente |
+| `trocarPerfil(...)` em `ENTREGUE` | Rejeitada. O perfil vigente e o `calcularAtual()` não mudam | RN 7: o CO₂ que a auditoria já somou não pode ficar inconsistente |
+| `simular(...)` em `ENTREGUE` | Permitida | RN 7. A simulação não altera nada, então não pergunta ao status |
+| Trocar o perfil antes da entrega | A auditoria soma o CO₂ do perfil novo | O aviso de `ENTREGUE` leva o CO₂ do perfil vigente (2.1.4 e 8.7) |
+| Dois transportes da mesma encomenda | Trocar o perfil de um não muda o outro | O perfil vigente é atributo de instância do `Transporte`, e não `static` (8.6) |
+
+#### Eficiência
+
+A troca é O(1): uma pergunta ao status e uma atribuição. O `calcularAtual()` e o `simular()` têm custo fixo, com três
+valores base e três multiplicações. Nada percorre listas.
+
+#### Onde os cenários de evolução tocam este fluxo
+
+Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
+
+- **O operador muda o perfil ativo (cenário 3):** é a seção inteira. A troca usa `trocarPerfil`, sem recriar o
+  transporte (ET 4), e nenhuma classe muda.
+
+- **Perfil corporativo e PREMIUM:** a troca funciona com eles sem alterar o `Transporte`, porque ele depende só de
+  `Perfil`. O piso de R$ 50,00 do PREMIUM entra no passo 7, dentro do próprio perfil (2.2.1).
+- **CANCELADO:** `Cancelado` responde não em `permiteTrocaDePerfil()` (2.2.3). O passo 2 não muda.
+- **Simulação de outro perfil:** já é o bloco 3 deste fluxo, com a regra de cálculo reaproveitada.
 
 ## 8. Plano de testes
 
