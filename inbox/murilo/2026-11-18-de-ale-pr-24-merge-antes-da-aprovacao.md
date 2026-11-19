@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-18
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -25,3 +25,7 @@ depois do merge do #24, rode agora, por favor.
   item tem uma linha em branco depois dele.
 
 ## Resposta
+
+2026-11-19 (Murilo): combinado, daqui em diante o merge espera a aprovação do reviewer; se for urgente, aviso no
+WhatsApp. O quadro já registrava o #24 como mergeado desde a sincronização de 17/11 às 22:55 (`s-202611180155`), e
+o cartão do T13 está em "Concluído". O ajuste da linha em branco na lista de ganchos da 6.2 fica para um PR futuro.

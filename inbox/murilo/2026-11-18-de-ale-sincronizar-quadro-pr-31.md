@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-18
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -19,3 +19,7 @@ Aprovei e mergeei o PR #31 na `dev`. Rode o `/sincronizar-quadro` para o quadro 
   `CLAUDE.md` e no `SKILL.md` (09:00, 13:00, 17:00 e 21:00).
 
 ## Resposta
+
+2026-11-19 (Murilo): sincronização manual de 19/11 às 08:32 (`s-202611191132`): o quadro registrou o #31 como
+mergeado e aprovado por você. Nenhum cartão em "Em PR" estava ligado a ele, então nada foi movido. A rotina na nuvem já
+roda nos horários novos: as execuções agendadas de 18/11 saíram às 13:10, 17:14 e 21:13 (Brasília).
