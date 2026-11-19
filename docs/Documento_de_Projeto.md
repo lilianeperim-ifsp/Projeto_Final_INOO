@@ -10,10 +10,11 @@
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
+> | 3. Diagrama de classes UML | T09 | Liliane | Escrita, em revisão |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
-> | 3 a 5, 6.3 e 7 | T09 a T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 4, 5, 6.3 e 7 | T10, T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -398,9 +399,491 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
   sem `null` nem exceção (ver a decisão na 6.1). Na revisão do PR #19, o Alexandre (dono da 2.2.6) definiu a
   pré-condição do `criar*` e a lista única de códigos.
 
+## 3. Diagrama de classes UML
+
+Os 31 tipos do catálogo (2.2) aparecem em seis diagramas: uma **visão geral**, com só os nomes, as hierarquias e as
+dependências entre os grupos, e um diagrama **por grupo** da 2.2, com atributos e métodos tipados. Um diagrama único
+com os 31 tipos completos ficava ilegível no PDF e difícil de explicar na defesa.
+
+**Como ler:**
+
+| Notação | Significado |
+|---|---|
+| `-` / `#` / `+` | `private` / `protected` / `public` |
+| `*` depois do método | método abstrato |
+| `$` depois do membro | membro `static` |
+| `A <\|-- B` (seta cheia, ponta vazada) | B herda de A |
+| `A <\|.. B` (tracejada, ponta vazada) | B implementa a interface A |
+| `A --> B` (seta cheia) | associação: A guarda um B num atributo, com a multiplicidade ao lado |
+| `A *-- B` (losango cheio) | composição: B faz parte de A (o transporte tem uma posição, 1.2) |
+| `A ..> B` (tracejada) | dependência: A usa ou cria um B sem guardá-lo |
+
+Nos diagramas por grupo, alguns getters simples ficam de fora para economizar espaço, e o texto abaixo de cada
+diagrama diz quais. Os construtores aparecem quando os parâmetros importam.
+
+### 3.1 Visão geral
+
+As dependências de dentro de cada grupo ficam nos diagramas 3.2 a 3.6. Aqui aparecem só as que ligam grupos
+diferentes. A `FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas,
+para `Modal` e `Perfil`.
+
+```mermaid
+classDiagram
+    direction TB
+
+    namespace Calculo {
+        class Modal {
+            <<abstract>>
+        }
+        class Rodoviario
+        class Aereo
+        class Aquaviario
+        class Perfil {
+            <<interface>>
+        }
+        class PerfilPorMultiplicadores {
+            <<abstract>>
+        }
+        class Economico
+        class Rapido
+        class Ecologico
+        class ResultadoCalculo
+    }
+
+    namespace EncomendaETransporte {
+        class Encomenda
+        class Transporte
+        class Posicao
+    }
+
+    namespace StatusDoTransporte {
+        class Status {
+            <<abstract>>
+        }
+        class Aguardando
+        class EmTransito
+        class Entregue
+    }
+
+    namespace Avisos {
+        class Aviso
+        class InteressadoEmStatus {
+            <<interface>>
+        }
+        class InteressadoEmPosicao {
+            <<interface>>
+        }
+        class CentralDeControle
+        class AuditoriaAmbiental
+        class Cliente
+    }
+
+    namespace LoteEntradaESaida {
+        class Main
+        class ProcessadorDeLote
+        class InterpretadorDeLinha
+        class LinhaInterpretada
+        class FabricaDeCodigos
+        class FormatadorDeSaida
+        class Rejeicao
+        class Relatorio
+    }
+
+    Modal <|-- Rodoviario
+    Modal <|-- Aereo
+    Modal <|-- Aquaviario
+    Perfil <|.. PerfilPorMultiplicadores
+    PerfilPorMultiplicadores <|-- Economico
+    PerfilPorMultiplicadores <|-- Rapido
+    PerfilPorMultiplicadores <|-- Ecologico
+    Status <|-- Aguardando
+    Status <|-- EmTransito
+    Status <|-- Entregue
+    InteressadoEmStatus <|.. CentralDeControle
+    InteressadoEmPosicao <|.. CentralDeControle
+    InteressadoEmStatus <|.. AuditoriaAmbiental
+    InteressadoEmStatus <|.. Cliente
+
+    Encomenda --> "1" Modal : modal
+    Encomenda --> "1" Perfil : perfilPedido
+    Transporte --> "1" Encomenda : encomenda
+    Transporte --> "1" Status : status
+    Transporte *-- "0..1" Posicao : posicao
+    Transporte --> "1" Perfil : perfilVigente
+    Transporte --> "*" InteressadoEmStatus : interessadosEmStatus
+    Transporte --> "*" InteressadoEmPosicao : interessadosEmPosicao
+    Aviso --> "1" Status : status
+    Aviso --> "0..1" Posicao : posicao
+    LinhaInterpretada --> "0..1" Encomenda : encomenda
+    LinhaInterpretada --> "0..1" Rejeicao : rejeicao
+    ProcessadorDeLote --> "1" InterpretadorDeLinha : interpretador
+    ProcessadorDeLote --> "1" FormatadorDeSaida : formatador
+    InterpretadorDeLinha --> "1" FabricaDeCodigos : fabrica
+
+    Main ..> ProcessadorDeLote : usa
+    Encomenda ..> ResultadoCalculo : cria
+    Transporte ..> ResultadoCalculo : devolve
+    Transporte ..> Aviso : cria
+    InteressadoEmStatus ..> Aviso : recebe
+    InteressadoEmPosicao ..> Aviso : recebe
+    AuditoriaAmbiental ..> Status : contaParaAuditoria()
+    InterpretadorDeLinha ..> Encomenda : cria
+    InterpretadorDeLinha ..> Modal : excedeCapacidade()
+    FabricaDeCodigos ..> Modal : cria os concretos
+    FabricaDeCodigos ..> Perfil : cria os concretos
+    Relatorio ..> ResultadoCalculo : registrarValida()
+    FormatadorDeSaida ..> ResultadoCalculo : usa
+
+    note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: provisório, confirmar no T14"
+    note for FabricaDeCodigos "estrutura interna: pendente, decisão do Murilo (T20)"
+```
+
+### 3.2 Cálculo
+
+```mermaid
+classDiagram
+    direction TB
+    class Modal {
+        <<abstract>>
+        -double LIMITE_CARGA_PESADA_KG = 1000$
+        -double FATOR_SOBRETAXA = 1.05$
+        +freteBase(double peso, double distancia) double
+        +tempoBase(double distancia) double
+        +co2Base(double peso, double distancia) double
+        +excedeCapacidade(double peso) boolean
+        #custoPorKm() double*
+        #custoPorKg() double*
+        #velocidade() double*
+        #manuseio() double*
+        #fatorEmissao() double*
+        #capacidadeMaxima() double*
+    }
+    class Rodoviario {
+        #custoPorKm() double
+        #custoPorKg() double
+        #velocidade() double
+        #manuseio() double
+        #fatorEmissao() double
+        #capacidadeMaxima() double
+    }
+    class Aereo
+    class Aquaviario
+    class Perfil {
+        <<interface>>
+        +aplicarFrete(double base) double
+        +aplicarTempo(double base) double
+        +aplicarCo2(double base) double
+    }
+    class PerfilPorMultiplicadores {
+        <<abstract>>
+        +aplicarFrete(double base) double
+        +aplicarTempo(double base) double
+        +aplicarCo2(double base) double
+        #multiplicadorFrete() double*
+        #multiplicadorTempo() double*
+        #multiplicadorCo2() double*
+    }
+    class Economico {
+        #multiplicadorFrete() double
+        #multiplicadorTempo() double
+        #multiplicadorCo2() double
+    }
+    class Rapido
+    class Ecologico
+    class ResultadoCalculo {
+        -double frete
+        -double tempo
+        -double co2
+        +ResultadoCalculo(double frete, double tempo, double co2)
+        +getFrete() double
+        +getTempo() double
+        +getCo2() double
+        +arredondar(double valor) double$
+    }
+
+    Modal <|-- Rodoviario
+    Modal <|-- Aereo
+    Modal <|-- Aquaviario
+    Perfil <|.. PerfilPorMultiplicadores
+    PerfilPorMultiplicadores <|-- Economico
+    PerfilPorMultiplicadores <|-- Rapido
+    PerfilPorMultiplicadores <|-- Ecologico
+
+    note for Modal "freteBase aplica a sobretaxa: único ponto da regra (2.1.1)"
+    note for ResultadoCalculo "arredondar: único ponto do arredondamento; o método fica com o T29 (2.1.2)"
+```
+
+`Aereo` e `Aquaviario` implementam as mesmas seis etapas de `Rodoviario`, e `Rapido` e `Ecologico`, as mesmas três de
+`Economico`, só com outros números: o diagrama mostra as etapas uma vez em cada hierarquia, para não repetir linhas
+iguais. O `ResultadoCalculo` não tem setas porque
+não depende de ninguém: quem o cria é a `Encomenda` (3.1).
+
+### 3.3 Encomenda e transporte
+
+```mermaid
+classDiagram
+    direction TB
+    class Encomenda {
+        -int id
+        -Modal modal
+        -double peso
+        -double distancia
+        -String origem
+        -String destino
+        -Perfil perfilPedido
+        +Encomenda(int id, Modal modal, double peso, double distancia, String origem, String destino, Perfil perfilPedido)
+        +calcular(Perfil perfil) ResultadoCalculo
+        +getId() int
+        +getModal() Modal
+        +getPerfilPedido() Perfil
+    }
+    class Transporte {
+        -Encomenda encomenda
+        -Status status
+        -Posicao posicao
+        -Perfil perfilVigente
+        -List~InteressadoEmStatus~ interessadosEmStatus
+        -List~InteressadoEmPosicao~ interessadosEmPosicao
+        +Transporte(Encomenda encomenda)
+        +iniciarTransito() boolean
+        +entregar() boolean
+        +atualizarPosicao(double lat, double lon) boolean
+        +trocarPerfil(Perfil perfil) boolean
+        +simular(Perfil perfil) ResultadoCalculo
+        +calcularAtual() ResultadoCalculo
+        +adicionarInteressadoEmStatus(InteressadoEmStatus i) void
+        +removerInteressadoEmStatus(InteressadoEmStatus i) void
+        +adicionarInteressadoEmPosicao(InteressadoEmPosicao i) void
+        +removerInteressadoEmPosicao(InteressadoEmPosicao i) void
+        +temPosicao() boolean
+        +getStatus() Status
+        +getPosicao() Posicao
+        +getPerfilVigente() Perfil
+    }
+    class Posicao {
+        -double latitude
+        -double longitude
+        +Posicao(double latitude, double longitude)
+        +posicaoValida(double lat, double lon) boolean$
+        +mesmaPosicao(Posicao outra) boolean
+        +getLatitude() double
+        +getLongitude() double
+    }
+
+    Transporte --> "1" Encomenda : encomenda
+    Transporte *-- "0..1" Posicao : posicao
+
+    note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: provisório, confirmar no T14"
+```
+
+A `Encomenda` tem também os getters de peso, distância, origem e destino. As listas de interessados nunca saem do
+`Transporte`: não há getter para elas (2.2.2). As setas para `Modal`, `Perfil`, `Status`, os interessados,
+`ResultadoCalculo` e `Aviso` ligam grupos diferentes e estão na visão geral (3.1).
+
+### 3.4 Status
+
+```mermaid
+classDiagram
+    direction LR
+    class Status {
+        <<abstract>>
+        +iniciarTransito() Status
+        +entregar() Status
+        +permiteTrocaDePerfil() boolean
+        +contaParaAuditoria() boolean
+        +getNome() String*
+    }
+    class Aguardando {
+        +iniciarTransito() Status
+        +getNome() String
+    }
+    class EmTransito {
+        +entregar() Status
+        +getNome() String
+    }
+    class Entregue {
+        +permiteTrocaDePerfil() boolean
+        +contaParaAuditoria() boolean
+        +getNome() String
+    }
+
+    Status <|-- Aguardando
+    Status <|-- EmTransito
+    Status <|-- Entregue
+    Aguardando ..> EmTransito : cria
+    EmTransito ..> Entregue : cria
+
+    note for Status "por padrão, iniciarTransito e entregar rejeitam; mecanismo da rejeição: T14"
+```
+
+Cada filha sobrescreve só o que muda nela (2.2.3). O `getNome()` é o único método abstrato.
+
+### 3.5 Avisos
+
+```mermaid
+classDiagram
+    direction TB
+    class Aviso {
+        -int id
+        -Status status
+        -Posicao posicao
+        -double co2
+        +Aviso(int id, Status status, Posicao posicao, double co2)
+        +getId() int
+        +getStatus() Status
+        +getPosicao() Posicao
+        +temPosicao() boolean
+        +getCo2() double
+    }
+    class InteressadoEmStatus {
+        <<interface>>
+        +statusMudou(Aviso aviso) void
+    }
+    class InteressadoEmPosicao {
+        <<interface>>
+        +posicaoMudou(Aviso aviso) void
+    }
+    class CentralDeControle {
+        -List~String~ log
+        +statusMudou(Aviso aviso) void
+        +posicaoMudou(Aviso aviso) void
+        +getLog() List~String~
+    }
+    class AuditoriaAmbiental {
+        -double co2Auditado
+        +statusMudou(Aviso aviso) void
+        +getCo2Auditado() double
+    }
+    class Cliente {
+        -List~String~ mensagens
+        +statusMudou(Aviso aviso) void
+        +getMensagens() List~String~
+    }
+
+    InteressadoEmStatus <|.. CentralDeControle
+    InteressadoEmPosicao <|.. CentralDeControle
+    InteressadoEmStatus <|.. AuditoriaAmbiental
+    InteressadoEmStatus <|.. Cliente
+    InteressadoEmStatus ..> Aviso : recebe
+    InteressadoEmPosicao ..> Aviso : recebe
+
+    note for Aviso "imutável: sem setters (2.1.4)"
+```
+
+`getLog()` e `getMensagens()` devolvem uma cópia da lista (2.2.4).
+
+### 3.6 Lote, entrada e saída
+
+```mermaid
+classDiagram
+    direction TB
+    class Main {
+        +main(String[] args) void$
+    }
+    class ProcessadorDeLote {
+        -InterpretadorDeLinha interpretador
+        -FormatadorDeSaida formatador
+        +processar(List~String~ linhas) List~String~
+    }
+    class InterpretadorDeLinha {
+        -FabricaDeCodigos fabrica
+        +interpretar(String linha, int numeroFisico) LinhaInterpretada
+    }
+    class LinhaInterpretada {
+        -Encomenda encomenda
+        -Rejeicao rejeicao
+        +LinhaInterpretada()
+        +LinhaInterpretada(Encomenda encomenda)
+        +LinhaInterpretada(Rejeicao rejeicao)
+        +ehValida() boolean
+        +ehEmBranco() boolean
+        +getEncomenda() Encomenda
+        +getRejeicao() Rejeicao
+    }
+    class FabricaDeCodigos {
+        +existeModal(String codigo) boolean
+        +existePerfil(String codigo) boolean
+        +criarModal(String codigo) Modal
+        +criarPerfil(String codigo) Perfil
+    }
+    class FormatadorDeSaida {
+        +formatarValida(int id, ResultadoCalculo resultado) String
+        +formatarRejeitada(Rejeicao rejeicao) String
+        +formatarRelatorio(Relatorio relatorio) String
+        -numero(double valor) String
+    }
+    class Rejeicao {
+        -String identificador
+        -String motivo
+        +Rejeicao(String identificador, String motivo)
+        +getIdentificador() String
+        +getMotivo() String
+    }
+    class Relatorio {
+        -double custoTotal
+        -double somaTempos
+        -double co2Total
+        -int validas
+        -int rejeitadas
+        +registrarValida(ResultadoCalculo resultado) void
+        +registrarRejeitada() void
+        +getTempoMedio() double
+        +getCustoTotal() double
+        +getCo2Total() double
+        +getValidas() int
+        +getRejeitadas() int
+    }
+
+    Main ..> ProcessadorDeLote : usa
+    ProcessadorDeLote --> "1" InterpretadorDeLinha : interpretador
+    ProcessadorDeLote --> "1" FormatadorDeSaida : formatador
+    ProcessadorDeLote ..> Relatorio : cria
+    ProcessadorDeLote ..> LinhaInterpretada : usa
+    InterpretadorDeLinha --> "1" FabricaDeCodigos : fabrica
+    InterpretadorDeLinha ..> LinhaInterpretada : cria
+    InterpretadorDeLinha ..> Rejeicao : cria
+    LinhaInterpretada --> "0..1" Rejeicao : rejeicao
+    FormatadorDeSaida ..> Rejeicao : usa
+    FormatadorDeSaida ..> Relatorio : usa
+
+    note for FabricaDeCodigos "estrutura interna: pendente, decisão do Murilo (T20)"
+```
+
+### 3.7 Decisões do diagrama
+
+O catálogo (2.2) não trazia os tipos dos atributos e dos retornos. Estes vieram do próprio documento: o `id` é `int`
+(1.3), o identificador da `Rejeicao` é `String` porque pode ser `LINHA4`, os números são `double` e os contadores são
+`int`. As decisões abaixo são do T09.
+
+1. **As operações do `Transporte` que aceitam ou rejeitam devolvem `boolean`** (`true` = aceita). **Provisório:
+   confirmar no T14.**
+   - Por quê: o `Status` não pode usar `boolean`, porque devolve o próximo status (2.2.3). O `Transporte` não tem essa
+     limitação, e o `boolean` deixa o diagrama completo.
+   - Alternativa descartada: deixar o retorno sem tipo até o T14.
+2. **A posição ausente é `null` por dentro, e `temPosicao()` responde se ela existe**, no `Transporte` e no `Aviso`.
+   - Por quê: quem usa a posição pergunta antes, em vez de receber um `null` de surpresa (erro 13 da Livraria).
+   - Alternativa descartada: só o getter, devolvendo `null` sem aviso.
+3. **`getNome()` é abstrato em `Status`**, e cada status escreve o próprio nome, no mesmo padrão das etapas de `Modal`.
+   - Por quê: um status novo, como o `Cancelado`, não compila se esquecer o nome.
+   - Alternativa descartada: um atributo `nome` em `Status`, passado com `super("AGUARDANDO")`.
+4. **As classes do lote guardam os colaboradores em atributos**, criados no construtor: o `ProcessadorDeLote` guarda o
+   `InterpretadorDeLinha` e o `FormatadorDeSaida`, e o `InterpretadorDeLinha` guarda a `FabricaDeCodigos`.
+   - Por quê: são objetos, e o diagrama mostra a associação.
+   - Alternativa descartada: métodos `static`, mais curtos, mas sem objeto.
+5. **`LinhaInterpretada` tem dois atributos e três construtores sobrecarregados:** `()` para a linha em branco,
+   `(Encomenda)` para a válida e `(Rejeicao)` para a rejeitada. A linha em branco é a que não tem nenhum dos dois.
+   - Por quê: nenhum par de construtores tem os mesmos tipos de parâmetro, então a sobrecarga não é ambígua.
+   - Alternativa descartada: métodos estáticos `valida()`, `rejeitada()` e `emBranco()`, que seriam a escolha se dois
+     construtores tivessem os mesmos tipos.
+   - **Para a implementação:** os construtores com parâmetro rejeitam `null` com `Objects.requireNonNull`, porque uma
+     variável valendo `null` passa pelo compilador. `Objects` (`java.util`) não aparece nos slides, então o grupo
+     confirma antes de usar, como o `final` (2.1.1) e o `BigDecimal` (2.1.2).
+6. **A estrutura interna da lista única de códigos da `FabricaDeCodigos` está pendente:** array de `String`, listas
+   paralelas ou outra forma. Decide o Murilo (T20), e o diagrama mostra só os métodos públicos, com uma nota.
+
 ## 6. Fluxos principais
 
-> As seções 3 a 5 (T09 a T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
+> As seções 4 e 5 (T10 e T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
 
 ### 6.1 Processamento de uma linha do lote
 
