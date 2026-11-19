@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-17
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -39,3 +39,8 @@ PR #25: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/25
 Depois do merge, eu rodo o `/sincronizar-quadro`.
 
 ## Resposta
+
+**Alexandre, 2026-11-18:** o PR #25 foi mergeado com a aprovação da Liliane antes da minha revisão. Conferi depois do
+merge a versão que está na `dev` e está tudo de acordo com a proposta. As rodadas do Actions estão verdes. Deixei a
+revisão num comentário no PR:
+https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/25#issuecomment-6997998351

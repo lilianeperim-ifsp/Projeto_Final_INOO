@@ -107,7 +107,7 @@ main                       versão estável (o que será entregue)
 ## Quadro Kanban do grupo
 
 - O grupo acompanha tarefas, responsáveis e PRs num artefato do claude.ai: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH (precisa de acesso de Colaborador ou superior para editar).
-- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), com alguns minutos de variação.
+- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 09:00, 13:00, 17:00 e 21:00 (Brasília), com alguns minutos de variação.
 - **Apenas o Murilo consegue rodar `/sincronizar-quadro`.** O Claude não deve sugerir que outro integrante a rode.
 - **Todo PR aberto pelo Alexandre ou pela Liliane gera um recado na inbox do Murilo** para ele rodar a skill: arquivo `inbox/murilo/AAAA-MM-DD-de-<autor>-sincronizar-quadro-pr-<numero>.md`, com `tipo: tarefa`, no modelo de `inbox/README.md`, citando o número e o link do PR. Depois de mergear um PR, avise o Murilo para rodar a skill.
 - A skill só lê o GitHub e escreve no banco do artefato: não faz commit, push nem abre PR.
