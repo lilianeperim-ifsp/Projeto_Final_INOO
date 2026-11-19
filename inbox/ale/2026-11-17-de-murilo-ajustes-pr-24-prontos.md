@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-17
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -37,3 +37,11 @@ Nenhum valor nem nome de método mudou. Depois do merge, eu rodo o `/sincronizar
 `logitech/murilolss`. Você é o reviewer dele também.
 
 ## Resposta
+
+**Alexandre, 2026-11-18:** conferi a seção 6.2 na `dev` e os 7 pontos estão de acordo. Valores e nomes de método não
+mudaram. O PR #24 foi mergeado (01:01 UTC de 18/11) antes da nova revisão, ainda com o pedido de alterações aberto.
+Por isso deixei um comentário no PR que vale como aprovação:
+https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/24#issuecomment-6997903986
+
+Detalhe para um PR futuro: na lista de ganchos da 6.2, só o primeiro item tem uma linha em branco depois dele.
+Sobre o merge antes da aprovação e o `/sincronizar-quadro`, deixei um recado em `inbox/murilo/`.
