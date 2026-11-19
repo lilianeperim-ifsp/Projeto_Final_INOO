@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Sincronizar o quadro com o GitHub
 
-O quadro do grupo é um artefato do claude.ai. A página dele não alcança a API do GitHub, então esta skill lê os PRs com o `gh` e grava o resultado no banco do artefato. A rotina agendada roda a mesma skill às 08:00, 12:00 e 18:00 (horário de Brasília). **Apenas o Murilo consegue rodá-la na hora.**
+O quadro do grupo é um artefato do claude.ai. A página dele não alcança a API do GitHub, então esta skill lê os PRs com o `gh` e grava o resultado no banco do artefato. A rotina agendada roda a mesma skill às 09:00, 13:00, 17:00 e 21:00 (horário de Brasília). **Apenas o Murilo consegue rodá-la na hora.**
 
 - **Artefato:** https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH
 - **Repositório:** `lilianeperim-ifsp/Projeto_Final_INOO`
@@ -16,9 +16,12 @@ O quadro do grupo é um artefato do claude.ai. A página dele não alcança a AP
 
 | Coleção | Documento | Campos |
 |---|---|---|
-| `cartoes` | `t01` … (criados pela página) | `n, titulo, descricao, coluna, ordem, responsavel, pr, revisor, etapa, area, dependeDe[], atualizadoPorId, atualizadoEm` |
+| `cartoes` | `t01` … (criados pela página) | `n, titulo, descricao, coluna, ordem, responsavel, pr, revisor, etapa, area, dependeDe[], atualizadoPorId, atualizadoEm` e, opcionais, `prazo` (AAAA-MM-DD) e `porque` (texto do Roadmap) |
 | `prs` | `<número do PR>` (ex.: `2`) | `numero, titulo, branch, base, estado, autor, revisoresPedidos[], aprovadoPor[], url, mergeadoEm, sincronizadoEm` |
 | `sincronizacoes` | `s-AAAAMMDDhhmm` (UTC) | `quando, origem, por, resumo, mudancas[]` |
+| `historico` | gerado pela página | `em, autor, tipo, tarefa, titulo, de, para, campos[], texto`: ações feitas no quadro. **Esta skill não lê nem grava esta coleção.** |
+
+A página mostra as entradas de `sincronizacoes` junto com o `historico` na seção "Atualizações", e as de `prs` em "PRs do repositório". Os campos `prazo` e `porque` são do Roadmap: a skill não os altera.
 
 Valores de `coluna`: `fazer`, `andamento`, `pr`, `feito`. Valores de `estado`: `aberto`, `mergeado`, `fechado`. Valores de `origem`: `manual`, `agendada`.
 
