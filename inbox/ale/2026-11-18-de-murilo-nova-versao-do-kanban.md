@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-18
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -37,3 +37,5 @@ O PR #31, que você já ia revisar, agora tem dois assuntos: o script dos avisos
 Atualizei o título e a descrição dele.
 
 ## Resposta
+
+**Alexandre, 2026-11-18:** olhei a versão 10 do quadro e está tudo certo, nada estranho.

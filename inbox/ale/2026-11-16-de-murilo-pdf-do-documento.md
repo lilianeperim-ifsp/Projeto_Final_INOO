@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-16
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,5 @@ PDF, rode `/documento` na sua máquina.
 - Um diagrama com erro de sintaxe aparece no PDF como uma caixa vermelha, e o script não avisa. Vale abrir e conferir.
 
 ## Resposta
+
+**Alexandre, 2026-11-18:** ciente. O PDF não é versionado, e eu gero o meu com `/documento` quando precisar.
