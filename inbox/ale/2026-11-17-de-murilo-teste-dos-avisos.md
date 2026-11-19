@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-17
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -20,3 +20,5 @@ Também vale conferir se o aviso chegou onde você esperava (sininho, e-mail ou 
 "Participating" em https://github.com/settings/notifications.
 
 ## Resposta
+
+**Alexandre, 2026-11-18:** o aviso funcionou: a issue #32 chegou atribuída a mim.
