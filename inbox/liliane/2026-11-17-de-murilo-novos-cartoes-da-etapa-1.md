@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-17
 tipo: tarefa
-status: pendente
+status: aceito
 prazo: 2026-11-27
 ---
 
@@ -30,3 +30,5 @@ entregue em **27/11**.
 O ajuste está registrado em `docs/divisao-projeto.md`, seção "Ajuste de 2026-11-17".
 
 ## Resposta
+
+**2026-11-17, Liliane:** aceito o T09, o T16 e o T18, junto com o T06. Começo pelo T09, o diagrama de classes, a partir do catálogo do T08. Antes do T16, combino com o Alexandre o formato dos cenários. Se algo atrasar o T17 ou o T20, aviso por aqui.
