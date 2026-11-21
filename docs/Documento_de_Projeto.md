@@ -423,8 +423,9 @@ diagrama diz quais. Os construtores aparecem quando os parâmetros importam.
 
 ### 3.1 Visão geral
 
-As dependências de dentro de cada grupo ficam nos diagramas 3.2 a 3.6. Aqui aparecem só as que ligam grupos
-diferentes. A `FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas,
+As dependências de dentro de cada grupo ficam nos diagramas 3.2 a 3.6. Aqui aparecem as que ligam grupos
+diferentes e mais três de dentro do grupo: a do `Main`, que ficaria solto, e as de `InteressadoEmStatus` e
+`InteressadoEmPosicao` para o `Aviso`, que mostram o que os interessados recebem. A `FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas,
 para `Modal` e `Perfil`.
 
 ```mermaid
@@ -521,6 +522,8 @@ classDiagram
     InterpretadorDeLinha --> "1" FabricaDeCodigos : fabrica
 
     Main ..> ProcessadorDeLote : usa
+    ProcessadorDeLote ..> Encomenda : calcular()
+    ProcessadorDeLote ..> ResultadoCalculo : usa
     Encomenda ..> ResultadoCalculo : cria
     Transporte ..> ResultadoCalculo : devolve
     Transporte ..> Aviso : cria
