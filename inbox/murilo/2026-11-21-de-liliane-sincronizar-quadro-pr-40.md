@@ -3,7 +3,7 @@ para: murilo
 de: liliane
 data: 2026-11-21
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -20,3 +20,7 @@ Subi os ajustes que o Alexandre pediu no PR #40 (T09, diagrama de classes UML) e
 - Depois do merge do #43, ainda atualizo a 3.1 e a 3.6 com a lista única de códigos.
 
 ## Resposta
+
+2026-11-21 (Murilo): sincronização manual de 21/11 às 20:37 (`s-202611212337`), sem mudanças: o #40 continua aberto,
+com o Alexandre de revisor (a última revisão dele ainda é o pedido de alterações, e a nova revisão já foi pedida). O
+cartão do T09 segue em "Em PR" ligado ao #40 até o merge.
