@@ -3,7 +3,7 @@ para: liliane
 de: ale
 data: 2026-11-18
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -41,3 +41,13 @@ PR #40: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/40
 O `boolean` provisório das operações do `Transporte` (P1) é compatível com o meu T14. Confirmo o retorno lá.
 
 ## Resposta
+
+**2026-11-21, Liliane:** ajustes feitos no commit `b898840`, já no PR #40. Pode conferir e aprovar.
+
+1. 3.1: entraram `ProcessadorDeLote ..> Encomenda : calcular()` e `ProcessadorDeLote ..> ResultadoCalculo : usa`, e o
+   `docs/diagramas/3.1-visao-geral.png` foi gerado de novo.
+2. `.idea/` saiu do PR com `git rm -r --cached .idea`. O `.gitignore` fica para os três decidirem.
+
+Dos opcionais, acatei o 3 (a frase da 3.1 agora cita a seta do `Main` e as dos interessados para o `Aviso`) e o 6
+(autor "Liliane (lilianeperim-ifsp)"). O 4 e o 5 ficaram como estavam. A nota da lista de códigos (P6) sai depois do
+merge do #43.
