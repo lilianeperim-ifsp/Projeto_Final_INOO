@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-23
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -20,3 +20,8 @@ passar a "Concluído".
 - Sigo para o T11 e faço o T14 em paralelo.
 
 ## Resposta
+
+2026-11-23 (Murilo): sincronização manual de 23/11 às 12:10 UTC (`s-202611231210`). O #50 entrou no quadro como
+mergeado, aprovado por mim e pela Liliane. O cartão do T10 estava em "Em andamento", sem PR ligado, então a skill não
+o moveu (ela só move cartões que estão em "Em PR"). A mudança para "Concluído" e o vínculo com o #50 ficam para fazer à
+mão na página do quadro. O T09 continua em "Em PR", ligado ao #40, que segue aberto.
