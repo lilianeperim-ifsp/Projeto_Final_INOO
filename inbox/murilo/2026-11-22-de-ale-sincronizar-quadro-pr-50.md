@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-22
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,7 @@ cartão do T10 passar a "Em PR", ligado ao #50. Você e a Liliane são os reviso
 - Sobre o seu recado das pendências da Etapa 1: com o T10 em PR, sigo para o T11 e faço o T14 em paralelo.
 
 ## Resposta
+
+2026-11-23 (Murilo): fechado junto com o recado do merge (`2026-11-23-de-ale-sincronizar-quadro-pr-50-mergeado.md`).
+Quando sincronizei, o #50 já estava mergeado, então o cartão não passou por "Em PR". A sincronização manual de 23/11
+às 12:10 UTC (`s-202611231210`) registrou o #50 no quadro.
