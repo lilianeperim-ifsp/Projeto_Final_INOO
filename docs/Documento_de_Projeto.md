@@ -10,10 +10,11 @@
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
+> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
-> | 3 a 5, 6.3 e 7 | T09 a T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 3, 5, 6.3 e 7 | T09, T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -418,9 +419,97 @@ FormatadorDeSaida
   sem `null` nem exceção (ver a decisão na 6.1). Na revisão do PR #19, o Alexandre (dono da 2.2.6) definiu a
   pré-condição do `criar*` e a lista única de códigos.
 
+## 4. Estratégia de resolução dos pontos de variação
+
+> **Em revisão (T10, Alexandre).** Esta seção diz **como** o projeto isola o que muda entre modais, entre perfis e entre
+> interessados (ET 6, item 4). A fronteira com as seções vizinhas é esta:
+>
+> - a seção 4 descreve o **mecanismo** de cada ponto de variação;
+> - a seção 5 (T11) dá o **nome do padrão** de cada mecanismo, com a alternativa descartada;
+> - a seção 7 (T15 a T17) lista as **classes criadas e alteradas** em cada cenário de evolução.
+>
+> A sobretaxa (2.1.1) e o arredondamento (2.1.2) já foram decididos no catálogo, e aqui só são citados. Os cenários
+> são numerados na ordem da tabela de `contexto/especificacoes-tecnicas.md`, seção 4 (1 = ferroviário, 12 = separador).
+
+### 4.1 Três regras que valem para todos os pontos
+
+1. **O que varia fica atrás de uma abstração, e quem usa depende só dela.** A `Encomenda` conhece `Modal` e `Perfil`,
+   e não `Rodoviario` nem `Rapido`. O `Transporte` conhece `Status`, `Perfil` e as duas interfaces de interessado. É o
+   polimorfismo das aulas 11 e 12: a chamada é a mesma, e cada objeto responde do seu jeito.
+2. **A regra comum é escrita uma vez, na abstração.** As fórmulas e a sobretaxa ficam em `Modal`, a multiplicação em
+   `PerfilPorMultiplicadores`, a rejeição padrão em `Status` e o arredondamento em `ResultadoCalculo`. As classes
+   concretas só dizem o que as diferencia: números, uma transição aceita ou uma reação ao aviso (erro 5 da Livraria).
+3. **O tipo concreto é escolhido em poucos lugares, todos conhecidos, e nenhum outro lugar pergunta o tipo.** Criar o
+   objeto não é testar o tipo. Depois de criado, ninguém usa `instanceof`, `switch` nem comparação de código ou de
+   texto para decidir comportamento (ET 3.2). A lista completa desses lugares está na 4.3.
+
+### 4.2 Cada ponto de variação
+
+| Ponto | O que muda | O que fica igual, e onde | Mecanismo | Quem depende só da abstração | Cenários |
+|---|---|---|---|---|---|
+| **Modal** | Os seis parâmetros da RN 2: custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade | As fórmulas de frete, tempo e CO₂ base, a sobretaxa e a verificação de capacidade, em `Modal` | Classe abstrata com as fórmulas, que chamam seis etapas abstratas `protected`. Cada modal concreto implementa só as etapas, com os seus números (2.2.1) | `Encomenda` (cálculo) e `InterpretadorDeLinha` (`excedeCapacidade`) | 1 (ferroviário) |
+| **Perfil** | Os três multiplicadores da RN 4. No PREMIUM, também o comportamento do frete (piso de R$ 50,00) | A multiplicação `base × fator`, em `PerfilPorMultiplicadores` | Interface `Perfil` mais uma classe abstrata com a multiplicação. O perfil é **passado como objeto**: `Encomenda.calcular(perfil)` o recebe, e o `Transporte` guarda a referência do perfil vigente. Trocar o perfil é trocar essa referência, e simular é passar outro objeto (2.1.3 e 6.2) | `Encomenda` e `Transporte` | 2 (corporativo), 3 (troca), 5 (simulação), 11 (PREMIUM) |
+| **Status** | Quais transições o transporte aceita, se a troca de perfil é permitida e se a entrega conta para a auditoria | A resposta padrão de cada pergunta (rejeitar a transição, permitir a troca, não contar), em `Status` | Classe abstrata com o comportamento padrão. Cada status sobrescreve só o que aceita. O status atual devolve o próximo, e o `Transporte` troca o objeto que guarda. A forma de indicar a rejeição é decidida no T14 (6.3) | `Transporte` (transições e troca de perfil) e `AuditoriaAmbiental` (`contaParaAuditoria`) | 7 (CANCELADO) |
+| **Interessados** | A reação a cada aviso: linha de log, soma de CO₂, mensagem ao cliente e, no cenário, SMS por região | Montar o `Aviso` uma vez e percorrer a lista, no `Transporte` | Duas interfaces (`InteressadoEmStatus` e `InteressadoEmPosicao`) e duas listas no `Transporte`, com adicionar e remover em execução. O aviso é imutável e já leva o CO₂ do perfil vigente (2.1.4 e 2.2.4) | `Transporte` | 4 (SMS), 7 (auditoria não soma o CANCELADO), 8 (troca de assinatura) |
+| **Sobretaxa** | Limite e percentual da carga pesada | A regra, num único ponto: `Modal.freteBase`, com as constantes `LIMITE_CARGA_PESADA_KG` e `FATOR_SOBRETAXA` (2.1.1) | Uma regra só na abstração, que vale para todos os modais, inclusive os novos | Todos os modais, sem saber dela | 10 (8% acima de 2000 kg) |
+| **Arredondamento** | — (a RN 5 é fixa) | Um único método, `ResultadoCalculo.arredondar`, chamado no construtor do resultado e na média do relatório (2.1.2) | Todo resultado passa pelo mesmo construtor, então o lote, o transporte e a simulação arredondam no mesmo ponto | `Encomenda` (cria o resultado) e `Relatorio` (média) | 5 (a simulação reaproveita o cálculo) |
+| **Código → objeto** | O texto da entrada (`AEREO`, `RAPIDO`) e o objeto que ele vira | A lista única de códigos conhecidos, na `FabricaDeCodigos` (2.2.6) | A fábrica é o único lugar que compara código. Um modal ou perfil novo é uma entrada nova nessa lista, e o resto do sistema recebe o objeto pronto | `InterpretadorDeLinha` | 1, 2 e 11 (uma entrada nova), 6 (configuração externa) |
+| **Formato da linha e validação** | O separador e a sequência de validações | O separador existe só no `split` do passo 4 da 6.1. As validações estão no `InterpretadorDeLinha`, na ordem da RN 6 | Isolados na camada de entrada, sem padrão. Trocar o separador é mudar uma linha, e uma regra nova entra na posição dela na sequência | `ProcessadorDeLote` recebe a `LinhaInterpretada` pronta | 9 (peso mínimo), 12 (separador `,`) |
+| **Formato da saída** | — (a RN 11 é fixa) | Um único método, `FormatadorDeSaida.numero`, com o `String.format` em `pt-BR` (2.2.6) | Isolado na camada de saída, sem padrão | `ProcessadorDeLote` | — |
+
+- **A coluna "Quem depende só da abstração" nas linhas Sobretaxa, Arredondamento e Formato da saída:** nelas não há
+  tipo concreto a esconder, porque `ResultadoCalculo` e `FormatadorDeSaida` são classes concretas e a sobretaxa é uma
+  regra dentro de `Modal`. Nessas três linhas, a coluna mostra quem usa o ponto único.
+
+- **Por que o perfil é passado, e não herdado pelo modal:** modal e perfil variam de forma independente (RN 4: o
+  perfil vale igual para qualquer modal). Com o perfil como objeto separado, 3 modais e 3 perfis são 6 classes
+  concretas, e um modal novo é uma classe só. É a composição da aula 10 ("tem um"), usada onde a herança ("é um")
+  multiplicaria as classes.
+- **Por que o modal é herança, e não um objeto de parâmetros:** o modal não troca em execução e todos calculam do
+  mesmo jeito, só com números diferentes. As etapas abstratas fazem o compilador exigir os seis números de um modal
+  novo (2.2.1).
+- **Separador sem constante própria:** o `;` aparece uma vez só, no `split` do passo 4 da 6.1, e trocar o separador já
+  é mudar essa linha.
+  - Alternativa descartada: uma constante `SEPARADOR` no `InterpretadorDeLinha`. Ela não reduz o número de pontos a
+    alterar, que já é um, e mudaria o passo 4 da 6.1 sem ganho.
+
+### 4.3 Onde o tipo concreto aparece
+
+Esta lista serve de prova da ET 3.2 na defesa: são os **únicos** lugares do código, inclusive os testes, que escrevem o nome de
+um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o objeto, e nunca para perguntar qual ele
+é.
+
+| Lugar | O que cria | Por quê ali |
+|---|---|---|
+| `FabricaDeCodigos` (camada de entrada) | Os três modais e os três perfis, um por código conhecido | É a camada que a ET 3.2 libera para comparar código |
+| Construtor do `Transporte` | O `Aguardando` inicial | Todo transporte começa em `AGUARDANDO` (RN 7). O `Transporte` conhece o `Aguardando` só para criá-lo e, depois, fala com ele apenas como `Status` |
+| `Aguardando.iniciarTransito()` e `EmTransito.entregar()` | O próximo status (`EmTransito` e `Entregue`) | Cada status conhece só a sua saída. No cenário CANCELADO, `Aguardando` e `EmTransito` também criam o `Cancelado` |
+| Quem monta o transporte: os testes (seção 8) | Os interessados (`CentralDeControle`, `AuditoriaAmbiental`, `Cliente`) e o perfil de uma troca ou simulação | O operador é um ator externo (1.2 e 6.2), e no código quem faz o papel dele são os testes. Eles podem pedir o perfil à fábrica ou criá-lo com `new Rapido()`. Uma demonstração fora dos testes, se for criada, entra nesta linha |
+
+- **Fora dessa lista, só abstrações:** a `Encomenda` chama `Modal` e `Perfil`, o `Transporte` chama `Status`, `Perfil`
+  e as interfaces de interessado, e a `AuditoriaAmbiental` pergunta `contaParaAuditoria()` ao status do aviso.
+- **O `getNome()` do status não decide comportamento:** ele só escreve o texto do log e da mensagem. Os testes conferem
+  o status por ele (8.5), o que é verificar o resultado, e não escolher o que fazer.
+- **Como conferir no código (Etapa 2):** uma busca por `instanceof` e `switch` não deve achar nenhum uso sobre
+  modal, perfil ou status, e uma busca por `.equals(` deve achar comparação de código de modal ou perfil só na
+  `FabricaDeCodigos`. Cada cenário da seção 7 pode acrescentar um lugar a esta tabela, mas só de criação.
+
+### 4.4 Alternativas descartadas para o mecanismo geral
+
+- **Um cálculo único com condicionais sobre o código**, como `if (modal.equals("AEREO"))` ou um `switch` sobre o
+  perfil, dentro da encomenda ou de uma calculadora. Fere a ET 3.2. Cada cenário de modal ou perfil novo reescreveria
+  esse método, e esquecer um ramo só apareceria na execução.
+- **Os parâmetros em arrays indexados pelo modal**, com uma posição por modal e uma classe só para o cálculo. Os
+  números da RN 2 passariam a morar na entrada, um índice trocado não daria erro de compilação, e não haveria
+  polimorfismo a mostrar (uma alternativa parecida, a `Modal` concreta com os números vindos da fábrica, foi
+  descartada na 2.2.1).
+- **Uma classe para cada combinação de modal e perfil**, como `RodoviarioEconomico`. São 9 classes hoje. O ferroviário
+  pediria 3 classes novas, e o corporativo, mais 4. Também não permitiria trocar o perfil sem recriar o objeto
+  (cenário 3).
+
 ## 6. Fluxos principais
 
-> As seções 3 a 5 (T09 a T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
+> As seções 3 e 5 (T09 e T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
 
 ### 6.1 Processamento de uma linha do lote
 
