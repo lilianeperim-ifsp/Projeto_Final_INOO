@@ -252,7 +252,7 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 
 ### 2.2 Classes e interfaces
 
-São **31 tipos** em 6 grupos. Atributos são sempre `private`, e as constantes são `static final` com nome. As
+São **33 tipos** em 6 grupos. Atributos são sempre `private`, e as constantes são `static final` com nome. As
 operações que podem ser rejeitadas aparecem como "aceita ou rejeita": o mecanismo (valor de retorno ou exceção) foi
 resolvido para o lote na 6.1 e, para o `Status` e o `Transporte`, se resolve no T14.
 
@@ -421,9 +421,9 @@ FormatadorDeSaida
 
 ## 3. Diagrama de classes UML
 
-Os 31 tipos do catálogo (2.2) aparecem em seis diagramas: uma **visão geral**, com só os nomes, as hierarquias e as
+Os 33 tipos do catálogo (2.2) aparecem em seis diagramas: uma **visão geral**, com só os nomes, as hierarquias e as
 dependências entre os grupos, e um diagrama **por grupo** da 2.2, com atributos e métodos tipados. Um diagrama único
-com os 31 tipos completos ficava ilegível no PDF e difícil de explicar na defesa.
+com os 33 tipos completos ficava ilegível no PDF e difícil de explicar na defesa.
 
 **Como ler:**
 
@@ -444,9 +444,11 @@ diagrama diz quais. Os construtores aparecem quando os parâmetros importam.
 ### 3.1 Visão geral
 
 As dependências de dentro de cada grupo ficam nos diagramas 3.2 a 3.6. Aqui aparecem as que ligam grupos
-diferentes e mais três de dentro do grupo: a do `Main`, que ficaria solto, e as de `InteressadoEmStatus` e
-`InteressadoEmPosicao` para o `Aviso`, que mostram o que os interessados recebem. A `FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas,
-para `Modal` e `Perfil`.
+diferentes e mais cinco de dentro do grupo: a do `Main`, que ficaria solto; as de `InteressadoEmStatus` e
+`InteressadoEmPosicao` para o `Aviso`, que mostram o que os interessados recebem; e as da `FabricaDeCodigos` para
+`CodigoDeModal` e `CodigoDePerfil`, que mostram como um código da entrada chega ao `Modal` e ao `Perfil` (2.2.6). A
+`FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas, para `Modal` e
+`Perfil`.
 
 ```mermaid
 classDiagram
@@ -505,6 +507,8 @@ classDiagram
         class InterpretadorDeLinha
         class LinhaInterpretada
         class FabricaDeCodigos
+        class CodigoDeModal
+        class CodigoDePerfil
         class FormatadorDeSaida
         class Rejeicao
         class Relatorio
@@ -540,6 +544,10 @@ classDiagram
     ProcessadorDeLote --> "1" InterpretadorDeLinha : interpretador
     ProcessadorDeLote --> "1" FormatadorDeSaida : formatador
     InterpretadorDeLinha --> "1" FabricaDeCodigos : fabrica
+    FabricaDeCodigos --> "*" CodigoDeModal : modais
+    FabricaDeCodigos --> "*" CodigoDePerfil : perfis
+    CodigoDeModal --> "1" Modal : modal
+    CodigoDePerfil --> "1" Perfil : perfil
 
     Main ..> ProcessadorDeLote : usa
     ProcessadorDeLote ..> Encomenda : calcular()
@@ -558,7 +566,6 @@ classDiagram
     FormatadorDeSaida ..> ResultadoCalculo : usa
 
     note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: provisório, confirmar no T14"
-    note for FabricaDeCodigos "estrutura interna: pendente, decisão do Murilo (T20)"
 ```
 
 ### 3.2 Cálculo
@@ -824,10 +831,29 @@ classDiagram
         +getRejeicao() Rejeicao
     }
     class FabricaDeCodigos {
+        -List~CodigoDeModal~ modais
+        -List~CodigoDePerfil~ perfis
+        +FabricaDeCodigos()
         +existeModal(String codigo) boolean
         +existePerfil(String codigo) boolean
         +criarModal(String codigo) Modal
         +criarPerfil(String codigo) Perfil
+        -indiceDoModal(String codigo) int
+        -indiceDoPerfil(String codigo) int
+    }
+    class CodigoDeModal {
+        -String codigo
+        -Modal modal
+        +CodigoDeModal(String codigo, Modal modal)
+        +getCodigo() String
+        +getModal() Modal
+    }
+    class CodigoDePerfil {
+        -String codigo
+        -Perfil perfil
+        +CodigoDePerfil(String codigo, Perfil perfil)
+        +getCodigo() String
+        +getPerfil() Perfil
     }
     class FormatadorDeSaida {
         +formatarValida(int id, ResultadoCalculo resultado) String
@@ -863,14 +889,20 @@ classDiagram
     ProcessadorDeLote ..> Relatorio : cria
     ProcessadorDeLote ..> LinhaInterpretada : usa
     InterpretadorDeLinha --> "1" FabricaDeCodigos : fabrica
+    FabricaDeCodigos --> "*" CodigoDeModal : modais
+    FabricaDeCodigos --> "*" CodigoDePerfil : perfis
     InterpretadorDeLinha ..> LinhaInterpretada : cria
     InterpretadorDeLinha ..> Rejeicao : cria
     LinhaInterpretada --> "0..1" Rejeicao : rejeicao
     FormatadorDeSaida ..> Rejeicao : usa
     FormatadorDeSaida ..> Relatorio : usa
 
-    note for FabricaDeCodigos "estrutura interna: pendente, decisão do Murilo (T20)"
+    note for FabricaDeCodigos "o construtor preenche as listas, uma linha por código; indiceDo* devolve -1 se não acha (2.2.6)"
 ```
+
+O `FabricaDeCodigos()` aparece porque é nele que um modal ou perfil novo ganha a sua linha (2.2.6). As setas de
+`CodigoDeModal` para `Modal` e de `CodigoDePerfil` para `Perfil`, e as da fábrica para os concretos, ligam grupos
+diferentes e estão na visão geral (3.1).
 
 ### 3.7 Decisões do diagrama
 
@@ -901,8 +933,13 @@ O catálogo (2.2) não trazia os tipos dos atributos e dos retornos. Estes viera
    - **Para a implementação:** os construtores com parâmetro rejeitam `null` com `Objects.requireNonNull`, porque uma
      variável valendo `null` passa pelo compilador. `Objects` (`java.util`) não aparece nos slides, então o grupo
      confirma antes de usar, como o `final` (2.1.1) e o `BigDecimal` (2.1.2).
-6. **A estrutura interna da lista única de códigos da `FabricaDeCodigos` está pendente:** array de `String`, listas
-   paralelas ou outra forma. Decide o Murilo (T20), e o diagrama mostra só os métodos públicos, com uma nota.
+6. **A lista única de códigos da `FabricaDeCodigos` aparece por inteiro:** os atributos `List<CodigoDeModal>` e
+   `List<CodigoDePerfil>`, os privados `indiceDoModal` e `indiceDoPerfil` e as classes de par `CodigoDeModal` e
+   `CodigoDePerfil`, com associação `*` da fábrica para cada par e `1` de cada par para `Modal` ou `Perfil`. A
+   estrutura foi decidida na 2.2.6 (PR #43), onde estão as alternativas descartadas para ela.
+   - Por quê: o cenário do ferroviário passa pela fábrica, e o diagrama mostra onde entra a linha nova.
+   - Alternativa descartada: mostrar só os quatro métodos públicos, com uma nota de que a estrutura interna ficava
+     para depois. Era a versão anterior deste diagrama, de antes da decisão da 2.2.6.
 
 ## 6. Fluxos principais
 
