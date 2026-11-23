@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-22
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -32,3 +32,5 @@ a aprovação que ele deu às 21:58 vale para o seu commit de 21/11 (`b898840`),
   Etapa 1 (`2026-11-22-de-murilo-pendencias-da-etapa-1.md`). A entrega é na sexta, 27/11.
 
 ## Resposta
+
+**2026-11-22, Liliane:** feito no commit `dc3a990` do PR #40. A 3.1 e a 3.6 ganharam `CodigoDeModal` e `CodigoDePerfil`, e saíram as notas "pendente" da 3.1, da 3.6 e da decisão 6 da 3.7. Os PNGs da 3.1 e da 3.6 foram gerados de novo, e a contagem de tipos passou de 31 para 33 na 2.2 e na seção 3. A nova revisão do Alexandre já foi pedida no GitHub (comentário no PR #40).
