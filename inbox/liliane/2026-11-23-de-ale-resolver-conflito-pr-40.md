@@ -3,7 +3,7 @@ para: liliane
 de: ale
 data: 2026-11-23
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -27,3 +27,9 @@ O PR #50 (T10, seção 4) entrou na `dev` (merge `23652e0`). Agora o #40 precisa
 - Depois do merge, avise o Murilo para rodar o `/sincronizar-quadro`.
 
 ## Resposta
+
+2026-11-23 (Liliane): conflito resolvido como combinado, no merge `74b52d8` da `logitech/lilianeperim-ifsp`, já
+enviado para o #40. Seção 3 antes da 4, tabela do topo na ordem 2, 3, 4, linha "A fazer" como "5, 6.3 e 7 | T11 e
+T14 a T18" e aviso da 6 como "A seção 5 (T11) entra antes desta". A sugestão opcional sobre a frase "mais cinco de
+dentro do grupo" da 3.1 ainda não foi feita. O Murilo já foi avisado
+(`inbox/murilo/2026-11-23-de-liliane-sincronizar-quadro-pr-40.md`).
