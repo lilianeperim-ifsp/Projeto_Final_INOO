@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-19
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -25,3 +25,5 @@ do merge, dá para atualizar o diagrama do T09 no PR #40.
   - nas notas da 3.1 e da 3.6 e na decisão 6 da 3.7, a pendência sai. Depois, gerar os PNGs de novo.
 
 ## Resposta
+
+**2026-11-22, Liliane:** ciente. O #43 foi mergeado, e o diagrama do T09 foi atualizado no PR #40 (commit `dc3a990`), como pede o recado `2026-11-22-de-murilo-atualizar-pr-40-apos-merge-do-43.md`.
