@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-19
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -26,3 +26,9 @@ atualiza o diagrama do T09.
 - Pedido da Liliane: `inbox/murilo/2026-11-18-de-liliane-lista-unica-de-codigos.md`, já fechado.
 
 ## Resposta
+
+**2026-11-22, Alexandre:** aprovei o PR #43 no GitHub. As duas classes novas da 2.2.6, `CodigoDeModal` e
+`CodigoDePerfil`, estão aprovadas, assim como a busca única por `indiceDoModal`/`indiceDoPerfil`. O contrato do PR #19
+continua igual (`existe*` responde `>= 0` e `criar*` lança `IllegalArgumentException` no `-1`), a comparação com
+`equals` segue a RN 4, e a instância compartilhada é segura porque modais e perfis não têm atributos de instância
+(2.2.1). Pode mergear. Depois do merge, rode `/sincronizar-quadro`, e a Liliane atualiza a seção 3 no PR #40.
