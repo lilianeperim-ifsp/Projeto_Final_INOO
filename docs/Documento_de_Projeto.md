@@ -10,9 +10,9 @@
 > |---|---|---|---|
 > | 1. Análise do problema | T07 | Murilo | Escrita |
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
+> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
-> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
 > | 3, 5, 6.3 e 7 | T09, T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
@@ -447,7 +447,7 @@ FormatadorDeSaida
 
 | Ponto | O que muda | O que fica igual, e onde | Mecanismo | Quem depende só da abstração | Cenários |
 |---|---|---|---|---|---|
-| **Modal** | Os seis parâmetros da RN 2: custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade | As fórmulas de frete, tempo e CO₂ base, a sobretaxa e a verificação de capacidade, em `Modal` | Classe abstrata com as fórmulas, que chamam seis etapas abstratas `protected`. Cada modal concreto implementa só as etapas, com os seus números (2.2.1) | `Encomenda` (cálculo) e `InterpretadorDeLinha` (`excedeCapacidade`) | 1 (ferroviário), 6 (configuração externa) |
+| **Modal** | Os seis parâmetros da RN 2: custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade | As fórmulas de frete, tempo e CO₂ base, a sobretaxa e a verificação de capacidade, em `Modal` | Classe abstrata com as fórmulas, que chamam seis etapas abstratas `protected`. Cada modal concreto implementa só as etapas, com os seus números (2.2.1) | `Encomenda` (cálculo) e `InterpretadorDeLinha` (`excedeCapacidade`) | 1 (ferroviário) |
 | **Perfil** | Os três multiplicadores da RN 4. No PREMIUM, também o comportamento do frete (piso de R$ 50,00) | A multiplicação `base × fator`, em `PerfilPorMultiplicadores` | Interface `Perfil` mais uma classe abstrata com a multiplicação. O perfil é **passado como objeto**: `Encomenda.calcular(perfil)` o recebe, e o `Transporte` guarda a referência do perfil vigente. Trocar o perfil é trocar essa referência, e simular é passar outro objeto (2.1.3 e 6.2) | `Encomenda` e `Transporte` | 2 (corporativo), 3 (troca), 5 (simulação), 11 (PREMIUM) |
 | **Status** | Quais transições o transporte aceita, se a troca de perfil é permitida e se a entrega conta para a auditoria | A resposta padrão de cada pergunta (rejeitar a transição, permitir a troca, não contar), em `Status` | Classe abstrata com o comportamento padrão. Cada status sobrescreve só o que aceita. O status atual devolve o próximo, e o `Transporte` troca o objeto que guarda. A forma de indicar a rejeição é decidida no T14 (6.3) | `Transporte` (transições e troca de perfil) e `AuditoriaAmbiental` (`contaParaAuditoria`) | 7 (CANCELADO) |
 | **Interessados** | A reação a cada aviso: linha de log, soma de CO₂, mensagem ao cliente e, no cenário, SMS por região | Montar o `Aviso` uma vez e percorrer a lista, no `Transporte` | Duas interfaces (`InteressadoEmStatus` e `InteressadoEmPosicao`) e duas listas no `Transporte`, com adicionar e remover em execução. O aviso é imutável e já leva o CO₂ do perfil vigente (2.1.4 e 2.2.4) | `Transporte` | 4 (SMS), 7 (auditoria não soma o CANCELADO), 8 (troca de assinatura) |
@@ -456,6 +456,10 @@ FormatadorDeSaida
 | **Código → objeto** | O texto da entrada (`AEREO`, `RAPIDO`) e o objeto que ele vira | A lista única de códigos conhecidos, na `FabricaDeCodigos` (2.2.6) | A fábrica é o único lugar que compara código. Um modal ou perfil novo é uma entrada nova nessa lista, e o resto do sistema recebe o objeto pronto | `InterpretadorDeLinha` | 1, 2 e 11 (uma entrada nova), 6 (configuração externa) |
 | **Formato da linha e validação** | O separador e a sequência de validações | O separador existe só no `split` do passo 4 da 6.1. As validações estão no `InterpretadorDeLinha`, na ordem da RN 6 | Isolados na camada de entrada, sem padrão. Trocar o separador é mudar uma linha, e uma regra nova entra na posição dela na sequência | `ProcessadorDeLote` recebe a `LinhaInterpretada` pronta | 9 (peso mínimo), 12 (separador `,`) |
 | **Formato da saída** | — (a RN 11 é fixa) | Um único método, `FormatadorDeSaida.numero`, com o `String.format` em `pt-BR` (2.2.6) | Isolado na camada de saída, sem padrão | `ProcessadorDeLote` | — |
+
+- **A coluna "Quem depende só da abstração" nas linhas Sobretaxa, Arredondamento e Formato da saída:** nelas não há
+  tipo concreto a esconder, porque `ResultadoCalculo` e `FormatadorDeSaida` são classes concretas e a sobretaxa é uma
+  regra dentro de `Modal`. Nessas três linhas, a coluna mostra quem usa o ponto único.
 
 - **Por que o perfil é passado, e não herdado pelo modal:** modal e perfil variam de forma independente (RN 4: o
   perfil vale igual para qualquer modal). Com o perfil como objeto separado, 3 modais e 3 perfis são 6 classes
@@ -471,16 +475,16 @@ FormatadorDeSaida
 
 ### 4.3 Onde o tipo concreto aparece
 
-Esta lista serve de prova da ET 3.2 na defesa: são os **únicos** lugares do código de produção que escrevem o nome de
+Esta lista serve de prova da ET 3.2 na defesa: são os **únicos** lugares do código, inclusive os testes, que escrevem o nome de
 um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o objeto, e nunca para perguntar qual ele
 é.
 
 | Lugar | O que cria | Por quê ali |
 |---|---|---|
 | `FabricaDeCodigos` (camada de entrada) | Os três modais e os três perfis, um por código conhecido | É a camada que a ET 3.2 libera para comparar código |
-| Construtor do `Transporte` | O `Aguardando` inicial | Todo transporte começa em `AGUARDANDO` (RN 7) |
+| Construtor do `Transporte` | O `Aguardando` inicial | Todo transporte começa em `AGUARDANDO` (RN 7). O `Transporte` conhece o `Aguardando` só para criá-lo e, depois, fala com ele apenas como `Status` |
 | `Aguardando.iniciarTransito()` e `EmTransito.entregar()` | O próximo status (`EmTransito` e `Entregue`) | Cada status conhece só a sua saída. No cenário CANCELADO, `Aguardando` e `EmTransito` também criam o `Cancelado` |
-| Quem monta o transporte: os testes e a demonstração do operador | Os interessados (`CentralDeControle`, `AuditoriaAmbiental`, `Cliente`) e o perfil de uma troca ou simulação | O operador é um ator externo (1.2 e 6.2). Ele pode pedir o perfil à fábrica ou criá-lo com `new Rapido()` |
+| Quem monta o transporte: os testes (seção 8) | Os interessados (`CentralDeControle`, `AuditoriaAmbiental`, `Cliente`) e o perfil de uma troca ou simulação | O operador é um ator externo (1.2 e 6.2), e no código quem faz o papel dele são os testes. Eles podem pedir o perfil à fábrica ou criá-lo com `new Rapido()`. Uma demonstração fora dos testes, se for criada, entra nesta linha |
 
 - **Fora dessa lista, só abstrações:** a `Encomenda` chama `Modal` e `Perfil`, o `Transporte` chama `Status`, `Perfil`
   e as interfaces de interessado, e a `AuditoriaAmbiental` pergunta `contaParaAuditoria()` ao status do aviso.
@@ -497,14 +501,15 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
   esse método, e esquecer um ramo só apareceria na execução.
 - **Os parâmetros em arrays indexados pelo modal**, com uma posição por modal e uma classe só para o cálculo. Os
   números da RN 2 passariam a morar na entrada, um índice trocado não daria erro de compilação, e não haveria
-  polimorfismo a mostrar (a mesma alternativa foi descartada para o modal na 2.2.1).
+  polimorfismo a mostrar (uma alternativa parecida, a `Modal` concreta com os números vindos da fábrica, foi
+  descartada na 2.2.1).
 - **Uma classe para cada combinação de modal e perfil**, como `RodoviarioEconomico`. São 9 classes hoje. O ferroviário
   pediria 3 classes novas, e o corporativo, mais 4. Também não permitiria trocar o perfil sem recriar o objeto
   (cenário 3).
 
 ## 6. Fluxos principais
 
-> As seções 3 a 5 (T09 a T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
+> As seções 3 e 5 (T09 e T11) entram antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
 
 ### 6.1 Processamento de uma linha do lote
 
