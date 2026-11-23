@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-18
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,6 @@ Se quiser, confira se ficou como você esperava. O Alexandre é o reviewer.
   sem a lista não dá para saber o que já existe.
 
 ## Resposta
+
+**2026-11-21, Liliane:** conferido. A correção do ponto 3 ficou como eu esperava, e o PR #31 já foi aprovado pelo Alexandre e
+mergeado em 2026-11-19.

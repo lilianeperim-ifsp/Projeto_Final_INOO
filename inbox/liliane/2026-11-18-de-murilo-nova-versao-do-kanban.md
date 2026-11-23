@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-18
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -34,3 +34,5 @@ hora sou eu, com `/sincronizar-quadro`. Os textos com os horários novos (`CLAUD
 para o PR #31: https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/31
 
 ## Resposta
+
+**2026-11-21, Liliane:** olhei a versão 10 do quadro e está tudo em ordem, ficou ótimo.
