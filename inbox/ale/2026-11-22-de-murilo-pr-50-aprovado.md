@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-22
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -31,3 +31,7 @@ conflito com o #40 que você previa. Se puder, faça os ajustes e mergeie o #50 
 - Depois do merge, me avise para eu rodar o `/sincronizar-quadro`. A entrega da Etapa 1 é na sexta, 27/11.
 
 ## Resposta
+
+**2026-11-23, Alexandre:** concluído. Fiz os 5 ajustes e também os 2 da revisão da Liliane (nota sobre a coluna
+"Quem depende só da abstração" na 4.2 e o `Aguardando` conhecido só para ser criado na 4.3), no commit `2a92169`. O #50
+entrou na `dev` antes do #40 (merge `23652e0`). A Liliane resolve o conflito no #40, que eu já aprovei de novo.
