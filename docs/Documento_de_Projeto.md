@@ -12,10 +12,11 @@
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
 > | 3. Diagrama de classes UML | T09 | Liliane | Escrita, em revisão |
 > | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
+> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita, em revisão |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
-> | 5, 6.3 e 7 | T11 e T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 6.3 e 7 | T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -122,6 +123,8 @@ cada variação. A coluna "Onde aparece" indica a seção de `contexto/regras-ne
 
 Cada cenário de evolução (`contexto/especificacoes-tecnicas.md`, seção 4) cai em um ponto de variação. Os padrões
 abaixo são **candidatos**: a escolha, com a alternativa descartada, é do T11 e o mecanismo é do T10.
+
+> A escolha final está na seção 5 (T11). O Decorator, citado abaixo para o PREMIUM, foi descartado (5.3).
 
 | Ponto de variação | Cenários que o exigem | Padrão candidato |
 |---|---|---|
@@ -1031,9 +1034,178 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
   pediria 3 classes novas, e o corporativo, mais 4. Também não permitiria trocar o perfil sem recriar o objeto
   (cenário 3).
 
+## 5. Padrões e mecanismos escolhidos
+
+> **Em revisão (T11, Alexandre).** Esta seção dá nome ao mecanismo de cada ponto de variação da seção 4 (ET 6, item
+> 5). Para cada padrão usado, ela traz o problema que ele resolve aqui, as classes que o compõem e uma alternativa
+> descartada. Para cada padrão da lista do enunciado que não foi usado, diz onde ele poderia entrar e por que ficou de
+> fora. A ET 5 diz que nenhum padrão é obrigatório e que um padrão sem justificativa não rende pontos, então a seção
+> não força um padrão em cada ponto: a 5.4 lista os pontos resolvidos sem padrão.
+>
+> Referência: FREEMAN et al., *Use a cabeça! Padrões de projetos* (ET 5), e as notas de `contexto/padroes-projeto/`.
+> Os cenários seguem a numeração da seção 4 (1 = ferroviário, 12 = separador).
+
+### 5.1 Resumo
+
+| Padrão | Situação | Onde (4.2) | Cenários |
+|---|---|---|---|
+| Template Method | Usado | Modal, e a multiplicação dos perfis | 1, 2, 10 e 11 |
+| Strategy | Usado | Perfil | 2, 3, 5 e 11 |
+| State | Usado | Status | 7 |
+| Observer | Usado | Interessados | 4, 7 e 8 |
+| Simple Factory | Usado (fora da lista do enunciado) | Código → objeto | 1, 2, 6 e 11 |
+| Decorator | Descartado | Piso do PREMIUM e sobretaxa | 10 e 11 |
+| Factory Method, Singleton, Prototype, Builder, Command, Adapter | Descartados | Ver 5.3 | — |
+
+### 5.2 Padrões usados
+
+#### 5.2.1 Template Method: as fórmulas do modal e a multiplicação do perfil
+
+- **Problema:** os três modais calculam frete, tempo e CO₂ com as mesmas fórmulas (RN 2) e a mesma sobretaxa (RN 3),
+  e só os números mudam. Escrever a fórmula em cada modal repete a regra (erro 5 da Livraria) e espalha a sobretaxa
+  por três arquivos, quando ela tem que ficar em um único ponto.
+- **Classes:**
+  - `Modal` (classe abstrata). Os métodos-modelo são `freteBase`, `tempoBase`, `co2Base` e `excedeCapacidade`, e as
+    etapas abstratas `protected` são `custoPorKm()`, `custoPorKg()`, `velocidade()`, `manuseio()`, `fatorEmissao()` e
+    `capacidadeMaxima()`. As filhas são `Rodoviario`, `Aereo` e `Aquaviario`.
+  - `PerfilPorMultiplicadores` (classe abstrata). Os métodos-modelo são `aplicarFrete`, `aplicarTempo` e
+    `aplicarCo2`, e as etapas são `multiplicadorFrete()`, `multiplicadorTempo()` e `multiplicadorCo2()`. As filhas
+    são `Economico`, `Rapido` e `Ecologico`.
+- **Por quê:** a regra comum mora na classe-mãe, e cada filha diz só o que a diferencia. O compilador obriga um modal
+  novo a fornecer os seis números (cenário 1), e a sobretaxa de 8% é a troca de duas constantes em `Modal`
+  (cenário 10). É o desenho do `Livro.calculaFrete()` abstrato da aula 11.
+- **Alternativa descartada:** Strategy também para o modal, com uma interface `Modal` e os parâmetros num objeto à
+  parte. O modal não troca em execução e todo modal calcula do mesmo jeito, então o contrato a mais não traria ganho,
+  e a sobretaxa ainda precisaria de um lugar comum (2.2.1 e 4.2).
+
+#### 5.2.2 Strategy: o perfil de precificação
+
+- **Problema:** o mesmo cálculo roda com perfis diferentes, e o perfil é escolhido de fora: vem da linha no lote, é
+  trocado pelo operador durante o transporte (cenário 3) e é passado só para simular, sem mudar o vigente
+  (cenário 5). O PREMIUM (cenário 11) muda o comportamento do frete, e não só um número.
+- **Classes:** a estratégia é a interface `Perfil` (`aplicarFrete`, `aplicarTempo` e `aplicarCo2`), e as estratégias
+  concretas são `Economico`, `Rapido` e `Ecologico`, por meio de `PerfilPorMultiplicadores`. Os contextos são a
+  `Encomenda`, que recebe a estratégia em `calcular(perfil)`, e o `Transporte`, que guarda a estratégia vigente e a
+  troca em `trocarPerfil(perfil)`.
+- **Por quê:** trocar o perfil é trocar uma referência, sem recriar a encomenda nem o transporte, e nenhuma linha
+  pergunta qual perfil está em uso (ET 3.2). Modal e perfil variam de forma independente, e a composição evita
+  multiplicar classes (4.2).
+- **Alternativa descartada:** herança que combina modal e perfil, como `RodoviarioEconomico`. São 9 classes hoje, e o
+  perfil não poderia ser trocado sem recriar o objeto (4.4). O perfil só como classe abstrata, sem a interface, também
+  foi descartado (2.2.1).
+- **Template Method e Strategy juntos:** a interface `Perfil` é a Strategy, e `PerfilPorMultiplicadores` é um Template
+  Method por trás dela, para não repetir `base × fator`. Um perfil que não use multiplicadores pode implementar
+  `Perfil` direto.
+
+#### 5.2.3 State: o status do transporte
+
+- **Problema:** o que o transporte aceita depende do status. A sequência é só `AGUARDANDO → EM_TRANSITO → ENTREGUE`
+  (RN 7), a troca de perfil é proibida depois da entrega, e só a entrega conta para a auditoria (RN 8). Escrever isso
+  com `if` sobre o status atual fere a ET 3.2 e obriga a reabrir cada `if` no cenário CANCELADO (7).
+- **Classes:** o contexto é o `Transporte`, que guarda o status atual e delega a ele. O estado é a classe abstrata
+  `Status`, com a resposta padrão de `iniciarTransito()`, `entregar()`, `permiteTrocaDePerfil()` e
+  `contaParaAuditoria()`. Os estados concretos são `Aguardando`, `EmTransito` e `Entregue`, e cada um cria o seu
+  sucessor (4.3).
+- **Por quê:** cada status sobrescreve só o que aceita, e o resto sai rejeitado pelo padrão de `Status`. O CANCELADO é
+  uma classe nova mais um método `cancelar()` em `Status` (2.2.3). A auditoria pergunta `contaParaAuditoria()` ao
+  status do aviso, em vez de comparar o texto.
+- **Alternativas descartadas:**
+  - Um método genérico `mudarStatus(Status novo)`, em que o status atual precisaria descobrir o tipo de `novo`
+    (2.2.3).
+  - O status como texto ou número, com uma tabela de transições permitidas: cada decisão seria uma comparação de
+    texto ou código, que a ET 3.2 proíbe fora da entrada.
+- **State ou Strategy?** As duas têm o mesmo desenho de classes. A diferença está em quem troca o objeto: o perfil é
+  escolhido de fora, pela linha ou pelo operador (Strategy), e o status troca a si mesmo, devolvendo o próximo a cada
+  transição aceita (State).
+- **Fica para o T14 (6.3):** a forma de indicar a transição rejeitada.
+
+#### 5.2.4 Observer: os avisos aos interessados
+
+- **Problema:** cada mudança de status ou de posição precisa chegar a vários interessados, e cada um reage do seu
+  jeito (RN 8). A lista muda em execução: o cliente cancela a assinatura e outro passa a receber (cenário 8), e surge
+  o SMS por região (cenário 4). O `Transporte` não pode conhecer as classes concretas dos interessados.
+- **Classes:** o sujeito é o `Transporte`, com duas listas e os métodos de adicionar e remover. Os observadores são as
+  interfaces `InteressadoEmStatus` (`statusMudou(aviso)`) e `InteressadoEmPosicao` (`posicaoMudou(aviso)`),
+  implementadas por `CentralDeControle` (as duas), `AuditoriaAmbiental` e `Cliente`. O `Aviso` leva os dados ao
+  observador.
+- **Por quê:** um interessado novo é uma classe nova que implementa uma das interfaces, sem mudar o `Transporte`. A
+  troca de assinatura é um `remover` e um `adicionar`, sem recriar o transporte. É o modelo "empurrar" do livro: o
+  sujeito envia o `Aviso` pronto e imutável, já com o CO₂ do perfil vigente (2.1.4), e o observador não consulta o
+  transporte.
+- **Alternativas descartadas:**
+  - O modelo "puxar", com o aviso levando uma referência ao transporte. Os interessados ganhariam acesso a métodos que
+    mudam o estado (2.1.4).
+  - Uma interface só, com os dois métodos, que deixaria `posicaoMudou` vazio no `Cliente` e na `AuditoriaAmbiental`
+    (erro 23 da Livraria), ou com um campo de tipo do evento, que cada interessado teria que testar (2.2.4).
+  - As classes `java.util.Observable` e `java.util.Observer` da biblioteca, obsoletas desde o Java 9. O `Transporte`
+    teria que herdar de `Observable`, e o aviso chegaria como `Object`, o que pede conversão de tipo.
+
+#### 5.2.5 Simple Factory (fora da lista do enunciado): do código ao objeto
+
+- **Problema:** a entrada traz texto (`AEREO`, `RAPIDO`), e o núcleo trabalha com objetos. Alguém precisa comparar o
+  código, e a ET 3.2 só permite isso na camada de entrada.
+- **Classes:** `FabricaDeCodigos` (`existeModal`, `existePerfil`, `criarModal` e `criarPerfil`), com os pares
+  `CodigoDeModal` e `CodigoDePerfil`. Quem a usa é o `InterpretadorDeLinha`.
+- **Por quê:** é o único lugar que compara código (4.3). Um modal ou perfil novo é uma linha no construtor da fábrica
+  (cenários 1, 2 e 11), e o código vindo de configuração externa (cenário 6) muda só a fábrica (6.1).
+- **Por que fora da lista:** o *Use a cabeça!* apresenta a Fábrica Simples como um hábito de programação, e não como
+  um padrão GoF. Ela também não é o Factory Method (5.3). A ET 5 aceita padrões de fora da lista, se justificados.
+- **Alternativa descartada:** comparar o código dentro do `InterpretadorDeLinha`, com um `if` por código. Funciona, mas
+  mistura validar campos com criar objetos, e o caso novo mexeria no método de validação. As alternativas internas da
+  fábrica (comparações em cada método, arrays paralelos e `getCodigo()` no modal) estão na 2.2.6.
+
+### 5.3 Padrões considerados e descartados
+
+- **Decorator.**
+  - *Onde poderia entrar:* no piso de R$ 50,00 do PREMIUM (cenário 11), com uma classe `PerfilComPiso` que embrulha
+    outro `Perfil` e corrige o frete, e na sobretaxa, com um modal que embrulha outro.
+  - *Por que não:* o Decorator serve para combinar responsabilidades em execução, e nenhum cenário pede isso: só o
+    PREMIUM tem piso. O PREMIUM estende `PerfilPorMultiplicadores` e sobrescreve `aplicarFrete`, chamando
+    `super.aplicarFrete(base)` e aplicando o piso (2.2.1). É uma classe, contra duas no Decorator (o perfil e o
+    embrulho). A sobretaxa vale sempre e para todos os modais, então fica na fórmula de `Modal` (2.1.1).
+  - *Quando reconsiderar:* se surgir um piso ou acréscimo que valha para qualquer perfil.
+- **Factory Method.**
+  - *Onde poderia entrar:* na criação dos modais e perfis.
+  - *Por que não:* o padrão põe um método de criação numa classe-mãe e deixa as filhas decidirem qual objeto criar.
+    Aqui não há uma família de criadores, só a tradução de um código em objeto, e uma fábrica só resolve (5.2.5).
+- **Singleton.**
+  - *Onde poderia entrar:* na `FabricaDeCodigos`, ou nos modais e perfis, que não têm estado.
+  - *Por que não:* o ponto de acesso global esconde quem depende da fábrica e prende os testes a uma instância única.
+    A fábrica já devolve sempre o mesmo objeto para o mesmo código (2.2.6), o que dá o compartilhamento sem o acesso
+    global.
+- **Prototype.**
+  - *Onde poderia entrar:* nos objetos que a fábrica devolve, copiados de um modelo.
+  - *Por que não:* modais e perfis não têm atributos de instância, então compartilhar o mesmo objeto é seguro e não há
+    estado a copiar (2.2.6).
+- **Builder.**
+  - *Onde poderia entrar:* na `Encomenda`, que tem sete campos.
+  - *Por que não:* o Builder ajuda quando o objeto é montado em etapas ou tem muitos campos opcionais. Todos os campos
+    da encomenda são obrigatórios, e o `InterpretadorDeLinha` valida tudo antes de chamar o construtor (2.2.2). O
+    Builder seria uma classe a mais e abriria espaço para uma encomenda montada pela metade.
+- **Command.**
+  - *Onde poderia entrar:* nas operações do operador (`iniciarTransito`, `entregar`, `atualizarPosicao` e
+    `trocarPerfil`), cada uma como um objeto.
+  - *Por que não:* o Command compensa quando é preciso enfileirar, registrar ou desfazer pedidos, e nenhuma regra nem
+    cenário pede isso. A chamada direta ao `Transporte` basta.
+- **Adapter.**
+  - *Onde poderia entrar:* no cenário 6 (código de modal vindo de configuração externa) ou na leitura de `System.in`.
+  - *Por que não:* não há duas interfaces incompatíveis para conciliar. A configuração externa muda só a forma como a
+    `FabricaDeCodigos` preenche a lista (6.1), e o `Main` já entrega uma `List<String>` ao processador.
+  - *Quando reconsiderar:* se a configuração vier de uma biblioteca com interface própria.
+
+### 5.4 Pontos resolvidos sem padrão
+
+| Ponto | Mecanismo | Por que sem padrão |
+|---|---|---|
+| Validação (cenário 9) | Sequência de validações no `InterpretadorDeLinha`, na ordem da RN 6 | A ordem é fixada pelo enunciado, e uma regra nova entra na posição dela. Uma classe por regra (Chain of Responsibility, de fora da lista) espalharia uma sequência fixa por várias classes |
+| Separador (cenário 12) | O `split` do passo 4 da 6.1 | Trocar o separador já é mudar uma linha (4.2) |
+| Arredondamento | `ResultadoCalculo.arredondar` (2.1.2) | A regra é fixa (RN 5), e um método único já evita a repetição |
+| Formato da saída | `FormatadorDeSaida.numero` (2.2.6) | A regra é fixa (RN 11), e um método único já evita a repetição |
+| Linha inválida no lote | `LinhaInterpretada` com uma `Rejeicao` (6.1) | A rejeição é um valor do fluxo normal, e não uma exceção. Basta uma classe que leva o resultado |
+
 ## 6. Fluxos principais
 
-> A seção 5 (T11) entra antes desta. A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
+> A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
 
 ### 6.1 Processamento de uma linha do lote
 
