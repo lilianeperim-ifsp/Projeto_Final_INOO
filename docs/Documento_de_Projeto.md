@@ -265,7 +265,8 @@ InteressadoEmStatus (interface)            ← CentralDeControle, AuditoriaAmbie
 InteressadoEmPosicao (interface)           ← CentralDeControle
 
 Encomenda, Transporte, Posicao, ResultadoCalculo, Aviso, Rejeicao, Relatorio
-Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodigos, FormatadorDeSaida
+Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodigos, CodigoDeModal, CodigoDePerfil,
+FormatadorDeSaida
 ```
 
 #### 2.2.1 Cálculo
@@ -385,15 +386,34 @@ Main, ProcessadorDeLote, InterpretadorDeLinha, LinhaInterpretada, FabricaDeCodig
 | `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Encomenda`, `ResultadoCalculo`, `Relatorio`, `FormatadorDeSaida` |
 | `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Modal` (capacidade, antes de criar a encomenda), `Encomenda`, `Rejeicao` |
 | `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
-| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`; `criarModal(codigo)` e `criarPerfil(codigo)`, com a pré-condição de que `existe*` devolveu `true` (se violada, lançam `IllegalArgumentException`; ver 6.1). Os quatro consultam a mesma lista de códigos conhecidos | modais e perfis concretos |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`; `criarModal(codigo)` e `criarPerfil(codigo)`, com a pré-condição de que `existe*` devolveu `true` (se violada, lançam `IllegalArgumentException`; ver 6.1). Os quatro consultam a mesma lista de códigos conhecidos: guarda `List<CodigoDeModal>` e `List<CodigoDePerfil>`, e a busca fica nos privados `indiceDoModal(codigo)` e `indiceDoPerfil(codigo)` → `int` (`-1` se não acha) | `CodigoDeModal`, `CodigoDePerfil`, modais e perfis concretos |
+| `CodigoDeModal` | Liga um código de modal da entrada ao objeto `Modal` pronto | construtor `(codigo, modal)`; `getCodigo()`, `getModal()` | `Modal` |
+| `CodigoDePerfil` | Liga um código de perfil da entrada ao objeto `Perfil` pronto | construtor `(codigo, perfil)`; `getCodigo()`, `getPerfil()` | `Perfil` |
 | `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
 
 - **Alternativa descartada para a `LinhaInterpretada`:** lançar uma exceção quando a linha é inválida. A seção 1.2 já
   descartou isso: a rejeição é um conceito, e não uma exceção no fluxo normal do lote.
 - **Lista única de códigos na `FabricaDeCodigos`:** `existe*` e `criar*` consultam a mesma lista de códigos
   conhecidos. Um modal ou perfil novo (como o ferroviário) é **uma entrada nova** nessa lista, num único lugar.
+  - **Por dentro (decisão do Murilo, 19/11):** a fábrica guarda **pares código + objeto**, uma
+    `List<CodigoDeModal>` e uma `List<CodigoDePerfil>`, preenchidas no construtor com uma linha por código
+    (`RODOVIARIO`, `AEREO`, `AQUAVIARIO`; `ECONOMICO`, `RAPIDO`, `ECOLOGICO`). `indiceDoModal(codigo)` percorre a
+    lista comparando com `equals`, porque o código diferencia maiúsculas de minúsculas (RN 4), e devolve `-1` se não
+    acha. `existeModal` responde `indiceDoModal(codigo) >= 0`. `criarModal` lança `IllegalArgumentException` quando o
+    índice é `-1` e, senão, devolve o `Modal` do par. Os perfis funcionam do mesmo jeito.
+  - **Objeto compartilhado:** `criar*` devolve sempre a mesma instância para o mesmo código. É seguro porque os
+    modais e os perfis não têm atributos de instância (2.2.1), e nenhuma encomenda ou transporte altera o objeto
+    recebido.
+  - **Caso novo:** a classe nova mais uma linha no construtor da fábrica, por exemplo
+    `modais.add(new CodigoDeModal("FERROVIARIO", new Ferroviario()))`.
   - Alternativa descartada: cada método com as próprias comparações. Esquecer uma delas faria `existeModal` dizer
     `true` e `criarModal` lançar a exceção, um risco a mais para a alteração ao vivo da defesa.
+  - Alternativa descartada: arrays paralelos (um `String[]` de códigos e um `Modal[]` na mesma ordem). Não pedem
+    classe nova, mas o caso novo mexe em dois arrays, e uma ordem trocada faz `AEREO` devolver o `Rodoviario` sem
+    erro de compilação.
+  - Alternativa descartada: `getCodigo()` em `Modal` e `Perfil`, com a fábrica guardando só os objetos. Levaria o
+    texto da entrada para o núcleo de cálculo, que não usa o código, já que a saída (RN 11) não imprime modal nem
+    perfil.
 - **Conferida pelo Murilo no T12:** os nomes e as responsabilidades deste grupo foram usados no fluxo do lote (6.1). A
   única mudança foi na `FabricaDeCodigos`, que ganhou `existeModal` e `existePerfil` para indicar o código inexistente
   sem `null` nem exceção (ver a decisão na 6.1). Na revisão do PR #19, o Alexandre (dono da 2.2.6) definiu a
