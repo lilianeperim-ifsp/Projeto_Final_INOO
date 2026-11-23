@@ -555,6 +555,7 @@ classDiagram
     Encomenda ..> ResultadoCalculo : cria
     Transporte ..> ResultadoCalculo : devolve
     Transporte ..> Aviso : cria
+    Transporte ..> Aguardando : cria
     InteressadoEmStatus ..> Aviso : recebe
     InteressadoEmPosicao ..> Aviso : recebe
     AuditoriaAmbiental ..> Status : contaParaAuditoria()
