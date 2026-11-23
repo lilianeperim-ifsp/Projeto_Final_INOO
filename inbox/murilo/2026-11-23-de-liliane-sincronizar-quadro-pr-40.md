@@ -3,7 +3,7 @@ para: murilo
 de: liliane
 data: 2026-11-23
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,7 @@ cartão do T09 passar a "Concluído".
 - O cartão do T09 estava em "Em PR", ligado ao #40, então a skill deve movê-lo sozinha.
 
 ## Resposta
+
+2026-11-23 (Murilo): sincronização manual de 23/11 às 22:34 UTC (`s-202611232234`), sem mudanças. O #40 já constava
+como mergeado no quadro desde a rotina agendada das 20:13 UTC (`s-202611232013`), e o cartão do T09 já estava em
+"Concluído", ligado ao #40: foi movido à mão na página do quadro às 17:02 UTC, então a skill não precisou movê-lo.
