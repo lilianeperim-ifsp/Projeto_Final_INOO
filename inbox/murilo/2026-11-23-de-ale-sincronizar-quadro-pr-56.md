@@ -8,8 +8,8 @@ status: pendente
 
 ## O que é
 
-Abri o PR #56 (T11, seção 5: padrões escolhidos e descartados). Rode o `/sincronizar-quadro` para o cartão do T11
-passar a "Em PR", ligado ao #56.
+O PR #56 (T11, seção 5: padrões escolhidos e descartados) foi mergeado na `dev` (merge `073667f`, 24/11 às 00:38
+UTC). Rode o `/sincronizar-quadro` para o cartão do T11 passar a "Concluído", ligado ao #56.
 
 ## Contexto
 
@@ -17,7 +17,9 @@ passar a "Em PR", ligado ao #56.
 - Reviewers: Liliane e você (o PR é do Alexandre).
 - A seção 5 traz os cinco padrões usados (Template Method, Strategy, State, Observer e Simple Factory), os sete
   descartados e os pontos resolvidos sem padrão. Nenhuma classe ou interface muda.
-- Depois do merge do #56, a T15 (cenários 1 a 4) fica liberada.
+- O #56 foi aprovado por você depois das correções do commit `93d0cfb`. A Liliane não chegou a revisar, e o merge
+  foi feito com uma aprovação, como no #40.
+- Com o merge, a T15 (cenários 1 a 4) fica liberada.
 
 ## Resposta
 
