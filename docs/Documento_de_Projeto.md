@@ -12,7 +12,7 @@
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
 > | 3. Diagrama de classes UML | T09 | Liliane | Escrita, em revisão |
 > | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
-> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita, em revisão |
+> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita, em revisão |
@@ -1540,7 +1540,8 @@ sequenceDiagram
         T-->>O: false, e nada muda
     else devolveu outro status: aceita
         T->>T: o status passa a ser o novo
-        T->>E: calcular(perfil vigente), para o CO₂
+        T->>T: calcularAtual(), para o CO₂
+        T->>E: calcular(perfil vigente)
         E-->>T: ResultadoCalculo
         T->>A: new Aviso(id, status novo, posição atual, co2)
         loop cada um, numa cópia da lista de interessados em status
@@ -1557,7 +1558,8 @@ sequenceDiagram
         T-->>O: true, sem aviso
     else posição nova, ou a primeira
         T->>T: a posição passa a ser a nova
-        T->>E: calcular(perfil vigente), para o CO₂
+        T->>T: calcularAtual(), para o CO₂
+        T->>E: calcular(perfil vigente)
         E-->>T: ResultadoCalculo
         T->>A: new Aviso(id, status atual, posição nova, co2)
         loop cada um, numa cópia da lista de interessados em posição
