@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-22
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -40,3 +40,14 @@ a T10 e a T11 primeiro e faça a T14 em paralelo.
 Quadro: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH
 
 ## Resposta
+
+**2026-11-23, Alexandre:** concluído. As minhas quatro tarefas da Etapa 1 estão escritas:
+
+- T10 (seção 4): PR #50, mergeado.
+- T11 (seção 5): PR #56, mergeado.
+- T14 (seção 6.3): PR #58, mergeado.
+- T15 (seção 7, cenários 1 a 4): PR #61 (https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/61), em
+  revisão.
+
+O PR #61 também propõe o formato comum da seção 7 e deixa os espaços 7.5 a 7.8 (T16, Liliane) e 7.9 a 7.12 (T17, você).
+Com ele, a T16 já pode começar.
