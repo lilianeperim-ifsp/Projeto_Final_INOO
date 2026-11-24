@@ -1828,8 +1828,9 @@ sem nenhuma mudança (8.1 e 8.8).
 - **Testes:**
   - novos: no `PerfilTest`, os três `aplicar...` do `Corporativo` sobre valores base conhecidos. No `EncomendaTest`, uma
     encomenda do gabarito calculada com o `Corporativo`. O gabarito da RN 12 não tem o corporativo, então o valor
-    esperado é uma conta feita à mão: o valor base do gabarito vezes o multiplicador escolhido. Ele nunca é copiado da
-    saída do programa (8.1). No `FabricaDeCodigosTest`, `existePerfil("CORPORATIVO")`;
+    esperado é uma conta feita à mão: o valor base do gabarito, sem arredondar (2.1.2), vezes o multiplicador
+    escolhido. A tabela da RN 12 mostra a base já arredondada (tempo 18,67, e não 18,6667), e partir dela pode dar um
+    centavo de diferença. O esperado nunca é copiado da saída do programa (8.1). No `FabricaDeCodigosTest`, `existePerfil("CORPORATIVO")`;
   - regressão: os perfis que já existem e o gabarito da RN 12 não mudam.
 - **Alternativa descartada:** `Corporativo` implementar `Perfil` direto, já que só tem multiplicadores. Repetiria
   `base × fator` nos três métodos (erro 5 da Livraria), que é o que a classe abstrata evita.
