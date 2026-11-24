@@ -15,10 +15,10 @@
 > | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
-> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita, em revisão |
-> | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
+> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita |
 > | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita, em revisão |
 > | 7.5 a 7.12 e conferência dos 5 minutos | T16 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -355,7 +355,7 @@ FormatadorDeSaida
 - **Cenário CANCELADO:** cria-se a classe `Cancelado` e entra um método `cancelar()` em `Status`, que rejeita por
   padrão. `Aguardando` e `EmTransito` o sobrescrevem. `Cancelado` não permite troca de perfil e não conta para a
   auditoria. O `Transporte` também é alterado, porque ganha o `cancelar()` que o operador chama. Classes criadas:
-  `Cancelado`. Classes alteradas: `Status`, `Aguardando`, `EmTransito` e `Transporte` (para o T15 e o T16).
+  `Cancelado`. Classes alteradas: `Status`, `Aguardando`, `EmTransito` e `Transporte` (para o T16).
 - **Alternativa descartada:** um método genérico `mudarStatus(Status novo)`. Para saber se a transição vale, o
   status atual precisaria descobrir o tipo de `novo`, o que exige `instanceof` ou comparação de texto.
 
@@ -1744,8 +1744,14 @@ resposta no mesmo lugar na defesa:
 | **O que não muda** | As classes que provam a exigência (por exemplo, o `Transporte` no cenário 4) |
 | **Por que funciona** | O mecanismo que já absorve a mudança, com remissão à 4.2, à 5 ou ao fluxo da 6 |
 | **Alteração ao vivo** | Os passos, na ordem em que são feitos no IntelliJ, para a T18 cronometrar |
+| **Decisões do cenário** (opcional) | As escolhas que o cenário pede além do mecanismo, numeradas, cada uma com a justificativa |
+| **Casos de borda** (opcional) | As situações-limite do cenário e o que acontece em cada uma |
 | **Testes** | Os casos novos e os que já existem e devem continuar passando |
 | **Alternativa descartada** | Quando houver uma forma de responder ao cenário que o grupo não escolheu |
+
+Os dois campos opcionais aparecem só quando o cenário tem escolhas ou situações-limite próprias (como na 7.2 e na
+7.4). A alternativa descartada de uma decisão fica dentro da própria decisão, logo abaixo dela. O campo
+**Alternativa descartada** fica para a alternativa ao cenário como um todo.
 
 Os testes de regressão valem para todos os cenários: o gabarito da RN 12 e os casos da 8.2 a 8.7 continuam passando
 sem nenhuma mudança (8.1 e 8.8).
@@ -1774,8 +1780,15 @@ sem nenhuma mudança (8.1 e 8.8).
   2. No IntelliJ, usar "Implement methods" (Alt+Enter), que lista as seis etapas que faltam.
   3. Escrever o `return` de cada etapa com o número escolhido.
   4. Acrescentar a linha do `FERROVIARIO` no construtor da `FabricaDeCodigos`.
-  5. Rodar `java Main < entrada.txt` com uma linha como `10;FERROVIARIO;500;1000;Santos;Campinas;ECONOMICO` e conferir
-     a linha `VALIDA`.
+  5. Compilar o projeto (Build Project, Ctrl+F9).
+  6. Rodar o lote com uma linha como `10;FERROVIARIO;500;1000;Santos;Campinas;ECONOMICO` e conferir a linha `VALIDA`.
+
+  **Atenção ao rodar no Windows.** O terminal do IntelliJ abre o PowerShell, que não aceita o `<` de
+  `java Main < entrada.txt`. Já o `Get-Content entrada.txt | java Main` troca os acentos por `?` no PowerShell 5.1.
+  Há duas saídas seguras. A primeira é configurar o Run do `Main` no IntelliJ com "Redirect input from" apontando para
+  `entrada.txt`. A segunda é rodar pelo `cmd`, com `cmd /c "java -cp <pasta das classes> Main < entrada.txt"`. O
+  comando exato fica no `COMO_EXECUTAR.md`, e a T18 confere se ele cabe nos 5 minutos. Os passos 5 e 6 valem para
+  todos os cenários que rodam o lote.
 - **Testes:**
   - novos: no `ModalTest`, frete, tempo e CO₂ base do `Ferroviario` com os números escolhidos, a sobretaxa acima de
     1000 kg e o `excedeCapacidade` no limite e logo acima dele. No `FabricaDeCodigosTest`,
@@ -1790,7 +1803,8 @@ sem nenhuma mudança (8.1 e 8.8).
 - **Exigência (ET 4):** surge o perfil corporativo, com outros multiplicadores. Ele deve ser adicionado sem alterar o
   cálculo dos modais.
 - **Classes criadas:** `Corporativo`, que estende `PerfilPorMultiplicadores` e implementa as três etapas, cada uma
-  devolvendo um multiplicador: `multiplicadorFrete()`, `multiplicadorTempo()` e `multiplicadorCo2()`.
+  devolvendo um multiplicador: `multiplicadorFrete()`, `multiplicadorTempo()` e `multiplicadorCo2()`. O enunciado
+  não dá esses números. Na defesa, eles são escolhidos na hora e são fictícios, como os do ferroviário (7.1).
 - **Classes alteradas:** só a `FabricaDeCodigos`, que ganha uma linha no construtor:
   `perfis.add(new CodigoDePerfil("CORPORATIVO", new Corporativo()));`.
 - **O que não muda:**
@@ -1806,14 +1820,17 @@ sem nenhuma mudança (8.1 e 8.8).
   2. Usar "Implement methods", que lista as três etapas.
   3. Escrever o `return` de cada multiplicador.
   4. Acrescentar a linha do `CORPORATIVO` no construtor da `FabricaDeCodigos`.
-  5. Rodar o lote com uma linha que use `CORPORATIVO`.
+  5. Compilar e rodar o lote com uma linha que use `CORPORATIVO` (ver a atenção ao rodar no Windows, na 7.1).
+- **Decisões do cenário:**
+  1. **Se o corporativo mudar mais do que os multiplicadores**, por exemplo com um piso ou um desconto, ele sobrescreve
+     o `aplicar...` daquele valor e chama o `super`, como o PREMIUM (2.2.1 e 7.11). Se ele não usar multiplicadores,
+     implementa `Perfil` direto.
 - **Testes:**
   - novos: no `PerfilTest`, os três `aplicar...` do `Corporativo` sobre valores base conhecidos. No `EncomendaTest`, uma
-    encomenda do gabarito calculada com o `Corporativo`. No `FabricaDeCodigosTest`, `existePerfil("CORPORATIVO")`;
+    encomenda do gabarito calculada com o `Corporativo`. O gabarito da RN 12 não tem o corporativo, então o valor
+    esperado é uma conta feita à mão: o valor base do gabarito vezes o multiplicador escolhido. Ele nunca é copiado da
+    saída do programa (8.1). No `FabricaDeCodigosTest`, `existePerfil("CORPORATIVO")`;
   - regressão: os perfis que já existem e o gabarito da RN 12 não mudam.
-- **Se o corporativo mudar mais do que os multiplicadores:** por exemplo, com um piso ou um desconto. Ele sobrescreve o
-  `aplicar...` daquele valor e chama o `super`, como o PREMIUM (2.2.1 e 7.11). Se ele não usar multiplicadores, implementa
-  `Perfil` direto.
 - **Alternativa descartada:** `Corporativo` implementar `Perfil` direto, já que só tem multiplicadores. Repetiria
   `base × fator` nos três métodos (erro 5 da Livraria), que é o que a classe abstrata evita.
 
@@ -1889,6 +1906,17 @@ sem nenhuma mudança (8.1 e 8.8).
   4. **O SMS é uma mensagem guardada, e não um envio real**, como no `Cliente`. O teste confere as mensagens.
 - **Casos de borda:**
   - **Primeira posição já dentro da região:** manda o SMS, porque o alerta começa "fora".
+  - **Alerta assinado com o transporte já dentro da região:** na próxima posição, ainda dentro, o alerta manda o SMS,
+    mesmo sem o transporte ter entrado. O alerta só conhece as posições que recebe e começa "fora". O grupo aceita
+    esse comportamento: quem monta o transporte assina o alerta antes de mover o transporte.
+    - Alternativa descartada: o transporte avisar a posição atual no momento da assinatura. Isso altera o `Transporte`,
+      que a exigência proíbe.
+  - **Limites invertidos no construtor** (mínimo maior que o máximo): nenhuma posição fica dentro, e o alerta nunca
+    dispara, sem nenhum aviso. Quem cria o alerta (os testes, 4.3) é responsável por passar mínimo ≤ máximo, como no
+    caso da longitude 180.
+    - Alternativa descartada: um `regiaoValida(...)` estático, chamado antes de criar, como `Posicao.posicaoValida`
+      (validar antes de criar, 2.2.2). É coerente com o resto do projeto, mas põe mais um método nos 5 minutos sem que
+      a exigência peça. Entra junto com a classe `Regiao`, se ela surgir (decisão 2).
   - **Posição exatamente no limite:** conta como dentro.
   - **Posição inválida:** o alerta não recebe nada, porque o transporte a rejeita antes de avisar (passo 10 da 6.3).
   - **Repetir a mesma posição:** o alerta não recebe nada, porque não é mudança (passo 11 da 6.3).
@@ -1903,6 +1931,7 @@ sem nenhuma mudança (8.1 e 8.8).
   - voltar: 2;
   - primeira posição já dentro: 1;
   - posição no limite exato: 1;
+  - limites invertidos: 0, com qualquer posição;
   - alterar a lista devolvida por `getMensagens()` não muda o alerta;
   - regressão: a central continua com uma linha de log por posição, e o cliente continua sem receber nada de posição
     (8.7).
@@ -1918,8 +1947,6 @@ sem nenhuma mudança (8.1 e 8.8).
 > na entrada. Os ganchos estão no fim da 6.1 e da 6.2.
 
 ## 8. Plano de testes
-
-> A seção 7 (cenários de evolução, T16 e T17) entra antes desta.
 
 O plano lista o que a Etapa 2 vai testar e o resultado esperado de cada caso. Cobre o que o enunciado exige dos testes
 unitários (ET 7, item 2): cálculos com o gabarito, bordas da validação, troca de perfil em tempo de execução e avisos
