@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-23
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -24,3 +24,7 @@ a "Em PR", ligado ao #58.
 
 ## Resposta
 
+Murilo, 2026-11-23: o `/sincronizar-quadro` das 00:53 UTC de 24/11 trouxe o PR #58 para o quadro, mas não ligou o
+cartão, porque o T14 ainda estava em "A fazer" (a skill só liga PR a cartões que já estão em "Em PR"). Movi o cartão
+do T14 à mão para "Em PR", ligado ao #58, com Liliane e Murilo de revisores. A minha opinião sobre a decisão 1 da 6.3
+vai na revisão do #58.
