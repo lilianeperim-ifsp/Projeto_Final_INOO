@@ -17,7 +17,8 @@
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita, em revisão |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
-> | 7 | T15 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita, em revisão |
+> | 7.5 a 7.12 e conferência dos 5 minutos | T16 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -1717,6 +1718,204 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
   `Cancelado` herda o `contaParaAuditoria()` padrão (não). A `AuditoriaAmbiental` não muda.
 - **Troca de assinatura (cenário 8):** `removerInteressadoEmStatus(cliente)` e `adicionarInteressadoEmStatus(outro)`,
   sem recriar o transporte. O próximo aviso já vai só para o novo. Nenhuma classe muda.
+
+## 7. Resposta aos cenários de evolução
+
+> **Em construção.** Para cada cenário de `contexto/especificacoes-tecnicas.md`, seção 4, esta seção diz quais classes
+> são criadas e quais são alteradas (ET 6, item 7). A subseção 7.N responde ao cenário N, na numeração da seção 4
+> (1 = ferroviário, 12 = separador). O mecanismo de cada ponto de variação está na 4.2, e o padrão, na 5.
+>
+> | Subseções | Cenários | Cartão | Responsável | Situação |
+> |---|---|---|---|---|
+> | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita, em revisão |
+> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | A fazer |
+> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | A fazer |
+>
+> A T18 (Liliane) confere se cada alteração cabe nos 5 minutos da defesa ao vivo.
+
+**Formato de cada cenário.** As subseções seguem os mesmos campos, nesta ordem, para que qualquer um do grupo ache a
+resposta no mesmo lugar na defesa:
+
+| Campo | O que traz |
+|---|---|
+| **Exigência (ET 4)** | O texto do enunciado para o cenário |
+| **Classes criadas** | Cada classe nova, com o que ela estende ou implementa e o que escreve |
+| **Classes alteradas** | Cada classe que já existe e muda, com o que muda nela. "Nenhuma", quando for o caso |
+| **O que não muda** | As classes que provam a exigência (por exemplo, o `Transporte` no cenário 4) |
+| **Por que funciona** | O mecanismo que já absorve a mudança, com remissão à 4.2, à 5 ou ao fluxo da 6 |
+| **Alteração ao vivo** | Os passos, na ordem em que são feitos no IntelliJ, para a T18 cronometrar |
+| **Testes** | Os casos novos e os que já existem e devem continuar passando |
+| **Alternativa descartada** | Quando houver uma forma de responder ao cenário que o grupo não escolheu |
+
+Os testes de regressão valem para todos os cenários: o gabarito da RN 12 e os casos da 8.2 a 8.7 continuam passando
+sem nenhuma mudança (8.1 e 8.8).
+
+### 7.1 Cenário 1: modal ferroviário
+
+- **Exigência (ET 4):** surge o modal ferroviário, com parâmetros próprios. Ele deve ser adicionado criando classes
+  novas, e só a camada de entrada pode ser alterada no código que já existe.
+- **Classes criadas:** `Ferroviario`, que estende `Modal` e implementa as seis etapas `protected`, cada uma
+  devolvendo um número: `custoPorKm()`, `custoPorKg()`, `velocidade()`, `manuseio()`, `fatorEmissao()` e
+  `capacidadeMaxima()`. O enunciado não dá esses números. Na defesa, eles são escolhidos na hora e são fictícios, como
+  os da RN 2.
+- **Classes alteradas:** só a `FabricaDeCodigos`, da camada de entrada (2.2.6), que ganha uma linha no construtor:
+  `modais.add(new CodigoDeModal("FERROVIARIO", new Ferroviario()));`.
+- **O que não muda:**
+  - `Modal`: as fórmulas e a sobretaxa valem para o modal novo sem ele saber delas (2.1.1);
+  - `Encomenda` e `Transporte`, que dependem só de `Modal`;
+  - `InterpretadorDeLinha`: o código passa por `existeModal`, e a capacidade, por `modal.excedeCapacidade(peso)`;
+  - `ProcessadorDeLote` e `FormatadorDeSaida`;
+  - os outros três modais.
+- **Por que funciona:** o Template Method de `Modal` (5.2.1) deixa para a filha só os números, e o compilador exige as
+  seis etapas. A lista única de códigos (2.2.6) faz do código novo uma entrada num único lugar, e a fábrica é o único
+  ponto que compara código (4.3).
+- **Alteração ao vivo:**
+  1. Criar a classe `Ferroviario extends Modal`.
+  2. No IntelliJ, usar "Implement methods" (Alt+Enter), que lista as seis etapas que faltam.
+  3. Escrever o `return` de cada etapa com o número escolhido.
+  4. Acrescentar a linha do `FERROVIARIO` no construtor da `FabricaDeCodigos`.
+  5. Rodar `java Main < entrada.txt` com uma linha como `10;FERROVIARIO;500;1000;Santos;Campinas;ECONOMICO` e conferir
+     a linha `VALIDA`.
+- **Testes:**
+  - novos: no `ModalTest`, frete, tempo e CO₂ base do `Ferroviario` com os números escolhidos, a sobretaxa acima de
+    1000 kg e o `excedeCapacidade` no limite e logo acima dele. No `FabricaDeCodigosTest`,
+    `existeModal("FERROVIARIO")` responde `true`, e `existeModal("ferroviario")` responde `false` (RN 10, item 5);
+  - regressão: os modais que já existem e o gabarito da RN 12 não mudam.
+- **Alternativa descartada:** `Ferroviario` estender `Rodoviario`, por serem os dois terrestres. O trem não "é um"
+  rodoviário (aula 10). Ele herdaria os números do rodoviário e precisaria sobrescrever todos, e uma mudança no
+  rodoviário passaria a mexer no ferroviário sem querer.
+
+### 7.2 Cenário 2: perfil corporativo
+
+- **Exigência (ET 4):** surge o perfil corporativo, com outros multiplicadores. Ele deve ser adicionado sem alterar o
+  cálculo dos modais.
+- **Classes criadas:** `Corporativo`, que estende `PerfilPorMultiplicadores` e implementa as três etapas, cada uma
+  devolvendo um multiplicador: `multiplicadorFrete()`, `multiplicadorTempo()` e `multiplicadorCo2()`.
+- **Classes alteradas:** só a `FabricaDeCodigos`, que ganha uma linha no construtor:
+  `perfis.add(new CodigoDePerfil("CORPORATIVO", new Corporativo()));`.
+- **O que não muda:**
+  - `Modal` e as três filhas, como pede a exigência;
+  - `PerfilPorMultiplicadores`, que já faz a multiplicação;
+  - `Encomenda`, `Transporte` e `ResultadoCalculo`, que dependem só de `Perfil`;
+  - os outros três perfis.
+- **Por que funciona:** o perfil é uma Strategy (5.2.2), e a multiplicação fica escrita uma vez em
+  `PerfilPorMultiplicadores` (5.2.1). O perfil novo funciona no lote, na troca em execução (cenário 3) e na simulação
+  (cenário 5), porque todos recebem um `Perfil`.
+- **Alteração ao vivo:**
+  1. Criar a classe `Corporativo extends PerfilPorMultiplicadores`.
+  2. Usar "Implement methods", que lista as três etapas.
+  3. Escrever o `return` de cada multiplicador.
+  4. Acrescentar a linha do `CORPORATIVO` no construtor da `FabricaDeCodigos`.
+  5. Rodar o lote com uma linha que use `CORPORATIVO`.
+- **Testes:**
+  - novos: no `PerfilTest`, os três `aplicar...` do `Corporativo` sobre valores base conhecidos. No `EncomendaTest`, uma
+    encomenda do gabarito calculada com o `Corporativo`. No `FabricaDeCodigosTest`, `existePerfil("CORPORATIVO")`;
+  - regressão: os perfis que já existem e o gabarito da RN 12 não mudam.
+- **Se o corporativo mudar mais do que os multiplicadores:** por exemplo, com um piso ou um desconto. Ele sobrescreve o
+  `aplicar...` daquele valor e chama o `super`, como o PREMIUM (2.2.1 e 7.11). Se ele não usar multiplicadores, implementa
+  `Perfil` direto.
+- **Alternativa descartada:** `Corporativo` implementar `Perfil` direto, já que só tem multiplicadores. Repetiria
+  `base × fator` nos três métodos (erro 5 da Livraria), que é o que a classe abstrata evita.
+
+### 7.3 Cenário 3: o operador muda o perfil ativo
+
+- **Exigência (ET 4):** o operador muda o perfil ativo de uma encomenda em execução. A partir da troca, os valores
+  usam o perfil novo, sem recriar o transporte.
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** nenhuma. O projeto já atende ao cenário com `Transporte.trocarPerfil(perfil)` (6.2).
+- **O que não muda:** a encomenda, o status, a posição e os interessados do transporte, que continua sendo o mesmo
+  objeto (6.2, decisão 4).
+- **Por que funciona:**
+  - o `Transporte` guarda o perfil vigente como uma referência a `Perfil` (Strategy, 5.2.2), e trocar o perfil é
+    trocar essa referência;
+  - o `calcularAtual()` recalcula a partir da encomenda com o perfil vigente, então os valores seguintes já usam o
+    perfil novo (6.2, decisão 1);
+  - o status decide se a troca é permitida (`permiteTrocaDePerfil()`), e depois de `ENTREGUE` a troca devolve `false`
+    (6.3, decisão 2);
+  - o aviso de `ENTREGUE` leva o CO₂ do perfil vigente, então a auditoria soma o valor do perfil novo (2.1.4).
+- **Alteração ao vivo:** não há código a mudar. A demonstração é o teste da 8.6, ou uma sequência no mesmo formato:
+  1. Criar o transporte.
+  2. Chamar `trocarPerfil(new Rapido())` e conferir o `true`.
+  3. Comparar o `calcularAtual()` de antes e o de depois da troca.
+
+  Se o operador escolher o perfil pelo texto do código, ele pede o objeto à fábrica (`existePerfil("RAPIDO")` e
+  depois `criarPerfil("RAPIDO")`), que é um dos lugares de criação da 4.3. O `Transporte` continua recebendo um
+  `Perfil`.
+- **Testes:** os da 8.6, que já cobrem a troca em `AGUARDANDO` e em `EM_TRANSITO`, a rejeição em `ENTREGUE` e os dois
+  transportes da mesma encomenda. Nenhum caso novo.
+- **Alternativa descartada:** recriar o transporte com o perfil novo. Perderia o status, a posição e as assinaturas, e
+  contraria a própria exigência (6.2, decisão 4).
+
+### 7.4 Cenário 4: alerta por SMS ao atingir uma região
+
+- **Exigência (ET 4):** surge um interessado novo, como um alerta por SMS ao atingir certa região. Ele deve ser
+  adicionado sem alterar a classe do transporte.
+- **Classes criadas:** `AlertaSmsPorRegiao`, que implementa só `InteressadoEmPosicao`.
+  - **Atributos `private`:** os quatro limites da região (`latitudeMinima`, `latitudeMaxima`, `longitudeMinima` e
+    `longitudeMaxima`), recebidos no construtor; `estavaNaRegiao`, que começa `false`; e a lista de mensagens.
+  - **`posicaoMudou(aviso)`:** confere se a posição do aviso está dentro dos limites, que são inclusivos, como na
+    `Posicao.posicaoValida`. Só quando o transporte **entra** na região, isto é, quando estava fora e agora está dentro,
+    guarda uma mensagem com o ID da encomenda. Depois, atualiza `estavaNaRegiao`.
+  - **`getMensagens()`:** devolve uma cópia da lista (ET 3.3), como o `Cliente`.
+- **Classes alteradas:** nenhuma. Quem monta o transporte (os testes, 4.3) cria o alerta e o assina com
+  `adicionarInteressadoEmPosicao(alerta)`.
+- **O que não muda:**
+  - `Transporte`, como pede a exigência: o passo 12 da 6.3 já percorre a lista de interessados em posição, seja qual for
+    o tipo de cada um;
+  - `Aviso` e a interface `InteressadoEmPosicao`;
+  - `CentralDeControle`, `Cliente` e `AuditoriaAmbiental`.
+- **Por que funciona:** é o Observer (5.2.4). O transporte conhece só a interface, e um interessado novo é uma classe
+  que a implementa. Como o alerta só quer saber de posição, ele não implementa `InteressadoEmStatus` e não fica com um
+  método vazio (erro 23 da Livraria). As duas interfaces existem para isso (2.2.4).
+- **Alteração ao vivo:**
+  1. Criar a classe `AlertaSmsPorRegiao implements InteressadoEmPosicao`, com os atributos e o construtor.
+  2. Usar "Implement methods" para criar o `posicaoMudou`.
+  3. Escrever a conta dos limites e a regra da entrada na região.
+  4. Escrever o `getMensagens()`, que devolve uma cópia.
+  5. Num teste, assinar o alerta num transporte e chamar `atualizarPosicao` fora e depois dentro da região.
+- **Decisões do cenário:**
+  1. **"Ao atingir" quer dizer ao entrar.** O alerta guarda se o transporte já estava na região e só manda o SMS na
+     passagem de fora para dentro. Se ele sair e voltar, manda de novo.
+     - Alternativa descartada: um SMS a cada posição dentro da região. O transporte avisa a cada posição nova, e o
+       alerta repetiria a mesma notícia a cada uma.
+  2. **A região são quatro limites dentro da própria classe.**
+     - Alternativa descartada: uma classe `Regiao` à parte. Ela só compensa se surgirem várias regiões ou outros usos,
+       e uma classe a mais pesa nos 5 minutos da defesa.
+  3. **Um alerta por transporte.** O alerta guarda o estado de um transporte só (`estavaNaRegiao`), então quem monta
+     cria um alerta para cada transporte.
+     - Alternativa descartada: um alerta compartilhado, com a lista de IDs que estão dentro da região. Funciona, mas
+       complica uma classe que precisa caber em 5 minutos, e um alerta compartilhado sem essa lista misturaria o estado
+       dos transportes.
+  4. **O SMS é uma mensagem guardada, e não um envio real**, como no `Cliente`. O teste confere as mensagens.
+- **Casos de borda:**
+  - **Primeira posição já dentro da região:** manda o SMS, porque o alerta começa "fora".
+  - **Posição exatamente no limite:** conta como dentro.
+  - **Posição inválida:** o alerta não recebe nada, porque o transporte a rejeita antes de avisar (passo 10 da 6.3).
+  - **Repetir a mesma posição:** o alerta não recebe nada, porque não é mudança (passo 11 da 6.3).
+  - **Transporte já entregue:** o alerta continua recebendo, porque a posição pode mudar em qualquer status (RN 7).
+  - **Região que atravessa a longitude 180:** não é atendida, porque os limites supõem mínimo ≤ máximo. Se o cenário
+    pedir, entra uma classe `Regiao` (decisão 2).
+- **Testes:** um `AlertaSmsPorRegiaoTest` novo, com um transporte da encomenda de exemplo da 8.6:
+  - posição fora: 0 mensagens;
+  - entrar: 1;
+  - outra posição dentro: continua 1;
+  - sair: continua 1;
+  - voltar: 2;
+  - primeira posição já dentro: 1;
+  - posição no limite exato: 1;
+  - alterar a lista devolvida por `getMensagens()` não muda o alerta;
+  - regressão: a central continua com uma linha de log por posição, e o cliente continua sem receber nada de posição
+    (8.7).
+
+### 7.5 a 7.8: cenários 5 a 8
+
+> **A fazer (T16, Liliane):** simulação sob outro perfil, código de modal vindo de configuração externa, status
+> CANCELADO e troca de assinatura dos avisos. Os ganchos estão no fim da 6.1, da 6.2 e da 6.3.
+
+### 7.9 a 7.12: cenários 9 a 12
+
+> **A fazer (T17, Murilo):** peso mínimo de 0,5 kg, sobretaxa de 8% acima de 2000 kg, perfil PREMIUM e separador `,`
+> na entrada. Os ganchos estão no fim da 6.1 e da 6.2.
 
 ## 8. Plano de testes
 
