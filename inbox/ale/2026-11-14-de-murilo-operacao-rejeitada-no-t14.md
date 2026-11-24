@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-14
 tipo: aviso
-status: aceito
+status: concluido
 ---
 
 ## O que é
@@ -45,3 +45,10 @@ como o `setValor` da Livraria. Assim o projeto inteiro teria um mecanismo só pa
 `entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` e atualizar a linha da 1.7. Vou considerar a sua
 sugestão (perguntar antes no `Status` e `boolean` no `Transporte`, como no lote), para o projeto ter um mecanismo só.
 Fecho este recado como `concluido` quando o T14 estiver escrito.
+
+**2026-11-23, Alexandre:** concluído. A 6.3 está no PR #58
+(https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/58). Ficou o `boolean` no `Transporte`, como você
+sugeriu, nas quatro operações. No `Status`, escolhi outra saída: ao rejeitar, o status devolve a si mesmo (`this`), e
+o `Transporte` compara a resposta com `==` e devolve `false`. Descartei perguntar antes (`aceitaIniciarTransito()`)
+porque cada transição passaria a ter dois métodos que precisam concordar: no CANCELADO seriam seis métodos, contra
+três. A justificativa está na decisão 1 da 6.3, e a linha da 1.7 foi atualizada. Se não concordar, comente no #58.
