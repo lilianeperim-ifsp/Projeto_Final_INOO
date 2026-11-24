@@ -390,7 +390,7 @@ FormatadorDeSaida
 | `ProcessadorDeLote` | Percorre as linhas uma vez: interpreta, calcula, acumula e monta as linhas de saída | `processar(linhas)` → `List<String>` (o núcleo não imprime) | `InterpretadorDeLinha`, `LinhaInterpretada`, `Encomenda`, `ResultadoCalculo`, `Relatorio`, `FormatadorDeSaida` |
 | `InterpretadorDeLinha` | Separa os campos e valida na ordem da tabela da RN 6 | `interpretar(linha, numeroFisico)` → `LinhaInterpretada` | `FabricaDeCodigos`, `Modal` (capacidade, antes de criar a encomenda), `Encomenda`, `Rejeicao` |
 | `LinhaInterpretada` | Leva o resultado de uma linha: uma encomenda, uma rejeição ou uma linha em branco | `ehValida()`, `ehEmBranco()`, `getEncomenda()`, `getRejeicao()` | `Encomenda`, `Rejeicao` |
-| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que não é um dos 11 padrões do enunciado nem o Factory Method; o T11 a justifica como padrão de fora da lista) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`; `criarModal(codigo)` e `criarPerfil(codigo)`, com a pré-condição de que `existe*` devolveu `true` (se violada, lançam `IllegalArgumentException`; ver 6.1). Os quatro consultam a mesma lista de códigos conhecidos: guarda `List<CodigoDeModal>` e `List<CodigoDePerfil>`, e a busca fica nos privados `indiceDoModal(codigo)` e `indiceDoPerfil(codigo)` → `int` (`-1` se não acha) | `CodigoDeModal`, `CodigoDePerfil`, modais e perfis concretos |
+| `FabricaDeCodigos` | Traduz o código de texto em objeto; é o **único** lugar que compara código (Simple Factory, que divide com o Factory Method a mesma linha da lista do enunciado, mas não é o Factory Method; ver 5.2.5) | `existeModal(codigo)` e `existePerfil(codigo)` → `boolean`; `criarModal(codigo)` e `criarPerfil(codigo)`, com a pré-condição de que `existe*` devolveu `true` (se violada, lançam `IllegalArgumentException`; ver 6.1). Os quatro consultam a mesma lista de códigos conhecidos: guarda `List<CodigoDeModal>` e `List<CodigoDePerfil>`, e a busca fica nos privados `indiceDoModal(codigo)` e `indiceDoPerfil(codigo)` → `int` (`-1` se não acha) | `CodigoDeModal`, `CodigoDePerfil`, modais e perfis concretos |
 | `CodigoDeModal` | Liga um código de modal da entrada ao objeto `Modal` pronto | construtor `(codigo, modal)`; `getCodigo()`, `getModal()` | `Modal` |
 | `CodigoDePerfil` | Liga um código de perfil da entrada ao objeto `Perfil` pronto | construtor `(codigo, perfil)`; `getCodigo()`, `getPerfil()` | `Perfil` |
 | `FormatadorDeSaida` | Monta as linhas `VALIDA`, `REJEITADA` e `RELATORIO` | `formatarValida(...)`, `formatarRejeitada(...)`, `formatarRelatorio(...)`; `numero(valor)` privado, o único com `String.format` em `pt-BR` | `ResultadoCalculo`, `Rejeicao`, `Relatorio` |
@@ -1053,9 +1053,11 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
 | Strategy | Usado | Perfil | 2, 3, 5 e 11 |
 | State | Usado | Status | 7 |
 | Observer | Usado | Interessados | 4, 7 e 8 |
-| Simple Factory | Usado (fora da lista do enunciado) | Código → objeto | 1, 2, 6 e 11 |
+| Factory Method / Simple Factory | Simple Factory usada; Factory Method descartado (5.3) | Código → objeto | 1, 2, 6 e 11 |
 | Decorator | Descartado | Piso do PREMIUM e sobretaxa | 10 e 11 |
-| Factory Method, Singleton, Prototype, Builder, Command, Adapter | Descartados | Ver 5.3 | — |
+| Singleton, Prototype, Builder, Command, Adapter | Descartados | Ver 5.3 | — |
+
+A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Method e Simple Factory numa linha só.
 
 ### 5.2 Padrões usados
 
@@ -1065,12 +1067,21 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
   e só os números mudam. Escrever a fórmula em cada modal repete a regra (erro 5 da Livraria) e espalha a sobretaxa
   por três arquivos, quando ela tem que ficar em um único ponto.
 - **Classes:**
-  - `Modal` (classe abstrata). Os métodos-modelo são `freteBase`, `tempoBase`, `co2Base` e `excedeCapacidade`, e as
+  - `Modal` (classe abstrata). Os métodos-modelo são `freteBase`, `tempoBase` e `co2Base`, como na 2.2.1, e as
     etapas abstratas `protected` são `custoPorKm()`, `custoPorKg()`, `velocidade()`, `manuseio()`, `fatorEmissao()` e
-    `capacidadeMaxima()`. As filhas são `Rodoviario`, `Aereo` e `Aquaviario`.
+    `capacidadeMaxima()`. As filhas são `Rodoviario`, `Aereo` e `Aquaviario`. O `excedeCapacidade(peso)` também usa
+    uma etapa (`capacidadeMaxima()`), mas é só uma comparação, e não um esqueleto de cálculo.
   - `PerfilPorMultiplicadores` (classe abstrata). Os métodos-modelo são `aplicarFrete`, `aplicarTempo` e
     `aplicarCo2`, e as etapas são `multiplicadorFrete()`, `multiplicadorTempo()` e `multiplicadorCo2()`. As filhas
     são `Economico`, `Rapido` e `Ecologico`.
+- **Métodos-modelo sem `final` no perfil, de propósito:** o Template Method costuma declarar o método-modelo como
+  `final`, para nenhuma filha reescrever o esqueleto (`contexto/padroes-projeto/template-method.md`). Os `aplicar*` de
+  `PerfilPorMultiplicadores` ficam sem `final` porque são o ponto de extensão do PREMIUM, que sobrescreve
+  `aplicarFrete`, chama `super.aplicarFrete(base)` e só então aplica o piso (2.2.1). O esqueleto continua sendo o da
+  mãe, e o PREMIUM acrescenta um passo depois dele. O `final` em aberto na 2.1.1 vale só para as fórmulas de `Modal`.
+  - Alternativa descartada: um gancho, como `ajustarFrete(frete)`, que a mãe chamaria no fim de `aplicarFrete` e que
+    por padrão devolveria o frete sem mudança. Permitiria o `final`, mas acrescenta um método ao catálogo só para um
+    perfil, e mudar o catálogo pede o acordo dos 3.
 - **Por quê:** a regra comum mora na classe-mãe, e cada filha diz só o que a diferencia. O compilador obriga um modal
   novo a fornecer os seis números (cenário 1), e a sobretaxa de 8% é a troca de duas constantes em `Modal`
   (cenário 10). É o desenho do `Livro.calculaFrete()` abstrato da aula 11.
@@ -1106,9 +1117,11 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
   `Status`, com a resposta padrão de `iniciarTransito()`, `entregar()`, `permiteTrocaDePerfil()` e
   `contaParaAuditoria()`. Os estados concretos são `Aguardando`, `EmTransito` e `Entregue`, e cada um cria o seu
   sucessor (4.3).
-- **Por quê:** cada status sobrescreve só o que aceita, e o resto sai rejeitado pelo padrão de `Status`. O CANCELADO é
-  uma classe nova mais um método `cancelar()` em `Status` (2.2.3). A auditoria pergunta `contaParaAuditoria()` ao
-  status do aviso, em vez de comparar o texto.
+- **Por quê:** cada status sobrescreve só o que aceita, e o resto sai rejeitado pelo padrão de `Status`. A auditoria
+  pergunta `contaParaAuditoria()` ao status do aviso, em vez de comparar o texto. No CANCELADO (2.2.3), a classe
+  criada é `Cancelado`, e as alteradas são `Status` (ganha `cancelar()`, que rejeita por padrão), `Aguardando` e
+  `EmTransito` (sobrescrevem `cancelar()`) e `Transporte` (ganha o `cancelar()` que o operador chama). A
+  `AuditoriaAmbiental` não muda.
 - **Alternativas descartadas:**
   - Um método genérico `mudarStatus(Status novo)`, em que o status atual precisaria descobrir o tipo de `novo`
     (2.2.3).
@@ -1140,7 +1153,7 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
   - As classes `java.util.Observable` e `java.util.Observer` da biblioteca, obsoletas desde o Java 9. O `Transporte`
     teria que herdar de `Observable`, e o aviso chegaria como `Object`, o que pede conversão de tipo.
 
-#### 5.2.5 Simple Factory (fora da lista do enunciado): do código ao objeto
+#### 5.2.5 Simple Factory: do código ao objeto
 
 - **Problema:** a entrada traz texto (`AEREO`, `RAPIDO`), e o núcleo trabalha com objetos. Alguém precisa comparar o
   código, e a ET 3.2 só permite isso na camada de entrada.
@@ -1148,8 +1161,9 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
   `CodigoDeModal` e `CodigoDePerfil`. Quem a usa é o `InterpretadorDeLinha`.
 - **Por quê:** é o único lugar que compara código (4.3). Um modal ou perfil novo é uma linha no construtor da fábrica
   (cenários 1, 2 e 11), e o código vindo de configuração externa (cenário 6) muda só a fábrica (6.1).
-- **Por que fora da lista:** o *Use a cabeça!* apresenta a Fábrica Simples como um hábito de programação, e não como
-  um padrão GoF. Ela também não é o Factory Method (5.3). A ET 5 aceita padrões de fora da lista, se justificados.
+- **Simple Factory e Factory Method:** o enunciado junta os dois na mesma linha da lista (ET 5), e o projeto usa só a
+  Simple Factory: uma classe concreta que decide qual objeto criar. O *Use a cabeça!* a apresenta como um hábito de
+  programação, e não como um padrão GoF. O Factory Method, com uma hierarquia de criadores, foi descartado (5.3).
 - **Alternativa descartada:** comparar o código dentro do `InterpretadorDeLinha`, com um `if` por código. Funciona, mas
   mistura validar campos com criar objetos, e o caso novo mexeria no método de validação. As alternativas internas da
   fábrica (comparações em cada método, arrays paralelos e `getCodigo()` no modal) estão na 2.2.6.
@@ -1164,10 +1178,14 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
     `super.aplicarFrete(base)` e aplicando o piso (2.2.1). É uma classe, contra duas no Decorator (o perfil e o
     embrulho). A sobretaxa vale sempre e para todos os modais, então fica na fórmula de `Modal` (2.1.1).
   - *Quando reconsiderar:* se surgir um piso ou acréscimo que valha para qualquer perfil.
-- **Factory Method.**
-  - *Onde poderia entrar:* na criação dos modais e perfis.
+- **Factory Method** (na mesma linha da Simple Factory, na lista do enunciado).
+  - *Onde poderia entrar:* na criação dos modais e perfis, com uma classe abstrata de criador, como `CriadorDeModal`,
+    com o método abstrato `criarModal()`, e uma filha por modal (`CriadorRodoviario`, `CriadorAereo` e
+    `CriadorAquaviario`), e outra hierarquia igual para os perfis.
   - *Por que não:* o padrão põe um método de criação numa classe-mãe e deixa as filhas decidirem qual objeto criar.
-    Aqui não há uma família de criadores, só a tradução de um código em objeto, e uma fábrica só resolve (5.2.5).
+    Aqui não há uma família de criadores, só a tradução de um código em objeto. Alguém ainda teria que escolher o
+    criador pelo código, e cada modal ou perfil novo pediria duas classes em vez de uma. A Simple Factory resolve com
+    uma classe só (5.2.5).
 - **Singleton.**
   - *Onde poderia entrar:* na `FabricaDeCodigos`, ou nos modais e perfis, que não têm estado.
   - *Por que não:* o ponto de acesso global esconde quem depende da fábrica e prende os testes a uma instância única.
