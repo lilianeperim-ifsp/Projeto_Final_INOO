@@ -12,11 +12,12 @@
 > | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
 > | 3. Diagrama de classes UML | T09 | Liliane | Escrita, em revisão |
 > | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
-> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita, em revisão |
+> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita |
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
+> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita, em revisão |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
-> | 6.3 e 7 | T14 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 7 | T15 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
 > abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
@@ -158,8 +159,8 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 | Dúvida | Onde se resolve | Situação |
 |---|---|---|
 | A sobretaxa mora na abstração comum dos modais ou numa classe própria? | T08 e T10 (Alexandre) | **Resolvida em 2.1.1** |
-| O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) | **Resolvida em 2.1.4** (objeto próprio). O fluxo dos avisos continua no T14 |
-| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) | **Resolvida para o lote em 6.1** (valor). No `Status` e no `Transporte`, segue aberta para o T14 |
+| O aviso é um objeto próprio ou só parâmetros? | T14 (Alexandre) | **Resolvida em 2.1.4** (objeto próprio). O fluxo dos avisos está na 6.3 |
+| A operação rejeitada devolve um valor ou lança uma exceção? | T12 (Murilo) e T14 (Alexandre) | **Resolvida para o lote em 6.1** (valor) **e para o `Status` e o `Transporte` em 6.3** (valor: o status devolve a si mesmo, e o transporte devolve `boolean`) |
 | Onde mora o arredondamento, para que o cálculo normal e a simulação usem o mesmo ponto? | T10 (Alexandre) | **Resolvida em 2.1.2** |
 | Quem guarda o modal, se ele não aparece na encomenda nem no transporte (1.3)? Com qual perfil começa o perfil vigente? | T08 (Alexandre) | **Resolvida em 2.1.3** |
 | Como a auditoria soma o CO₂ do perfil vigente, se o aviso (1.2) só traz ID, status e coordenadas? | T08 e T14 (Alexandre) | **Resolvida em 2.1.4** |
@@ -250,15 +251,15 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 - **Alternativa descartada:** o aviso levar uma referência ao transporte, e a auditoria perguntar o CO₂ a ele. Isso
   prende os interessados ao transporte e dá a eles acesso a métodos que mudam o estado: um interessado poderia mudar
   o status no meio do aviso.
-- **Fica para o T11 e o T14:** a auditoria precisa saber se o aviso é de entrega sem comparar o texto do status. A
+- **Resolvido no T11 e no T14 (5.2.3 e 6.3):** a auditoria precisa saber se o aviso é de entrega sem comparar o texto do status. A
   saída é polimórfica: o próprio status responde se aquele aviso conta para a auditoria. No cenário CANCELADO, o
   status novo responde que não, e a auditoria não soma nada.
 
 ### 2.2 Classes e interfaces
 
 São **33 tipos** em 6 grupos. Atributos são sempre `private`, e as constantes são `static final` com nome. As
-operações que podem ser rejeitadas aparecem como "aceita ou rejeita": o mecanismo (valor de retorno ou exceção) foi
-resolvido para o lote na 6.1 e, para o `Status` e o `Transporte`, se resolve no T14.
+operações que podem ser rejeitadas aparecem como "aceita ou rejeita". O mecanismo é um valor de retorno, e não uma
+exceção: no lote, decidido na 6.1, e no `Status` e no `Transporte`, na 6.3.
 
 ```
 Modal (classe abstrata)                    ← Rodoviario, Aereo, Aquaviario
@@ -322,7 +323,7 @@ FormatadorDeSaida
 | Classe | Responsabilidade | Principais atributos | Principais métodos | Colaboradores |
 |---|---|---|---|---|
 | `Encomenda` | Guarda os dados do pedido e calcula frete, tempo e CO₂ para um perfil (2.1.3) | id, modal, peso, distância, origem, destino e perfil pedido, que não mudam depois de criados | `calcular(perfil)` → `ResultadoCalculo`, getters | `Modal`, `Perfil`, `ResultadoCalculo` |
-| `Transporte` | Acompanha a entrega (status, posição e perfil vigente) e avisa os interessados | encomenda, status (começa `Aguardando`), posição (começa ausente), perfil vigente (começa igual ao pedido), uma lista de interessados em status e outra de interessados em posição | `iniciarTransito()`, `entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` (aceitam ou rejeitam); `simular(perfil)` e `calcularAtual()` → `ResultadoCalculo`; adicionar e remover interessado em cada lista; getters, sem devolver as listas | `Encomenda`, `Status`, `Posicao`, `Perfil`, `Aviso`, `InteressadoEmStatus`, `InteressadoEmPosicao` |
+| `Transporte` | Acompanha a entrega (status, posição e perfil vigente) e avisa os interessados | encomenda, status (começa `Aguardando`), posição (começa ausente), perfil vigente (começa igual ao pedido), uma lista de interessados em status e outra de interessados em posição | `iniciarTransito()`, `entregar()`, `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` → `boolean` (`true` se aceita, 6.3); `simular(perfil)` e `calcularAtual()` → `ResultadoCalculo`; adicionar e remover interessado em cada lista; getters, sem devolver as listas | `Encomenda`, `Status`, `Posicao`, `Perfil`, `Aviso`, `InteressadoEmStatus`, `InteressadoEmPosicao` |
 | `Posicao` | Guarda um par válido de latitude e longitude | latitude, longitude | `static posicaoValida(lat, lon)` → `boolean`, que confere os intervalos da RN 7; `mesmaPosicao(outra)`, getters | — |
 
 - **Validar antes de criar:** a `Encomenda` e a `Posicao` só são criadas com dados válidos. O
@@ -339,16 +340,17 @@ FormatadorDeSaida
 
 | Classe | Responsabilidade | Principais métodos | Colaboradores |
 |---|---|---|---|
-| `Status` (abstrata) | Decide quais transições e operações o transporte aceita no estado atual | `iniciarTransito()` e `entregar()`, que devolvem o próximo status ou indicam rejeição (por padrão, rejeitam); `permiteTrocaDePerfil()` (por padrão, sim); `contaParaAuditoria()` (por padrão, não); `getNome()`, usado só no texto do log e da mensagem e nos testes, que conferem o status por ele, sem `instanceof` (8.5) | — |
+| `Status` (abstrata) | Decide quais transições e operações o transporte aceita no estado atual | `iniciarTransito()` e `entregar()`, que devolvem o próximo status ou, ao rejeitar, o próprio status (`this`); por padrão, rejeitam (6.3); `permiteTrocaDePerfil()` (por padrão, sim); `contaParaAuditoria()` (por padrão, não); `getNome()`, usado só no texto do log e da mensagem e nos testes, que conferem o status por ele, sem `instanceof` (8.5) | — |
 | `Aguardando` | Aceita só iniciar o trânsito | sobrescreve `iniciarTransito()` | `EmTransito` |
 | `EmTransito` | Aceita só a entrega | sobrescreve `entregar()` | `Entregue` |
 | `Entregue` | Não aceita transição nem troca de perfil, e conta para a auditoria | sobrescreve `permiteTrocaDePerfil()` (não) e `contaParaAuditoria()` (sim) | — |
 
 - **Por quê:** repetir o status atual ou pular uma etapa já sai rejeitado pelo comportamento padrão de `Status`, sem
   nenhum `if` sobre qual é o status atual. O padrão (State) é justificado no T11.
-- **Fica para o T12 e o T14:** `iniciarTransito()` e `entregar()` devolvem um `Status`, então a rejeição não pode
-  ser um `boolean`. Devolver `null` repete o risco do erro 13 da Livraria. As saídas possíveis são uma exceção ou um
-  método à parte que pergunta se a operação é aceita. Esse desenho já restringe o mecanismo em aberto na 1.7.
+- **Rejeição (decidida no T14, 6.3):** `iniciarTransito()` e `entregar()` devolvem um `Status`, então a rejeição não
+  pode ser um `boolean`, e devolver `null` repete o risco do erro 13 da Livraria. Ao rejeitar, o status devolve a si
+  mesmo (`this`), e o `Transporte` compara a resposta com `==` e devolve `false`. A exceção e o método à parte que
+  pergunta antes foram descartados na 6.3 (decisão 1).
 - **Cenário CANCELADO:** cria-se a classe `Cancelado` e entra um método `cancelar()` em `Status`, que rejeita por
   padrão. `Aguardando` e `EmTransito` o sobrescrevem. `Cancelado` não permite troca de perfil e não conta para a
   auditoria. O `Transporte` também é alterado, porque ganha o `cancelar()` que o operador chama. Classes criadas:
@@ -369,7 +371,7 @@ FormatadorDeSaida
 
 - **Por que duas interfaces:** cada interessado assina só o que lhe interessa, e nenhum implementa um método vazio
   (erro 23 da Livraria). O SMS por região vira uma classe nova que implementa só `InteressadoEmPosicao`. O padrão
-  (Observer) é justificado no T11, e o fluxo dos avisos é o T14.
+  (Observer) é justificado no T11, e o fluxo dos avisos está na 6.3.
 - **Alternativas descartadas:**
   - Uma interface só, com os dois métodos: `Cliente` e `AuditoriaAmbiental` teriam `posicaoMudou` vazio (erro 23).
   - Uma interface só, com um método e um campo "tipo do evento" no aviso: cada interessado teria que testar esse
@@ -570,7 +572,7 @@ classDiagram
     Relatorio ..> ResultadoCalculo : registrarValida()
     FormatadorDeSaida ..> ResultadoCalculo : usa
 
-    note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: provisório, confirmar no T14"
+    note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: true se aceita (6.3)"
 ```
 
 ### 3.2 Cálculo
@@ -708,7 +710,7 @@ classDiagram
     Transporte --> "1" Encomenda : encomenda
     Transporte *-- "0..1" Posicao : posicao
 
-    note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: provisório, confirmar no T14"
+    note for Transporte "iniciarTransito, entregar, atualizarPosicao e trocarPerfil devolvem boolean: true se aceita (6.3)"
 ```
 
 A `Encomenda` tem também os getters de peso, distância, origem e destino. As listas de interessados nunca saem do
@@ -748,7 +750,7 @@ classDiagram
     Aguardando ..> EmTransito : cria
     EmTransito ..> Entregue : cria
 
-    note for Status "por padrão, iniciarTransito e entregar rejeitam; mecanismo da rejeição: T14"
+    note for Status "por padrão, iniciarTransito e entregar rejeitam, devolvendo o próprio status (6.3)"
 ```
 
 Cada filha sobrescreve só o que muda nela (2.2.3). O `getNome()` é o único método abstrato.
@@ -915,8 +917,8 @@ O catálogo (2.2) não trazia os tipos dos atributos e dos retornos. Estes viera
 (1.3), o identificador da `Rejeicao` é `String` porque pode ser `LINHA4`, os números são `double` e os contadores são
 `int`. As decisões abaixo são do T09.
 
-1. **As operações do `Transporte` que aceitam ou rejeitam devolvem `boolean`** (`true` = aceita). **Provisório:
-   confirmar no T14.**
+1. **As operações do `Transporte` que aceitam ou rejeitam devolvem `boolean`** (`true` = aceita). Era provisório e
+   foi confirmado no T14 (6.3, decisão 2).
    - Por quê: o `Status` não pode usar `boolean`, porque devolve o próximo status (2.2.3). O `Transporte` não tem essa
      limitação, e o `boolean` deixa o diagrama completo.
    - Alternativa descartada: deixar o retorno sem tipo até o T14.
@@ -976,7 +978,7 @@ O catálogo (2.2) não trazia os tipos dos atributos e dos retornos. Estes viera
 |---|---|---|---|---|---|
 | **Modal** | Os seis parâmetros da RN 2: custo por km, custo por kg, velocidade, manuseio, fator de emissão e capacidade | As fórmulas de frete, tempo e CO₂ base, a sobretaxa e a verificação de capacidade, em `Modal` | Classe abstrata com as fórmulas, que chamam seis etapas abstratas `protected`. Cada modal concreto implementa só as etapas, com os seus números (2.2.1) | `Encomenda` (cálculo) e `InterpretadorDeLinha` (`excedeCapacidade`) | 1 (ferroviário) |
 | **Perfil** | Os três multiplicadores da RN 4. No PREMIUM, também o comportamento do frete (piso de R$ 50,00) | A multiplicação `base × fator`, em `PerfilPorMultiplicadores` | Interface `Perfil` mais uma classe abstrata com a multiplicação. O perfil é **passado como objeto**: `Encomenda.calcular(perfil)` o recebe, e o `Transporte` guarda a referência do perfil vigente. Trocar o perfil é trocar essa referência, e simular é passar outro objeto (2.1.3 e 6.2) | `Encomenda` e `Transporte` | 2 (corporativo), 3 (troca), 5 (simulação), 11 (PREMIUM) |
-| **Status** | Quais transições o transporte aceita, se a troca de perfil é permitida e se a entrega conta para a auditoria | A resposta padrão de cada pergunta (rejeitar a transição, permitir a troca, não contar), em `Status` | Classe abstrata com o comportamento padrão. Cada status sobrescreve só o que aceita. O status atual devolve o próximo, e o `Transporte` troca o objeto que guarda. A forma de indicar a rejeição é decidida no T14 (6.3) | `Transporte` (transições e troca de perfil) e `AuditoriaAmbiental` (`contaParaAuditoria`) | 7 (CANCELADO) |
+| **Status** | Quais transições o transporte aceita, se a troca de perfil é permitida e se a entrega conta para a auditoria | A resposta padrão de cada pergunta (rejeitar a transição, permitir a troca, não contar), em `Status` | Classe abstrata com o comportamento padrão. Cada status sobrescreve só o que aceita. O status atual devolve o próximo, e o `Transporte` troca o objeto que guarda. Ao rejeitar, o status devolve a si mesmo, e o `Transporte` devolve `false` (6.3) | `Transporte` (transições e troca de perfil) e `AuditoriaAmbiental` (`contaParaAuditoria`) | 7 (CANCELADO) |
 | **Interessados** | A reação a cada aviso: linha de log, soma de CO₂, mensagem ao cliente e, no cenário, SMS por região | Montar o `Aviso` uma vez e percorrer a lista, no `Transporte` | Duas interfaces (`InteressadoEmStatus` e `InteressadoEmPosicao`) e duas listas no `Transporte`, com adicionar e remover em execução. O aviso é imutável e já leva o CO₂ do perfil vigente (2.1.4 e 2.2.4) | `Transporte` | 4 (SMS), 7 (auditoria não soma o CANCELADO), 8 (troca de assinatura) |
 | **Sobretaxa** | Limite e percentual da carga pesada | A regra, num único ponto: `Modal.freteBase`, com as constantes `LIMITE_CARGA_PESADA_KG` e `FATOR_SOBRETAXA` (2.1.1) | Uma regra só na abstração, que vale para todos os modais, inclusive os novos | Todos os modais, sem saber dela | 10 (8% acima de 2000 kg) |
 | **Arredondamento** | — (a RN 5 é fixa) | Um único método, `ResultadoCalculo.arredondar`, chamado no construtor do resultado e na média do relatório (2.1.2) | Todo resultado passa pelo mesmo construtor, então o lote, o transporte e a simulação arredondam no mesmo ponto | `Encomenda` (cria o resultado) e `Relatorio` (média) | 5 (a simulação reaproveita o cálculo) |
@@ -1130,7 +1132,7 @@ A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Meth
 - **State ou Strategy?** As duas têm o mesmo desenho de classes. A diferença está em quem troca o objeto: o perfil é
   escolhido de fora, pela linha ou pelo operador (Strategy), e o status troca a si mesmo, devolvendo o próximo a cada
   transição aceita (State).
-- **Fica para o T14 (6.3):** a forma de indicar a transição rejeitada.
+- **Transição rejeitada (6.3):** o status devolve a si mesmo, e o `Transporte` devolve `false`.
 
 #### 5.2.4 Observer: os avisos aos interessados
 
@@ -1223,8 +1225,6 @@ A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Meth
 
 ## 6. Fluxos principais
 
-> A 6.3 (mudança de status e avisos, T14) entra depois da 6.2.
-
 ### 6.1 Processamento de uma linha do lote
 
 O caminho de cada linha, da leitura até a saída. O lote só calcula e imprime: não cria transporte nem gera aviso
@@ -1297,7 +1297,8 @@ primeiro motivo (passo 5) e não chama o que vem depois.
 
 #### Decisão: no lote, a rejeição é um valor, não uma exceção
 
-Resolve, para o lote, a dúvida da 1.7. A parte do `Status` e do `Transporte` continua com o T14.
+Resolve, para o lote, a dúvida da 1.7. A parte do `Status` e do `Transporte` foi resolvida no T14 (6.3), também com
+um valor.
 
 - **Decisão:** o `InterpretadorDeLinha` sempre devolve uma `LinhaInterpretada`. A linha inválida leva uma `Rejeicao`
   com o identificador e o motivo, e nenhuma exceção sai do `InterpretadorDeLinha`.
@@ -1434,7 +1435,7 @@ sequenceDiagram
 | 1 | O operador obtém um `Perfil` e chama `transporte.trocarPerfil(novo)` | Operador | Fora da entrada, ninguém compara código: o transporte recebe o objeto, e não o texto `RAPIDO` (1.3) |
 | 2 | O transporte pergunta `status.permiteTrocaDePerfil()` ao status atual | `Transporte`, `Status` | Sem testar qual status é (2.2.2). Por padrão o `Status` responde sim, e só `Entregue` responde não (2.2.3 e RN 7) |
 | 3 | Se a troca é permitida, o perfil vigente passa a ser o novo. A encomenda, o status, a posição e os interessados continuam os mesmos | `Transporte` | Sem recriar o transporte (ET 4). Nenhum valor é gravado, só o perfil |
-| 4 | Se a troca não é permitida, ela é rejeitada: o perfil vigente não muda, e quem pediu fica sabendo | `Transporte` | O mecanismo (valor de retorno ou exceção) é decidido no T14. O efeito é o da RN 7 ("Operação rejeitada"), conferido no teste (8.1) |
+| 4 | Se a troca não é permitida, ela é rejeitada: o perfil vigente não muda, e quem pediu fica sabendo | `Transporte` | `trocarPerfil` devolve `false` (6.3, decisão 2). O efeito é o da RN 7 ("Operação rejeitada"), conferido no teste (8.1) |
 | 5 | Aceita ou rejeitada, a troca não avisa ninguém | `Transporte` | A RN 8 só avisa mudança de status ou de posição |
 | 6 | `calcularAtual()` chama `encomenda.calcular(perfilVigente)` | `Transporte`, `Encomenda` | A regra de cálculo existe uma vez só (2.1.3) |
 | 7 | A encomenda pede os valores base ao modal, aplica o perfil e cria o `ResultadoCalculo`, que arredonda | `Encomenda`, `Modal`, `Perfil`, `ResultadoCalculo` | A base anda sem arredondar, e o arredondamento vem depois do perfil (2.1.2 e RN 5) |
@@ -1487,7 +1488,7 @@ Completam a 8.6, que traz os testes.
 | Caso | Resultado | Por quê |
 |---|---|---|
 | Trocar para o próprio perfil vigente, em `AGUARDANDO` ou `EM_TRANSITO` | Aceita. Os valores ficam iguais e ninguém é avisado | O transporte não compara perfis, e a troca só muda a referência |
-| `trocarPerfil(null)` | Fica com o T14, junto com o mecanismo da rejeição | Se fosse aceito, o erro só apareceria no próximo `calcularAtual()`, longe da causa |
+| `trocarPerfil(null)` | Rejeitada: devolve `false`, e o perfil vigente não muda (6.3) | Se fosse aceito, o erro só apareceria no próximo `calcularAtual()`, longe da causa |
 | Duas trocas seguidas | Vale a última | O transporte guarda só um perfil vigente |
 | `trocarPerfil(...)` em `ENTREGUE` | Rejeitada. O perfil vigente e o `calcularAtual()` não mudam | RN 7: o CO₂ que a auditoria já somou não pode ficar inconsistente |
 | `simular(...)` em `ENTREGUE` | Permitida | RN 7. A simulação não altera nada, então não pergunta ao status |
@@ -1510,6 +1511,212 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
   `Perfil`. O piso de R$ 50,00 do PREMIUM entra no passo 7, dentro do próprio perfil (2.2.1).
 - **CANCELADO:** `Cancelado` responde não em `permiteTrocaDePerfil()` (2.2.3). O passo 2 não muda.
 - **Simulação de outro perfil:** já é o bloco 3 deste fluxo, com a regra de cálculo reaproveitada.
+
+### 6.3 Mudança de status e avisos
+
+> **Em revisão (T14, Alexandre).** O operador muda o status ou a posição de um transporte, e o transporte avisa quem
+> assinou (RN 7 e RN 8). Esta seção também decide o mecanismo da operação rejeitada no `Status` e no `Transporte`, a
+> parte da dúvida da 1.7 que a 6.1 deixou para o T14.
+
+Como na 6.2, o operador é um ator externo, e no código quem chama é um teste (4.3). O diagrama tem dois blocos: a
+mudança de status, que avisa os interessados em status, e a mudança de posição, que avisa os interessados em posição.
+A troca de perfil não avisa ninguém (6.2).
+
+```mermaid
+sequenceDiagram
+    participant O as Operador
+    participant T as Transporte
+    participant St as Status atual
+    participant E as Encomenda
+    participant A as Aviso
+    participant I as InteressadoEmStatus
+    participant P as InteressadoEmPosicao
+
+    Note over O,I: 1. Mudança de status (iniciarTransito ou entregar)
+    O->>T: iniciarTransito()
+    T->>St: iniciarTransito()
+    St-->>T: o próximo status, ou ele mesmo (this) se rejeita
+    alt devolveu ele mesmo: rejeitada
+        T-->>O: false, e nada muda
+    else devolveu outro status: aceita
+        T->>T: o status passa a ser o novo
+        T->>T: calcularAtual(), para o CO₂
+        T->>E: calcular(perfil vigente)
+        E-->>T: ResultadoCalculo
+        T->>A: new Aviso(id, status novo, posição atual, co2)
+        loop cada um, numa cópia da lista de interessados em status
+            T->>I: statusMudou(aviso)
+        end
+        T-->>O: true
+    end
+
+    Note over O,P: 2. Mudança de posição
+    O->>T: atualizarPosicao(lat, lon)
+    alt Posicao.posicaoValida(lat, lon) responde não
+        T-->>O: false, e nada muda
+    else mesma posição da atual
+        T-->>O: true, sem aviso
+    else posição nova, ou a primeira
+        T->>T: a posição passa a ser a nova
+        T->>T: calcularAtual(), para o CO₂
+        T->>E: calcular(perfil vigente)
+        E-->>T: ResultadoCalculo
+        T->>A: new Aviso(id, status atual, posição nova, co2)
+        loop cada um, numa cópia da lista de interessados em posição
+            T->>P: posicaoMudou(aviso)
+        end
+        T-->>O: true
+    end
+```
+
+#### Passo a passo
+
+**Mudança de status:**
+
+| # | Passo | Quem | Regra que limita |
+|---|---|---|---|
+| 1 | O operador chama `transporte.iniciarTransito()` ou `transporte.entregar()` | Operador | Não existe um `mudarStatus(Status novo)` público (2.2.3): o operador pede a transição, e não escolhe o status |
+| 2 | O transporte repassa o pedido ao status atual: `status.iniciarTransito()` ou `status.entregar()` | `Transporte`, `Status` | Sem testar qual status é (ET 3.2). Cada status conhece só a própria saída (4.3) |
+| 3 | O status devolve o próximo status, se aceita, ou **a si mesmo** (`this`), se rejeita | `Status` e filhas | Por padrão, `Status` devolve `this`. Só `Aguardando.iniciarTransito()` e `EmTransito.entregar()` devolvem um objeto novo (decisão 1) |
+| 4 | O transporte compara a resposta com o status atual (`novo == status`). Se é o mesmo objeto, devolve `false` | `Transporte` | RN 7: a operação rejeitada não altera o estado, não avisa ninguém, e quem pediu fica sabendo pelo `false`. O `==` pergunta se é o mesmo objeto, e não qual é o tipo |
+| 5 | Se é outro objeto, o status novo passa a valer | `Transporte` | O estado muda antes do aviso (decisão 4) |
+| 6 | O transporte monta **um** `Aviso` com o ID da encomenda, o status novo, a posição atual (ou a falta dela) e o CO₂ de `calcularAtual()` | `Transporte`, `Encomenda`, `Aviso` | O CO₂ é o do perfil vigente nesse instante (2.1.4 e RN 8). O aviso é imutável |
+| 7 | O transporte percorre uma **cópia** da lista de interessados em status, na ordem em que assinaram, e chama `statusMudou(aviso)` em cada um | `Transporte`, `InteressadoEmStatus` | O mesmo aviso vai para todos (decisão 5). A cópia protege o laço (decisão 6) |
+| 8 | Cada interessado reage do seu jeito (tabela abaixo) | `CentralDeControle`, `Cliente`, `AuditoriaAmbiental` | Nenhum pergunta qual é o status: a auditoria pergunta `contaParaAuditoria()` (2.2.4) |
+| 9 | O transporte devolve `true` | `Transporte` | — |
+
+**Mudança de posição:**
+
+| # | Passo | Quem | Regra que limita |
+|---|---|---|---|
+| 10 | O operador chama `transporte.atualizarPosicao(lat, lon)`. Se `Posicao.posicaoValida(lat, lon)` responde não, o transporte devolve `false` | Operador, `Transporte`, `Posicao` | RN 7: o **par inteiro** é rejeitado, inclusive com `NaN` ou `Infinity`, e a posição anterior continua. Validar antes de criar (2.2.2) |
+| 11 | O transporte cria a `Posicao` nova. Se já tem posição e ela é a `mesmaPosicao` da nova, devolve `true` sem avisar | `Transporte`, `Posicao` | RN 8: atribuir o valor que já existe não é mudança. Também não é rejeição: a operação foi aceita e não mudou nada |
+| 12 | Senão, a posição nova passa a valer, e o transporte monta um `Aviso` com o status atual e a posição nova e percorre uma cópia da lista de interessados em posição, chamando `posicaoMudou(aviso)`. Devolve `true` | `Transporte`, `Aviso`, `InteressadoEmPosicao` | A primeira posição sempre conta como mudança, e a posição pode mudar em qualquer status (RN 7). O cliente e a auditoria não recebem: eles não assinam `InteressadoEmPosicao` (2.2.4) |
+
+**Reação de cada interessado:**
+
+| Interessado | Assina | Reação | O que lê do aviso |
+|---|---|---|---|
+| `CentralDeControle` | As duas interfaces | Uma linha de log por aviso, de status ou de posição | `getId()`, `getStatus().getNome()` e a posição. Se `temPosicao()` responde não, a linha indica que não há posição (3.7) |
+| `Cliente` | `InteressadoEmStatus` | Uma mensagem por mudança de status | `getId()` e `getStatus().getNome()` |
+| `AuditoriaAmbiental` | `InteressadoEmStatus` | Soma `getCo2()` ao CO₂ auditado quando `getStatus().contaParaAuditoria()` responde sim. Hoje, só `Entregue` responde sim | `getStatus()` e `getCo2()` |
+
+O texto exato da linha de log e da mensagem fica para a implementação (T32). A 8.7 confere o que cada um traz.
+
+#### Decisões do fluxo
+
+1. **Na transição rejeitada, o status devolve a si mesmo.** `Status.iniciarTransito()` e `Status.entregar()` devolvem
+   `this` por padrão, e o `Transporte` compara a resposta com o status atual usando `==`. Resolve a dúvida da 1.7 para o
+   `Status`, com o mesmo princípio da 6.1: a rejeição é um valor, e não uma exceção.
+   - **Por quê:** é um método por transição, sem `null` nem exceção, e repetir o status atual já sai rejeitado, porque
+     `EmTransito` herda o `iniciarTransito()` padrão. No cenário CANCELADO, entram só três métodos: `cancelar()` em
+     `Status` e os overrides em `Aguardando` e `EmTransito` (2.2.3). É a alteração mais curta para a defesa ao vivo.
+   - **Regra para quem escreve um status novo:** rejeitar é devolver `this`, e aceitar é devolver outro objeto. Um
+     status que rejeitasse devolvendo `new` de si mesmo seria lido como aceito, e os casos de "repetir o status" da 8.5
+     pegam esse erro.
+   - **Alternativa descartada:** perguntar antes, com `aceitaIniciarTransito()` e `aceitaEntregar()` em `Status` e a
+     transição como pré-condição, como o `existe*`/`criar*` da `FabricaDeCodigos` (sugestão do Murilo no T12). Daria
+     ao projeto o mesmo formato do lote, mas cada transição passaria a ter dois métodos que precisam concordar. No
+     CANCELADO seriam seis métodos, e esquecer um deles compila e erra só na execução.
+   - **Alternativa descartada:** o status lançar uma exceção ao rejeitar. A rejeição faz parte do uso normal (RN 7),
+     cada chamada do operador precisaria de `try/catch` para não deixar exceção sem tratamento, e o projeto teria dois
+     mecanismos, já que o lote usa valor (6.1).
+   - **Alternativa descartada:** devolver `null`. Repete o risco do erro 13 da Livraria, e a 2.2.3 já o descartava.
+2. **As quatro operações do `Transporte` devolvem `boolean`:** `iniciarTransito()`, `entregar()`,
+   `atualizarPosicao(lat, lon)` e `trocarPerfil(perfil)` devolvem `true` se aceitas e `false` se rejeitadas, como o
+   `setValor` da Livraria. Confirma o que a 3.7 (item 1) deixou provisório.
+   - **Aceita não quer dizer que mudou:** repetir a posição atual (passo 11) e trocar para o perfil vigente (6.2) são
+     aceitas e devolvem `true`, mas não avisam ninguém. Só a operação que a RN 7 proíbe devolve `false`.
+   - **Alternativa descartada:** métodos `void` mais um getter como `ultimaOperacaoAceita()`. Seria um estado a mais
+     no transporte, e o teste poderia ler o resultado de outra operação.
+3. **Um método privado concentra a transição.** `iniciarTransito()` e `entregar()` do `Transporte` têm uma linha cada,
+   por exemplo `return aplicarTransicao(status.iniciarTransito());`. O privado `aplicarTransicao(Status proximo)` faz
+   os passos 4 a 9: compara com `==`, grava, monta o aviso e avisa.
+   - **Por quê:** a comparação e o aviso ficam escritos uma vez (erro 5 da Livraria), e no CANCELADO o `Transporte`
+     ganha só `cancelar()`, também com uma linha.
+   - **Não é o `mudarStatus(Status novo)` descartado na 2.2.3:** lá, quem escolhia o status era quem chamava, e o status
+     atual teria de descobrir o tipo do novo. Aqui, quem escolhe é o próprio status atual, e o método é privado, então
+     o operador não consegue passar um status qualquer.
+   - **Alternativa descartada:** repetir o `if`, a gravação e o aviso em cada método público. Esquecer o aviso em um
+     deles só apareceria no teste.
+4. **O estado muda antes do aviso.** O aviso descreve uma mudança que já aconteceu, e ele é montado com o status ou a
+   posição que acabou de passar a valer.
+   - **Alternativa descartada:** avisar e só depois gravar. Os interessados receberiam a notícia de uma mudança que o
+     transporte ainda não tem.
+5. **Um aviso por mudança, o mesmo para todos.** O transporte monta o `Aviso` e calcula o CO₂ uma vez só, e cada
+   interessado lê o que precisa. Como o aviso é imutável (2.1.4), nenhum interessado altera o que o próximo recebe.
+   - **Alternativa descartada:** um aviso por interessado, ou parâmetros soltos em cada chamada. Repetiria o cálculo do
+     CO₂, e um interessado novo que precisasse de outro dado mudaria a assinatura dos métodos (2.1.4).
+6. **A lista é percorrida numa cópia.** O transporte copia a lista (`new ArrayList<>(...)`) e percorre a cópia.
+   - **Por quê:** a assinatura pode mudar em execução (cenário 8). Se um interessado se remover, ou acrescentar outro,
+     dentro do `statusMudou`, percorrer a lista original com o `for` de cada elemento lança
+     `ConcurrentModificationException`, e o projeto não pode ter exceção não tratada. Com a cópia, a mudança de
+     assinatura vale a partir do próximo aviso.
+   - **Alternativa descartada:** percorrer a lista original por índice. Não lança exceção, mas uma remoção no meio do
+     laço faz um interessado ser pulado sem aviso.
+7. **`adicionarInteressadoEm...` ignora `null` e o interessado que já está na lista.** O teste é `contains`, que compara
+   o próprio objeto, porque os interessados não sobrescrevem `equals`.
+   - **Por quê:** o mesmo interessado duas vezes receberia o aviso duas vezes, e a auditoria somaria o CO₂ em dobro.
+     Um `null` na lista só daria erro no próximo aviso, longe da causa.
+   - **Alternativa descartada:** aceitar a duplicata e deixar o cuidado com quem monta o transporte.
+
+#### Exemplo percorrido
+
+É a sequência da 8.7: a encomenda de exemplo da 8.6 (rodoviário, 500 kg, 1000 km, pedida em ECONOMICO), com os três
+interessados assinando. No aviso, `id` é o ID da encomenda.
+
+| # | Ação | Devolve | Aviso montado | Central (linhas) | Cliente (mensagens) | Auditoria (CO₂) |
+|---|---|---|---|---|---|---|
+| 1 | `atualizarPosicao(-23.5, -46.6)`, a primeira | `true` | (`id`, `AGUARDANDO`, (-23.5, -46.6), 31,00), só para a central | 1 | 0 | 0 |
+| 2 | `atualizarPosicao(-23.5, -46.6)` de novo | `true` | Nenhum: a mesma posição (passo 11) | 1 | 0 | 0 |
+| 3 | `iniciarTransito()` | `true` | (`id`, `EM_TRANSITO`, (-23.5, -46.6), 31,00), para os três. A auditoria não soma: `EmTransito` não conta | 2 | 1 | 0 |
+| 4 | `iniciarTransito()` de novo | `false` | Nenhum: `EmTransito` devolve `this` | 2 | 1 | 0 |
+| 5 | `trocarPerfil(RAPIDO)` | `true` | Nenhum: o perfil não avisa (6.2) | 2 | 1 | 0 |
+| 6 | `entregar()` | `true` | (`id`, `ENTREGUE`, (-23.5, -46.6), 35,65), para os três. A auditoria soma o CO₂ do perfil **vigente** | 3 | 2 | 35,65 |
+| 7 | `atualizarPosicao(-8.0, -34.9)` | `true` | (`id`, `ENTREGUE`, (-8.0, -34.9), 35,65), só para a central | 4 | 2 | 35,65 |
+
+#### Casos de borda do fluxo
+
+Completam a 8.5 e a 8.7, que trazem os testes.
+
+| Caso | Resultado | Por quê |
+|---|---|---|
+| `iniciarTransito()` em `EM_TRANSITO` (repete) | `false`, sem aviso | `EmTransito` herda o `iniciarTransito()` padrão, que devolve `this` |
+| `entregar()` em `AGUARDANDO` (pula uma etapa) | `false`, sem aviso | `Aguardando` herda o `entregar()` padrão |
+| `iniciarTransito()` ou `entregar()` em `ENTREGUE` | `false`, sem aviso | `Entregue` não sobrescreve nenhuma transição |
+| Mudança de status antes de qualquer posição | Aceita. O aviso vai sem posição, e a central registra que não há posição | `temPosicao()` responde não (3.7) |
+| Posição com um dos valores fora do intervalo, `NaN` ou `Infinity` | `false`. A posição anterior continua, e ninguém é avisado | RN 7: o par inteiro é rejeitado |
+| A mesma posição da atual | `true`, sem aviso | RN 8: não é mudança, e também não é rejeição |
+| Atualizar a posição em `ENTREGUE` | `true`, e a central é avisada | RN 7: a posição pode mudar em qualquer status |
+| `trocarPerfil(null)` | `false`, e o perfil vigente não muda | Resolve o caso que a 6.2 deixou para o T14. Aceitar o `null` levaria o erro para o próximo `calcularAtual()`, longe da causa |
+| Nenhum interessado assinado | A operação é aceita normalmente, e ninguém recebe o aviso | Avisar é percorrer a lista, que pode estar vazia |
+| Interessado removido | Não recebe mais nada | 8.7 |
+| Interessado que se remove dentro do `statusMudou` | Recebe o aviso atual, e não recebe os próximos | O laço percorre a cópia (decisão 6) |
+| Remover um interessado que não está na lista | Nada acontece | O `remove` da lista só devolve `false` |
+| O mesmo interessado adicionado duas vezes | Fica uma vez só e recebe cada aviso uma vez | Decisão 7 |
+| A auditoria e um mesmo transporte | Soma no máximo uma vez | `ENTREGUE` só é alcançado uma vez, porque `Entregue` rejeita toda transição |
+| Simulação depois do `ENTREGUE` | O CO₂ auditado não muda | O aviso já foi enviado e é imutável (2.1.4 e 8.7) |
+
+#### Eficiência
+
+A transição e a atualização de posição custam O(1) mais O(k), em que k é o número de interessados daquela lista: uma
+pergunta ao status ou à `Posicao`, um cálculo de custo fixo para o CO₂, a cópia da lista e uma chamada por
+interessado. A operação rejeitada termina no passo 4 ou no passo 10, sem copiar nada.
+
+#### Onde os cenários de evolução tocam este fluxo
+
+Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
+
+- **SMS por região (cenário 4):** uma classe nova que implementa `InteressadoEmPosicao` e decide a região pela posição
+  do aviso. O operador a assina com `adicionarInteressadoEmPosicao`. O passo 12 e o `Transporte` não mudam.
+- **CANCELADO (cenário 7):** `Status` ganha `cancelar()`, que devolve `this`, e `Aguardando` e `EmTransito` o
+  sobrescrevem devolvendo um `Cancelado` novo. O `Transporte` ganha
+  `cancelar()`, com uma linha: `return aplicarTransicao(status.cancelar());` (decisão 3). O `Cancelado` herda as
+  transições que devolvem `this`, então rejeita todas, e sobrescreve só `permiteTrocaDePerfil()` (não) e `getNome()`.
+  A central e o cliente recebem o aviso pelos passos 6 a 8. A auditoria também recebe, mas não soma nada, porque o
+  `Cancelado` herda o `contaParaAuditoria()` padrão (não). A `AuditoriaAmbiental` não muda.
+- **Troca de assinatura (cenário 8):** `removerInteressadoEmStatus(cliente)` e `adicionarInteressadoEmStatus(outro)`,
+  sem recriar o transporte. O próximo aviso já vai só para o novo. Nenhuma classe muda.
 
 ## 8. Plano de testes
 
@@ -1566,9 +1773,10 @@ comparação feita por um comando, e não pelo olho.
   mas reescreve à mão o que o JUnit já faz.
 - **Em aberto:** o JUnit não aparece nos slides. O grupo avisa o professor que vai usá-lo, antes do T21.
 
-**Fica para outros cartões:** o mecanismo da operação rejeitada no `Status` e no `Transporte` (valor de retorno ou
-exceção, T14). Os casos da 8.5 a 8.7 conferem o **efeito** da rejeição: quem pediu fica sabendo, o estado não muda e
-ninguém é avisado. Quando o T14 escolher o mecanismo, cada caso ganha a asserção correspondente.
+**Operação rejeitada no `Status` e no `Transporte` (decidida no T14, 6.3):** as operações do `Transporte` devolvem
+`boolean`. Os casos da 8.5 a 8.7 conferem o **efeito** da rejeição em três asserções: o `boolean` devolvido é `false`
+(quem pediu fica sabendo), o estado não muda e ninguém é avisado. Nas operações aceitas, o teste confere o `true`,
+inclusive quando nada muda, como repetir a posição atual.
 
 ### 8.2 Cálculo
 
