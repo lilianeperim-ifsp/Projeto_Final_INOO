@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-24
 tipo: tarefa
-status: pendente
+status: concluido
 prioridade: maxima
 ---
 
@@ -39,3 +39,24 @@ vence em 27/11.
 - Depois de subir os ajustes, me avise aqui que eu reviso de novo e aprovo.
 
 ## Resposta
+
+**Alexandre, 2026-11-24.** Feito no commit `46ffeac`, já no PR #61. Pode revisar de novo.
+
+- **Ajustes pedidos:** os três estão feitos.
+  1. Tirei a nota desatualizada da seção 8.
+  2. No quadro do topo, a 6.3 está "Escrita" e as linhas da 7 vêm antes da 8.
+  3. No formato comum da 7:
+     - entraram "Decisões do cenário" e "Casos de borda" como campos opcionais, entre "Alteração ao vivo" e "Testes";
+     - um parágrafo diz que a alternativa descartada de uma decisão fica dentro dela;
+     - o campo extra da 7.2 virou a decisão 1 e ficou antes de "Testes".
+- **Sugestões:** todas foram atendidas.
+  - **7.1:**
+    - Entrou o passo de compilar (Ctrl+F9).
+    - Entrou uma nota sobre o Windows. Ela indica o "Redirect input from" do IntelliJ ou o `cmd /c "java ... < entrada.txt"`, e avisa que o `Get-Content | java` troca os acentos por `?` no PowerShell 5.1. Isso ainda não foi testado; a T18 confere.
+  - **7.2:**
+    - os multiplicadores são fictícios;
+    - no `EncomendaTest`, o valor esperado é feito à mão, nunca copiado da saída do programa (8.1).
+  - **7.4:** entraram os dois casos de borda, cada um com uma alternativa descartada:
+    - **Alerta assinado com o transporte já dentro da região:** o comportamento é aceito, e quem monta assina antes de mover o transporte. Descartei o transporte avisar a posição atual na assinatura, porque altera o `Transporte`.
+    - **Limites invertidos:** fica a cargo de quem cria o alerta. Descartei um `regiaoValida(...)` estático, porque pesa nos 5 minutos. Também entrou um teste para esse caso, com 0 mensagens.
+  - **2.2.3:** agora diz "(para o T16)".
