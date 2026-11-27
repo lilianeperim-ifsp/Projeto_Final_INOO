@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-10
 tipo: tarefa
-status: pendente
+status: descartado
 ---
 
 ## O que é
@@ -30,3 +30,5 @@ Pontos para você olhar:
 Pode responder aqui na Resposta, ou comentar no PR #14 se preferir. Os responsáveis só serão gravados no quadro depois que o PR for aprovado e mergeado.
 
 ## Resposta
+
+Liliane (2026-11-15): descartado. A divisão do PR #14 foi substituída pela redistribuição de 2026-11-14 (PR #17), que vale agora.

@@ -9,7 +9,7 @@ Trabalho final da disciplina Introdução à Orientação a Objetos (IFSP), feit
 | `contexto/regras-negocio.md` | Fórmulas, perfis, validação, rastreamento, avisos, formato de entrada e saída, gabarito |
 | `contexto/especificacoes-tecnicas.md` | Restrições técnicas, cenários de evolução, padrões GoF, conteúdo da Etapa 1 e da Etapa 2, stress test, defesa |
 | `contexto/slides/` | O que foi ensinado em aula: um `.md` por PDF (`aula_01.md` … `aula_12.md`). Comece pelo `README.md`, que tem o índice e o resumo |
-| `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Consultar antes de escrever ou revisar código |
+| `contexto/projeto-exemplo.md` | Projeto Livraria das aulas 10–12 (exemplo do professor): referência de herança, interfaces e polimorfismo, e **checklist de erros a não repetir** (seção 10). Já resumido na skill `/padrao-codigo`, obrigatória ao escrever ou revisar código |
 | `contexto/padroes-projeto/` | Notas sobre os 11 padrões do enunciado (um `.md` por padrão; comece pelo `README.md`). Consultar **somente** ao codificar ou quando alguém perguntar sobre um padrão |
 | `contexto/pdfs/` | Originais em PDF (enunciado e slides). Em caso de divergência, o enunciado vale mais |
 | `memory/` | Histórico das sessões e decisões do grupo (ver "Memória do projeto") |
@@ -30,6 +30,11 @@ As aulas 7, 8 e 9 **não foram fornecidas**.
 4. **Registrar o uso de IA.** Quando o Claude errar ou o grupo rejeitar uma proposta dele, anotar em `docs/relatorio_ia_notas.md` (data, autor, o que foi proposto, por que estava errado ou foi rejeitado, correção). O relatório final exige no mínimo 3 erros e 1 rejeição.
 5. **Mudanças de rumo** em relação ao Documento de Projeto são anotadas para a seção "Do projeto ao código".
 6. **Não commitar nem dar push** sem o usuário pedir.
+7. **Padrão de código obrigatório.** Antes de escrever, alterar ou revisar **qualquer** código Java do projeto
+   (produção ou testes, inclusive correções pequenas e cenários de evolução), carregar a skill **`/padrao-codigo`**
+   (`.claude/skills/padrao-codigo/`) e seguir o que ela diz, sem esperar o usuário pedir. Ela reúne o estilo dos
+   slides do professor e o checklist do `contexto/projeto-exemplo.md`, e termina com uma conferência que deve ser
+   feita antes de entregar o código.
 
 ## Restrições técnicas obrigatórias (resumo; detalhes em `contexto/especificacoes-tecnicas.md`)
 
@@ -44,7 +49,10 @@ As aulas 7, 8 e 9 **não foram fornecidas**.
 - O núcleo de cálculo **não lê dados**: a leitura de `System.in` fica na classe de entrada, que entrega uma `List<String>`.
 - Relatório em **uma passagem O(n)** e **nenhuma exceção não tratada**: linha inválida nunca interrompe o lote.
 - Saída com vírgula decimal e 2 casas: `String.format(Locale.forLanguageTag("pt-BR"), "%.2f", valor)`.
-- Execução: `java Main < entrada.txt`.
+- Execução: `java Main < entrada.txt` no enunciado. Como o código fica em pacotes, o comando exato
+  (`java -cp out br.edu.ifsp.logitech.Main < entrada.txt`) vai no `docs/COMO_EXECUTAR.md`, que a banca segue.
+- **Pacotes:** base `br.edu.ifsp.logitech` (pasta `LogiTech/src/br/edu/ifsp/logitech/`), organizada em **MVC**
+  (`model`, `view`, `controller`). A distribuição das classes está na skill `/padrao-codigo`.
 
 ## Equipe (3 integrantes)
 
@@ -107,7 +115,7 @@ main                       versão estável (o que será entregue)
 ## Quadro Kanban do grupo
 
 - O grupo acompanha tarefas, responsáveis e PRs num artefato do claude.ai: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH (precisa de acesso de Colaborador ou superior para editar).
-- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 08:00, 12:00 e 18:00 (Brasília), com alguns minutos de variação.
+- O quadro puxa os PRs do GitHub com **`/sincronizar-quadro`** (skill do projeto em `.claude/skills/sincronizar-quadro/`). Uma rotina na nuvem (https://claude.ai/code/routines/trig_01XQ2TurXDgT9vorBKWdQnV5) roda a skill todo dia às 09:00, 13:00, 17:00 e 21:00 (Brasília), com alguns minutos de variação.
 - **Apenas o Murilo consegue rodar `/sincronizar-quadro`.** O Claude não deve sugerir que outro integrante a rode.
 - **Todo PR aberto pelo Alexandre ou pela Liliane gera um recado na inbox do Murilo** para ele rodar a skill: arquivo `inbox/murilo/AAAA-MM-DD-de-<autor>-sincronizar-quadro-pr-<numero>.md`, com `tipo: tarefa`, no modelo de `inbox/README.md`, citando o número e o link do PR. Depois de mergear um PR, avise o Murilo para rodar a skill.
 - A skill só lê o GitHub e escreve no banco do artefato: não faz commit, push nem abre PR.
@@ -127,13 +135,17 @@ Na **primeira resposta de cada sessão**, antes de atender o pedido:
 3. **Recado com `prioridade: maxima` vem antes de tudo:** mostrá-lo primeiro e seguir as instruções dele, a menos que o usuário peça outra coisa. Os demais recados pendentes aparecem numa lista curta, uma linha cada.
 4. Se a branch estiver atrás da `dev`, avisar que recados novos podem estar faltando e sugerir `/atualizar-branch`.
 
+As issues com o rótulo `inbox` são abertas e fechadas automaticamente pelo workflow `.github/workflows/inbox-avisos.yml`
+(ver "Avisos no GitHub" em `inbox/README.md`). Elas são só o aviso e não substituem a leitura da inbox: o status e a
+resposta continuam no arquivo do recado.
+
 ## Estrutura do repositório
 
-- `LogiTech/` — projeto IntelliJ (JDK 26), código em `LogiTech/src`. `Main.java` ainda é o template do IntelliJ.
+- `LogiTech/` — projeto IntelliJ (JDK 26), código em `LogiTech/src/br/edu/ifsp/logitech/` (MVC) e testes em `LogiTech/test`. `Main.java` ainda é o template do IntelliJ.
 - `contexto/` — regras em `.md`, `projeto-exemplo.md` (Livraria das aulas 10–12), `pdfs/` (originais) e `slides/` (um `.md` por aula); somente leitura, salvo correção
 - `memory/` — memória compartilhada das sessões
 - `docs/` — Documento de Projeto, notas do relatório de IA, `COMO_EXECUTAR.md`
-- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`, `atualizar-branch`, `documento`)
+- `.claude/skills/` — skills do projeto (`salvar-memoria`, `sincronizar-quadro`, `atualizar-branch`, `documento`, `padrao-codigo`)
 
 ## Documento de Projeto
 

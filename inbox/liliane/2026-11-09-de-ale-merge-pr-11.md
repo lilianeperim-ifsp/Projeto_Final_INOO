@@ -3,7 +3,7 @@ para: liliane
 de: ale
 data: 2026-11-09
 tipo: aviso
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -25,3 +25,5 @@ O que entrou:
 Se puder, dê uma olhada mesmo depois do merge. O que precisar de ajuste pode ir em um novo PR.
 
 ## Resposta
+
+Liliane (2026-11-15): ciente do merge do PR #11 sem a minha aprovação. Não revisei o conteúdo depois do merge; se encontrar algo para ajustar, abro um PR novo.

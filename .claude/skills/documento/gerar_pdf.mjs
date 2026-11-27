@@ -4,7 +4,7 @@
 // o Markdown e os diagramas Mermaid são renderizados no navegador com bibliotecas do jsDelivr.
 import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { execFileSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
@@ -45,6 +45,7 @@ const textoJson = JSON.stringify(texto).replace(/</g, "\\u003c");
 
 const html = `<!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8"><title>Documento de Projeto</title>
+<base href="${pathToFileURL(dirname(md)).href}/">
 <style>
   @page { size: A4; margin: 20mm; }
   body { font: 11pt/1.5 "Segoe UI", Arial, sans-serif; color: #1a1a1a; margin: 0; }
