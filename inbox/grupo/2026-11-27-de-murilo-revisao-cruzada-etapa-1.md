@@ -64,3 +64,7 @@ seção.
 6. **Perguntas ao professor:** além das três do recado (`final`, `BigDecimal` e JUnit), o documento marca mais duas
    como "o grupo confirma antes de usar": `Objects.requireNonNull` (3.7, decisão 5, e 7.5, decisão 2) e `File` com
    `FileNotFoundException` (7.6). Não pedem mudança no documento, só entram na lista.
+
+**2026-11-27, Murilo:** li tudo e entendo tudo. As correções da revisão cruzada do Alexandre (pontos 1 a 5) e a
+sugestão da coluna "PR" do cabeçalho entraram no PR #77, commit `bd290f8`, junto com o ajuste da tabela da seção 7
+(7.13 como "Escrita (PR #73)", commit `9b62ff0`). Falta a resposta da Liliane.
