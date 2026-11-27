@@ -3,7 +3,7 @@ para: ale
 de: liliane
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -24,3 +24,7 @@ revisor oficial, e a entrega da Etapa 1 é hoje (27/11).
   da seção 7, que é sua (T15), ganhou o campo opcional "Ponto de partida".
 
 ## Resposta
+
+**2026-11-27, Alexandre:** concluído. O PR #65 foi aprovado e mergeado pelo Murilo em 27/11 (merge `bc38aff`), antes
+da minha revisão. As correções combinadas nele (6.1, 7.5 e 7.6) foram para o PR #69 da T17, e eu as conferi na
+revisão de lá: estão aplicadas.
