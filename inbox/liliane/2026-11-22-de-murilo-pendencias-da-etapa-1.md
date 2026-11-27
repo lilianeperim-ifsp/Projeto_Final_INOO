@@ -3,7 +3,7 @@ para: liliane
 de: murilo
 data: 2026-11-22
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -41,3 +41,12 @@ revisão cruzada e entrega). Como a fila é em série, vale já ir lendo os cen�
 Quadro: https://claude.ai/artifact/F1QWFXCoJWQXo3HDSBbvhH
 
 ## Resposta
+
+**2026-11-27, Liliane:** concluído. As três tarefas foram entregues:
+
+- **T09:** PR #40, mergeado em 23/11;
+- **T16:** PR #65, mergeado em 26/11 (merge `bc38aff`). As correções da revisão entraram no PR #69 da T17;
+- **T18:** PR #73 (https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/73), em revisão pelo Alexandre. É a
+  seção 7.13: conferência dos 5 minutos dos 12 cenários e teste de rodar o lote no Windows.
+
+Com o PR #73 aberto, a sua T20 pode começar.
