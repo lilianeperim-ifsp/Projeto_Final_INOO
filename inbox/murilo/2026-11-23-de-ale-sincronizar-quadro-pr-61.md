@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-23
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,4 @@ Abri o PR #61 (T15, seção 7: cenários de evolução 1 a 4). Rode o `/sincroni
 
 ## Resposta
 
+Murilo, 2026-11-27: concluído. A sincronização agendada de 24/11 (09:15, Brasília) registrou o PR #61 como aberto, com o cartão do T15 em "Em PR" ligado ao #61. O recado do merge do #61 foi fechado à parte.

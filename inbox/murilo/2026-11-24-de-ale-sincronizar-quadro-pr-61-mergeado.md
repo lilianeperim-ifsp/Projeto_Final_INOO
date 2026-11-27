@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-24
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,4 @@ Rode o `/sincronizar-quadro` para o cartão do T15 passar a "Concluído".
 
 ## Resposta
 
+Murilo, 2026-11-27: concluído. A sincronização manual de 24/11 (10:29, Brasília) registrou o PR #61 como mergeado e moveu o cartão do T15 para "Concluído".
