@@ -1727,8 +1727,8 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 >
 > | Subseções | Cenários | Cartão | Responsável | Situação |
 > |---|---|---|---|---|
-> | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita, em revisão |
-> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita, em revisão |
+> | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita (PR #61) |
+> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita, em revisão (PR #65) |
 > | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | A fazer |
 >
 > A T18 (Liliane) confere se cada alteração cabe nos 5 minutos da defesa ao vivo.
@@ -1739,6 +1739,7 @@ resposta no mesmo lugar na defesa:
 | Campo | O que traz |
 |---|---|
 | **Exigência (ET 4)** | O texto do enunciado para o cenário |
+| **Ponto de partida** (opcional) | O que o cenário supõe e o enunciado não define, como o formato do arquivo na 7.6 |
 | **Classes criadas** | Cada classe nova, com o que ela estende ou implementa e o que escreve |
 | **Classes alteradas** | Cada classe que já existe e muda, com o que muda nela. "Nenhuma", quando for o caso |
 | **O que não muda** | As classes que provam a exigência (por exemplo, o `Transporte` no cenário 4) |
@@ -1749,9 +1750,10 @@ resposta no mesmo lugar na defesa:
 | **Testes** | Os casos novos e os que já existem e devem continuar passando |
 | **Alternativa descartada** | Quando houver uma forma de responder ao cenário que o grupo não escolheu |
 
-Os dois campos opcionais aparecem só quando o cenário tem escolhas ou situações-limite próprias (como na 7.2 e na
-7.4). A alternativa descartada de uma decisão fica dentro da própria decisão, logo abaixo dela. O campo
-**Alternativa descartada** fica para a alternativa ao cenário como um todo.
+Os campos opcionais aparecem só quando o cenário precisa deles: o ponto de partida, quando supõe algo que o
+enunciado não define (como na 7.6), e as decisões e os casos de borda, quando tem escolhas ou situações-limite
+próprias (como na 7.2 e na 7.4). A alternativa descartada de uma decisão fica dentro da própria decisão, logo abaixo
+dela. O campo **Alternativa descartada** fica para a alternativa ao cenário como um todo.
 
 Os testes de regressão valem para todos os cenários: o gabarito da RN 12 e os casos da 8.2 a 8.7 continuam passando
 sem nenhuma mudança (8.1 e 8.8).
@@ -1965,7 +1967,8 @@ sem nenhuma mudança (8.1 e 8.8).
   2. **`simular(null)` lança `NullPointerException` logo na entrada**, com `Objects.requireNonNull`, como os
      construtores com parâmetro (3.7). A simulação devolve um `ResultadoCalculo` e não tem como responder `false`,
      como o `trocarPerfil(null)` (6.3). Quem chama é um teste ou o operador, e não o lote, então a exceção não chega
-     ao processamento da entrada padrão.
+     ao processamento da entrada padrão. `Objects` não aparece nos slides: o grupo confirma antes de usar, como na 3.7
+     (decisão 5).
      - Alternativa descartada: devolver `null`. Repete o risco do erro 13 da Livraria.
 - **Casos de borda:**
   - **Simular com o perfil vigente:** devolve o mesmo que o `calcularAtual()`.
@@ -1984,27 +1987,34 @@ sem nenhuma mudança (8.1 e 8.8).
 
 - **Exigência (ET 4):** o código de modal passa a vir de uma configuração externa. A mudança fica só na camada de
   entrada.
-- **O que a configuração traz:** um arquivo de texto, `modais.txt`, na pasta em que o programa roda, com uma linha por
-  código novo no formato `codigoExterno;CODIGO_CONHECIDO`. Por exemplo, `RODO;RODOVIARIO` faz a entrada aceitar
-  `RODO` como o modal rodoviário. A configuração **acrescenta** códigos aos três fixos e não os substitui (decisão 1).
+- **Ponto de partida:** um arquivo de texto, `modais.txt`, na pasta de trabalho do programa (ver casos de borda),
+  com uma linha por código novo no formato `codigoExterno;CODIGO_CONHECIDO`. Por exemplo, `RODO;RODOVIARIO` faz a
+  entrada aceitar `RODO` como o modal rodoviário. A configuração **acrescenta** códigos aos três fixos e não os substitui (decisão 1).
 - **Classes criadas:** nenhuma.
-- **Classes alteradas:** as quatro da camada de entrada (2.2.6), que é o que a exigência permite:
+- **Classes alteradas:** quatro, todas na tabela da camada de entrada e saída (2.2.6), que é o que a exigência
+  permite. O `ProcessadorDeLote` está nessa tabela, mas é a classe que percorre o lote e calcula. Nele, a mudança é só
+  um construtor a mais, que recebe a lista e a repassa ao `InterpretadorDeLinha`, sem tocar no `processar(linhas)`.
+  Essa linha não tem como ser evitada: cada classe cria o próprio colaborador (3.7, decisão 4), e a lista só chega à
+  fábrica passando por ele (decisão 6):
   - `Main`: antes de ler o lote, lê `modais.txt` para uma `List<String>` com um `Scanner` sobre o arquivo, como já faz
     com o `System.in` (passo 1 da 6.1). Se o arquivo não existe, trata o `FileNotFoundException` e segue com a lista
-    vazia. Depois cria `new ProcessadorDeLote(configuracao)`;
+    vazia. Depois cria `new ProcessadorDeLote(configuracao)`. `File` (`java.io`) e `FileNotFoundException`, uma
+    exceção verificada, não aparecem nos slides: o grupo confirma antes de usar, como na 3.7 (decisão 5);
   - `ProcessadorDeLote` e `InterpretadorDeLinha`: cada um ganha um construtor que recebe a lista e a repassa ao
     colaborador que já cria (3.7, decisão 4): `new InterpretadorDeLinha(configuracao)` e
     `new FabricaDeCodigos(configuracao)`. O construtor sem parâmetro continua e chama o novo com uma lista vazia
     (`this(new ArrayList<>())`);
   - `FabricaDeCodigos`: o construtor novo preenche os três modais e os três perfis fixos, como hoje, e depois percorre
-    a configuração. Para cada linha, separa as duas partes pelo `;` e, se o código conhecido existe e o código externo
-    ainda não, acrescenta `new CodigoDeModal(codigoExterno, modal do código conhecido)`. O construtor sem parâmetro
-    chama o novo com uma lista vazia.
+    a configuração. Para cada linha, separa as duas partes com `split(";", -1)` e faz `trim` em cada uma, como no
+    passo 4 da 6.1. Se o código conhecido existe e o código externo ainda não, acrescenta
+    `new CodigoDeModal(codigoExterno, modal do código conhecido)`. O construtor sem parâmetro chama o novo com uma
+    lista vazia.
 - **O que não muda:**
   - `existeModal`, `criarModal` e o `indiceDoModal`: o código novo é uma entrada a mais na lista única (2.2.6);
   - a validação do `InterpretadorDeLinha` (passo 5 da 6.1), que continua perguntando `existeModal(codigo)`;
   - `Modal` e as filhas, `Encomenda`, `Transporte` e `FormatadorDeSaida`: recebem um `Modal` e não sabem de onde ele
     veio (gancho da 6.1);
+  - o `processar(linhas)` do `ProcessadorDeLote`: o laço, o cálculo, o relatório e a formatação continuam iguais;
   - o núcleo de cálculo, que continua sem ler dados (RN 10): quem lê o arquivo é o `Main`.
 - **Por que funciona:** a fábrica é o único lugar que compara código (4.3), e a lista única de pares código + objeto
   (2.2.6) aceita uma entrada a mais sem mudar a busca. O código externo aponta para o **mesmo objeto** do código
@@ -2016,7 +2026,7 @@ sem nenhuma mudança (8.1 e 8.8).
   2. No `InterpretadorDeLinha` e no `ProcessadorDeLote`, criar o construtor que recebe a lista e a repassa, e fazer o
      sem parâmetro chamá-lo com uma lista vazia.
   3. No `Main`, ler `modais.txt` com `Scanner` e `try/catch`, e passar a lista ao `ProcessadorDeLote`.
-  4. Criar `modais.txt` com `RODO;RODOVIARIO`.
+  4. Criar `modais.txt` com `RODO;RODOVIARIO` na raiz de `LogiTech/`, ao lado da `src/` (ver casos de borda).
   5. Compilar e rodar o lote com `10;RODO;500;1000;Santos;Campinas;ECONOMICO` e conferir a linha `VALIDA` com os
      valores do rodoviário (ver a atenção ao rodar no Windows, na 7.1).
 
@@ -2040,8 +2050,17 @@ sem nenhuma mudança (8.1 e 8.8).
        todos os códigos novos.
   5. **O código fixo vence.** Uma linha como `AEREO;RODOVIARIO` é ignorada, porque `AEREO` já existe, e o gabarito
      não muda.
+  6. **A lista passa pelo `ProcessadorDeLote`, e o `Main` não monta a fábrica.**
+     - Alternativa descartada: o `Main` criar a `FabricaDeCodigos` e passá-la pronta. Mudaria a decisão 4 da 3.7 para
+       todas as classes do lote, e não só para este cenário.
 - **Casos de borda:**
   - **Arquivo ausente ou vazio:** os três códigos fixos, como hoje.
+  - **Arquivo na pasta errada:** o programa procura o `modais.txt` na pasta de trabalho. No Run do IntelliJ, é o campo
+    "Working directory", que por padrão é a raiz do projeto `LogiTech/`, e não a `src/`. No `cmd`, é a pasta em que o
+    comando é digitado. Fora dela, o arquivo conta como ausente, e o `RODO` sai `codigo inexistente` sem mensagem
+    (decisões 1 e 4). O `COMO_EXECUTAR.md` diz qual é a pasta.
+  - **Espaços em volta do `;`:** `RODO ; RODOVIARIO` vale como `RODO;RODOVIARIO`, por causa do `trim`. Já
+    ` ;RODOVIARIO` tem uma parte vazia e é ignorada (decisão 4).
   - **Linha em branco no arquivo:** ignorada (decisão 4).
   - **Maiúsculas e minúsculas:** `rodo;RODOVIARIO` cria o código `rodo`, e só ele. O código continua diferenciando
     maiúsculas de minúsculas (RN 4), e `RODO` no lote sai `codigo inexistente`.
