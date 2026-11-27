@@ -1,3 +1,29 @@
+<div align="center" style="height: 250mm; display: flex; flex-direction: column; justify-content: space-between;
+  text-align: center; font-size: 12pt; break-after: page;">
+<div>
+<img src="imagens/logo-ifsp.png" alt="Logo do IFSP" width="108"><br><br>
+<b>INSTITUTO FEDERAL DE EDUCAÇÃO, CIÊNCIA E TECNOLOGIA DE SÃO PAULO</b><br>
+<b>CAMPUS ARARAQUARA</b><br><br>
+Tecnologia em Sistemas para Internet · Introdução à Orientação a Objetos (ARQINOO)
+</div>
+<div>
+Alexandre Elson Costa Santana Santos<br>
+Liliane Perim Vigetta<br>
+Murilo Leandro dos Santos Silva
+</div>
+<div>
+<b style="font-size: 18pt;">SISTEMA LOGITECH</b><br><br>
+Documento de Projeto · Projeto Final, Etapa 1
+</div>
+<div>
+Professor: Luiz Henrique Nunes
+</div>
+<div>
+Araraquara<br>
+2026
+</div>
+</div>
+
 # Documento de Projeto: Sistema LogiTech
 
 **Disciplina:** Introdução à Orientação a Objetos (IFSP) · **Etapa 1** (entrega em 27/11, sem código)
