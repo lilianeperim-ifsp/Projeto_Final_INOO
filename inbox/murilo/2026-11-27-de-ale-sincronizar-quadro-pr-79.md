@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -24,3 +24,7 @@ quadro.
 - O Documento de Projeto não fala de pacotes. Por isso essas decisões vão para a seção "Do projeto ao código".
 
 ## Resposta
+
+**2026-11-27, Murilo:** concluído. A sincronização manual das 19:36 UTC (`s-202611271936`) registrou o PR #79 no
+quadro, aberto, comigo e com a Liliane de revisores. Este recado fecha só a sincronização: a minha revisão do #79
+(pacotes em MVC, subpacotes `interfaces` e pacote dos testes) sai no próprio PR.
