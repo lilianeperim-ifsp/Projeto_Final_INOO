@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 prioridade: maxima
 ---
@@ -35,3 +35,7 @@ nele, como você pediu no recado do grupo. Depois de aplicá-las, me avise, que 
 
 ## Resposta
 
+**2026-11-27, Murilo:** concluído. As cinco correções e a sugestão da coluna "PR" do cabeçalho entraram no PR #77,
+commit `bd290f8`. Avisei no PR para você reler o diff:
+https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/77#issuecomment-7226368322. O item 6 (perguntas ao
+professor) ficou fora do PR, como você indicou.
