@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -22,3 +22,8 @@ dois.
 - A revisão do #82 está no recado `2026-11-27-de-ale-revisar-pr-82-dev-para-main.md`.
 
 ## Resposta
+
+**2026-11-27, Murilo:** concluído. A sincronização manual das 20:09 UTC (`s-202611272009`) gravou o PR #77 como
+mergeado e aprovado por você e registrou o PR #82 aberto, comigo de reviewer. Nenhum cartão foi movido: o T20 está em
+"A fazer" e sem PR ligado, então não saiu sozinho para "Concluído"; o vínculo com o #77 e a coluna do T20 ficam para
+ajustar à mão no quadro.
