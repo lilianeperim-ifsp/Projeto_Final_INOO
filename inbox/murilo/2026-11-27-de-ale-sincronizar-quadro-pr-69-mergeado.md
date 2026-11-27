@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -19,3 +19,6 @@ O PR #69 (T17, seções 7.9 a 7.12: cenários de evolução 9 a 12) foi mergeado
 - Com o merge, a T18 (Liliane) e a T20 já podem partir da `dev`.
 
 ## Resposta
+
+**2026-11-27, Murilo:** concluído. A sincronização manual das 15:48 UTC (`s-202611271548`) gravou o PR #69 como
+mergeado e aprovado por você e moveu o cartão do T17 para "Concluído".

@@ -3,7 +3,7 @@ para: murilo
 de: liliane
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -23,3 +23,5 @@ Rode o `/sincronizar-quadro` para o cartão do T18 passar a "Em PR".
 
 ## Resposta
 
+**2026-11-27, Murilo:** concluído. Quando sincronizei, o PR #73 já estava mergeado, então o cartão do T18 foi direto
+de "Em PR" para "Concluído" (sincronização `s-202611271807`, 18:07 UTC).

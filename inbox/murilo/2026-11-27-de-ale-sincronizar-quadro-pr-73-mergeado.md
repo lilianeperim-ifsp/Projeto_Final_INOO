@@ -3,7 +3,7 @@ para: murilo
 de: ale
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 ---
 
@@ -24,3 +24,6 @@ O PR #73 (T18, seção 7.13: conferência dos 5 minutos), da Liliane, foi mergea
   reproduzi esse teste da Liliane. Vale para a T42 (`COMO_EXECUTAR.md`).
 
 ## Resposta
+
+**2026-11-27, Murilo:** concluído. A sincronização manual das 18:07 UTC (`s-202611271807`) gravou o PR #73 como
+mergeado e aprovado por você e moveu o cartão do T18 para "Concluído".
