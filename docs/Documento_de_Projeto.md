@@ -1732,7 +1732,7 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 > |---|---|---|---|---|
 > | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita (PR #61) |
 > | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita (PR #65) |
-> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | Escrita, em revisão |
+> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | Escrita, em revisão (PR #69) |
 >
 > A T18 (Liliane) confere se cada alteração cabe nos 5 minutos da defesa ao vivo.
 
