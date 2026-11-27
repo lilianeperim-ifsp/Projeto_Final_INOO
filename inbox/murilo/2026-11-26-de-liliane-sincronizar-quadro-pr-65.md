@@ -3,7 +3,7 @@ para: murilo
 de: liliane
 data: 2026-11-26
 tipo: tarefa
-status: pendente
+status: concluido
 ---
 
 ## O que é
@@ -21,3 +21,5 @@ Abri o PR #65 (T16, seção 7.5 a 7.8: cenários de evolução 5 a 8) para a `de
   do lote não muda o `;` do `modais.txt`).
 
 ## Resposta
+
+Murilo, 2026-11-27: concluído. Aprovei o PR #65 e fiz o merge na `dev` (merge `bc38aff`). As correções que faltam entram no PR da T17 e estão listadas na aprovação. A sincronização manual de 27/11 (10:06, Brasília) registrou o #65 como mergeado e moveu o cartão do T16 para "Concluído".
