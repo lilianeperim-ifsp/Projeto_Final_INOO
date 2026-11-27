@@ -16,8 +16,10 @@
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita |
-> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita, em revisão |
-> | 7.5 a 7.12 e conferência dos 5 minutos | T16 a T18 | Ver `docs/divisao-projeto.md` | A fazer |
+> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita |
+> | 7.5 a 7.8 Cenários de evolução 5 a 8 | T16 | Liliane | Escrita |
+> | 7.9 a 7.12 Cenários de evolução 9 a 12 | T17 | Murilo | Escrita |
+> | 7.13 Conferência dos 5 minutos | T18 | Liliane | Escrita, em revisão |
 > | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
@@ -1733,9 +1735,8 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 > |---|---|---|---|---|
 > | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita (PR #61) |
 > | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita (PR #65) |
-> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | Escrita, em revisão (PR #69) |
->
-> A T18 (Liliane) confere se cada alteração cabe nos 5 minutos da defesa ao vivo.
+> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | Escrita (PR #69) |
+> | 7.13 | Conferência dos 5 minutos da defesa ao vivo | T18 | Liliane | Escrita, em revisão |
 
 **Formato de cada cenário.** As subseções seguem os mesmos campos, nesta ordem, para que qualquer um do grupo ache a
 resposta no mesmo lugar na defesa:
@@ -1796,9 +1797,10 @@ acrescentam classes:
   **Atenção ao rodar no Windows.** O terminal do IntelliJ abre o PowerShell, que não aceita o `<` de
   `java Main < entrada.txt`. Já o `Get-Content entrada.txt | java Main` troca os acentos por `?` no PowerShell 5.1.
   Há duas saídas seguras. A primeira é configurar o Run do `Main` no IntelliJ com "Redirect input from" apontando para
-  `entrada.txt`. A segunda é rodar pelo `cmd`, com `cmd /c "java -cp <pasta das classes> Main < entrada.txt"`. O
-  comando exato fica no `COMO_EXECUTAR.md`, e a T18 confere se ele cabe nos 5 minutos. Os passos 5 e 6 valem para
-  todos os cenários que rodam o lote.
+  `entrada.txt`. A segunda é rodar pelo `cmd`, com `cmd /c "java -cp <pasta das classes> Main < entrada.txt"`. A
+  T18 testou as duas formas do PowerShell e a do `cmd` (7.13): o `Get-Content` também põe um BOM no início da primeira
+  linha e não pode ser usado. O comando exato fica no `COMO_EXECUTAR.md`. Os passos 5 e 6 valem para todos os
+  cenários que rodam o lote.
 - **Testes:**
   - novos: no `ModalTest`, frete, tempo e CO₂ base do `Ferroviario` com os números escolhidos, a sobretaxa acima de
     1000 kg e o `excedeCapacidade` no limite e logo acima dele. No `FabricaDeCodigosTest`,
@@ -2040,7 +2042,8 @@ acrescentam classes:
   5. Compilar e rodar o lote com `10;RODO;500;1000;Santos;Campinas;ECONOMICO` e conferir a linha `VALIDA` com os
      valores do rodoviário (ver a atenção ao rodar no Windows, na 7.1).
 
-  São quatro classes, e é o cenário com mais passos até aqui: a T18 confere se ele cabe nos 5 minutos.
+  São quatro classes, e é o cenário com mais passos. Pela conferência da T18, ele não cabe nos 5 minutos, e o
+  acoplamento é explicado na defesa (7.13).
 - **Decisões do cenário:**
   1. **A configuração acrescenta códigos e não substitui os fixos.** Sem o arquivo, o programa funciona como hoje, e o
      gabarito da RN 12 continua passando sem nenhum arquivo extra.
@@ -2409,6 +2412,123 @@ acrescentam classes:
     `;`, passam sem mudança.
 - **Alternativa descartada:** uma constante `SEPARADOR` no `InterpretadorDeLinha`, já descartada na 4.2. Ela não
   reduziria o número de pontos a alterar, que já é um.
+
+### 7.13 Conferência dos 5 minutos
+
+Na defesa, o professor pode pedir que um cenário seja implementado ao vivo (ET 8.2), em no máximo 5 minutos
+(orientação do professor). Esta subseção confere, cenário por cenário, se o campo **Alteração ao vivo** cabe nesse
+tempo. Na Etapa 1 ainda não há código, então a conta é uma **estimativa** por ação. O cronômetro de verdade é o ensaio
+da T45, na Etapa 2. Se o ensaio der outro resultado, a diferença vai para "Do projeto ao código".
+
+#### Método
+
+Cada passo da alteração ao vivo vira uma ou mais ações, e cada ação tem um tempo fixo:
+
+| Ação no IntelliJ | Tempo |
+|---|---|
+| Criar uma classe (nome e `extends` ou `implements`) | 20 s |
+| Abrir uma classe que já existe (Ctrl+N) | 10 s |
+| "Implement methods", "Override methods" ou "Generate" (Alt+Enter, Ctrl+O, Alt+Insert) | 10 s |
+| Linha simples: um `return`, uma constante, um `add` na fábrica, uma troca de valor | 15 s |
+| Linha com lógica: um `if`, um laço, um `try` ou um `catch` | 30 s |
+| Método de uma linha escrito do zero (assinatura e `return`) | 30 s |
+| Compilar (Ctrl+F9) | 15 s |
+| Pôr as linhas de teste no `entrada.txt`, rodar o lote e conferir a saída | 60 s |
+| Escrever um teste curto e rodá-lo | 90 s a 120 s |
+
+A conta supõe que:
+
+- quem faz conhece o projeto e o IntelliJ, e o projeto já compila antes de começar;
+- a configuração de Run do `Main` já está pronta, lendo o `entrada.txt` (ver "Como rodar o lote no Windows", abaixo);
+- os números fictícios da 7.1 e da 7.2 são escolhidos antes de começar a digitar;
+- a explicação oral acompanha a digitação e não entra na conta.
+
+#### Resultado
+
+| Cenário | Classes | Conta | Estimativa | Veredito |
+|---|---|---|---|---|
+| 7.1 Ferroviário | 1 criada, 1 alterada | criar 20 + implement 10 + 6 `return` 90 + fábrica 25 + compilar 15 + lote 60 | ~3 min 40 s | Cabe |
+| 7.2 Corporativo | 1 criada, 1 alterada | criar 20 + implement 10 + 3 `return` 45 + fábrica 25 + compilar 15 + lote 60 | ~3 min | Cabe |
+| 7.3 Troca do perfil ativo | nenhuma | rodar o teste da 8.6 e mostrar os valores antes e depois | ~1 min | Cabe |
+| 7.4 SMS por região | 1 criada | criar 20 + 6 atributos 90 + construtor 25 + implement 10 + regra da região 90 + `getMensagens` 15 + teste mínimo 120 | **~6 min** | **Arriscado** |
+| 7.5 Simulação | nenhuma | rodar o teste da 8.6 | ~1 min | Cabe |
+| 7.6 Configuração externa | 4 alteradas | fábrica 175 + interpretador 55 + processador 55 + `Main` 175 + `modais.txt` 30 + compilar 15 + lote 60 | **~9 min 30 s** | **Não cabe** |
+| 7.7 CANCELADO | 1 criada, 4 alteradas | `Cancelado` 70 + `Status` 40 + `Aguardando` 35 + `EmTransito` 35 + `Transporte` 40 + compilar 15 + teste mínimo 90 | **~5 min 30 s** | **No limite** |
+| 7.8 Troca de assinatura | nenhuma | rodar o caso da 8.7 (interessado removido) | ~1 min | Cabe |
+| 7.9 Peso mínimo | 1 alterada | abrir 10 + constante 15 + `if` 30 + compilar 15 + lote 60 | ~2 min | Cabe |
+| 7.10 Sobretaxa de 8% | 1 alterada | abrir 10 + 2 constantes 30 + compilar 15 + lote 60 | ~2 min | Cabe |
+| 7.11 PREMIUM | 1 criada, 1 alterada | criar 20 + implement 10 + 3 `return` 45 + constante 15 + `aplicarFrete` 55 + fábrica 25 + compilar 15 + lote 60 | ~4 min | Cabe |
+| 7.12 Separador `,` | 1 alterada | abrir 10 + `split` 15 + `entrada_virgula.txt` 45 + apontar o Run para ele 30 + compilar 15 + lote 60 | ~3 min | Cabe |
+
+Nove cenários cabem com folga. Os três que pedem atenção são os que mexem em mais classes ou escrevem uma classe
+inteira na hora.
+
+#### Os três cenários apertados
+
+- **7.4, arriscado.** A alteração em si (passos 1 a 4) dá cerca de 4 min. O que estoura é a demonstração: o teste
+  completo da 7.4 tem nove casos. Na defesa, escreve-se só o teste mínimo, com uma posição fora e depois uma dentro da
+  região, conferindo 1 mensagem. Se a Etapa 2 tiver um método auxiliar que monta o transporte de exemplo da 8.6, o
+  teste o reaproveita. Os outros casos ficam fora dos 5 minutos. Mesmo assim a conta fica perto de 6 min, porque a
+  classe é escrita inteira, com seis atributos e a regra da entrada na região. Para encurtar seria preciso mudar a
+  7.4, por exemplo mandando um SMS a cada posição dentro da região, alternativa já descartada na decisão 1 dela. O
+  grupo mantém a 7.4 e ensaia este cenário primeiro na T45.
+- **7.7, no limite.** A conta usa um teste mínimo: o do passo 6 **sem** a mensagem do cliente, isto é, cancelar em
+  `AGUARDANDO` e conferir o `true` e o nome `CANCELADO`. Os passos de código (1 a 5) dão cerca de 4 min. São cinco
+  classes, mas quatro delas ganham uma linha cada, porque o `Cancelado` herda o padrão de `Status` (7.7, decisão 2).
+  Os casos de rejeição do campo "Testes" da 7.7 ficam fora dos 5 minutos.
+- **7.6, não cabe.** Só o código e o `modais.txt`, sem compilar e rodar, dão cerca de 8 min. A causa é a cadeia de
+  criação: a lista lida pelo `Main` atravessa três construtores até chegar à `FabricaDeCodigos`, porque cada classe
+  cria o próprio colaborador (3.7, decisão 4) e a leitura fica no `Main` (7.6, decisão 2). É um acoplamento da
+  montagem dos objetos, e não do cálculo: o núcleo, os modais e os perfis não mudam. A ET 4 pede que isso seja
+  explicado na defesa quando a alteração leva mais tempo.
+
+#### Decisão: a 7.6 fica como está e o acoplamento é explicado na defesa
+
+O projeto não muda por causa da 7.6. Na defesa, quem for sorteado com o cenário explica a cadeia de criação acima e
+implementa na ordem da alteração ao vivo: fábrica, interpretador, processador e `Main`. A primeira parte que fica
+pronta, a da fábrica (passo 1, cerca de 3 min), já mostra o mecanismo: o código novo vira mais uma entrada na lista
+única (2.2.6).
+
+- **Por quê:** a entrega da Etapa 1 é hoje (27/11), e qualquer das alternativas abaixo mexe na 2.2.6 e no diagrama
+  da 3, o que é mudança estrutural e pede o aval dos três. O enunciado aceita uma alteração mais longa, desde que o
+  motivo seja explicado.
+- **Alternativa descartada, a reavaliar na Etapa 2:** as três classes da cadeia já nascerem com o construtor que
+  recebe a lista de configuração, vazia por padrão. Ao vivo, sobrariam o laço da fábrica e a leitura no `Main`, cerca
+  de 4 a 5 min. Foi descartada agora porque põe na entrega um parâmetro que nenhuma regra do enunciado usa e porque
+  exige mudar a 2.2.6 e a 3 no dia da entrega. Se o grupo a adotar na Etapa 2, ela vai para "Do projeto ao código".
+- **Alternativa descartada:** a `FabricaDeCodigos` ler o arquivo sozinha, com uma classe só alterada. Já foi
+  descartada na 7.6 (decisão 2): a fábrica passaria a fazer I/O, e o teste dela dependeria de um arquivo no disco.
+
+#### Como rodar o lote no Windows (teste de 2026-11-27)
+
+A nota da 7.1 afirmava, sem teste, que o PowerShell 5.1 troca os acentos por `?`. A T18 testou as formas de rodar com
+o JDK 26 do IntelliJ (`openjdk-26.0.2`) e o Windows PowerShell 5.1. O teste usou um programa de 5 linhas, fora do
+projeto, que lê com `new Scanner(System.in)`, como o `Main` (passo 1 da 6.1), e mostra o código de cada caractere
+lido. A entrada foi `1;RODOVIARIO;500;1000;São Paulo;Maceió;ECONOMICO`, salva em UTF-8 sem BOM, como o IntelliJ salva.
+
+| Forma de rodar | O que o programa recebe |
+|---|---|
+| `java Main < entrada.txt`, no PowerShell | Nada: erro de sintaxe, "Operador '<' reservado para uso futuro" |
+| `Get-Content entrada.txt \| java Main` | Acentos quebrados (o `ã` vira dois caracteres) e um BOM (U+FEFF) antes do `1` |
+| `Get-Content -Encoding UTF8 entrada.txt \| java Main` | Acentos certos só com o console em UTF-8. No padrão do PowerShell 5.1 (`$OutputEncoding` em ASCII), viram `?`. O BOM aparece sempre |
+| `cmd /c "java -cp <pasta das classes> Main < entrada.txt"` | A linha idêntica ao arquivo, com os acentos certos, também com o `cmd` na página de código 850 |
+| O mesmo `cmd /c`, com o `entrada.txt` salvo **com** BOM | O BOM (U+FEFF) antes do `1` |
+
+O que o teste mostra:
+
+1. **A nota da 7.1 está certa, e o problema é maior que os acentos.** Origem e destino não entram no cálculo nem na
+   saída, mas o BOM entra no primeiro campo da primeira linha. Pela 6.1, o `1` precedido do BOM não é um inteiro, e
+   o `trim` não remove o BOM, porque só tira caracteres até U+0020. A primeira linha do lote sairia
+   `REJEITADA;LINHA1;formato invalido`, e o gabarito falharia. **O lote nunca é rodado com o `Get-Content` do
+   PowerShell.**
+2. **O `cmd /c` funciona.** A partir do JDK 18, o `Scanner` sem charset lê em UTF-8, mesmo com o Windows informando
+   Cp1252 para a entrada, e o teste confirma. A saída da RN 11 não tem acentos (os motivos são escritos sem acento),
+   então a codificação da saída não muda o resultado.
+3. **O `entrada.txt` é salvo em UTF-8 sem BOM**, que é o padrão do IntelliJ. Um editor que grave com BOM causa o mesmo
+   problema do item 1, até pelo `cmd`.
+4. **Fica sem teste:** o "Redirect input from" da configuração de Run do IntelliJ, que é a forma prevista para a
+   defesa, porque é configurado pela interface e só pode ser testado com o projeto aberto. A T42 o confere e fixa o
+   comando exato no `COMO_EXECUTAR.md`. O `cmd /c` fica como reserva.
 
 ## 8. Plano de testes
 
