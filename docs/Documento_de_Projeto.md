@@ -1163,7 +1163,8 @@ A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Meth
 - **Classes:** `FabricaDeCodigos` (`existeModal`, `existePerfil`, `criarModal` e `criarPerfil`), com os pares
   `CodigoDeModal` e `CodigoDePerfil`. Quem a usa é o `InterpretadorDeLinha`.
 - **Por quê:** é o único lugar que compara código (4.3). Um modal ou perfil novo é uma linha no construtor da fábrica
-  (cenários 1, 2 e 11), e o código vindo de configuração externa (cenário 6) muda só a fábrica (6.1).
+  (cenários 1, 2 e 11), e o código vindo de configuração externa (cenário 6) muda quatro classes da camada de entrada
+  (7.6).
 - **Simple Factory e Factory Method:** o enunciado junta os dois na mesma linha da lista (ET 5), e o projeto usa só a
   Simple Factory: uma classe concreta que decide qual objeto criar. O *Use a cabeça!* a apresenta como um hábito de
   programação, e não como um padrão GoF. O Factory Method, com uma hierarquia de criadores, foi descartado (5.3).
@@ -1210,8 +1211,8 @@ A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Meth
     cenário pede isso. A chamada direta ao `Transporte` basta.
 - **Adapter.**
   - *Onde poderia entrar:* no cenário 6 (código de modal vindo de configuração externa) ou na leitura de `System.in`.
-  - *Por que não:* não há duas interfaces incompatíveis para conciliar. A configuração externa muda só a forma como a
-    `FabricaDeCodigos` preenche a lista (6.1), e o `Main` já entrega uma `List<String>` ao processador.
+  - *Por que não:* não há duas interfaces incompatíveis para conciliar. A configuração externa muda quatro classes da
+    camada de entrada (7.6), sem nenhuma interface a adaptar, e o `Main` já entrega uma `List<String>` ao processador.
   - *Quando reconsiderar:* se a configuração vier de uma biblioteca com interface própria.
 
 ### 5.4 Pontos resolvidos sem padrão
@@ -1364,8 +1365,9 @@ Servem também de base para o plano de testes (T19).
 
 #### Eficiência
 
-Uma única passagem pela lista, O(n). Cada linha custa um tempo fixo: são 7 campos, e a fábrica percorre uma lista de
-tamanho fixo (os códigos conhecidos). Não há varredura aninhada nem ordenação.
+Uma única passagem pela lista, O(n). Cada linha custa um tempo fixo: são 7 campos, e a fábrica percorre a lista dos
+códigos conhecidos, cujo tamanho não depende do lote. São os seis códigos fixos e, no cenário 6, também os da
+configuração externa (7.6). Não há varredura aninhada nem ordenação.
 
 #### Onde os cenários de evolução tocam este fluxo
 
@@ -1373,10 +1375,12 @@ Ganchos para os cenários (T16 e T17), que dizem as classes criadas e alteradas:
 
 - **Novo modal ou perfil (como o ferroviário):** as classes novas e uma entrada nova na lista de códigos da
   `FabricaDeCodigos`. O resto do fluxo não muda.
-- **Separador `,` na entrada:** muda só o separador do passo 4, no `InterpretadorDeLinha`.
-- **Peso mínimo de 0,5 kg:** uma verificação nova no passo 5, logo depois de `peso invalido`.
-- **Modal vindo de configuração externa:** muda só a `FabricaDeCodigos`. O resto do fluxo recebe um `Modal` e não
-  sabe de onde ele veio.
+- **Separador `,` na entrada:** muda só o separador do passo 4, no `InterpretadorDeLinha` (7.12).
+- **Peso mínimo de 0,5 kg:** uma verificação nova no passo 5, logo depois de `peso invalido` (7.9).
+- **Modal vindo de configuração externa:** mudam quatro classes da camada de entrada e saída (2.2.6). O `Main` lê o
+  arquivo, o `ProcessadorDeLote` e o `InterpretadorDeLinha` só repassam a lista pelo construtor, e a
+  `FabricaDeCodigos` acrescenta os códigos novos à lista única (7.6). O passo 5 continua perguntando `existeModal`, e
+  o resto do fluxo recebe um `Modal` sem saber de onde ele veio.
 
 ### 6.2 Troca de perfil em tempo de execução
 
@@ -1728,8 +1732,8 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 > | Subseções | Cenários | Cartão | Responsável | Situação |
 > |---|---|---|---|---|
 > | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita (PR #61) |
-> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita, em revisão (PR #65) |
-> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | A fazer |
+> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita (PR #65) |
+> | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | Escrita, em revisão (PR #69) |
 >
 > A T18 (Liliane) confere se cada alteração cabe nos 5 minutos da defesa ao vivo.
 
@@ -1756,7 +1760,11 @@ próprias (como na 7.2 e na 7.4). A alternativa descartada de uma decisão fica 
 dela. O campo **Alternativa descartada** fica para a alternativa ao cenário como um todo.
 
 Os testes de regressão valem para todos os cenários: o gabarito da RN 12 e os casos da 8.2 a 8.7 continuam passando
-sem nenhuma mudança (8.1 e 8.8).
+sem nenhuma mudança (8.1 e 8.8). Há duas exceções, porque os dois cenários mudam uma regra do enunciado, e não só
+acrescentam classes:
+
+- no cenário 10, os casos que dependem da sobretaxa passam a ter valores novos (7.10);
+- no cenário 12, as linhas de entrada dos testes passam a usar `,`, e as saídas esperadas continuam com `;` (7.12).
 
 ### 7.1 Cenário 1: modal ferroviário
 
@@ -1965,10 +1973,10 @@ sem nenhuma mudança (8.1 e 8.8).
      - Alternativa descartada: perguntar ao status se a simulação é permitida. Seria uma pergunta a mais em `Status`,
        sem nenhuma regra do enunciado que a peça.
   2. **`simular(null)` lança `NullPointerException` logo na entrada**, com `Objects.requireNonNull`, como os
-     construtores com parâmetro (3.7). A simulação devolve um `ResultadoCalculo` e não tem como responder `false`,
-     como o `trocarPerfil(null)` (6.3). Quem chama é um teste ou o operador, e não o lote, então a exceção não chega
-     ao processamento da entrada padrão. `Objects` não aparece nos slides: o grupo confirma antes de usar, como na 3.7
-     (decisão 5).
+     construtores com parâmetro da `LinhaInterpretada` (3.7, decisão 5). A simulação devolve um `ResultadoCalculo` e
+     não tem como responder `false`, como o `trocarPerfil(null)` (6.3). Quem chama é um teste ou o operador, e não o
+     lote, então a exceção não chega ao processamento da entrada padrão. `Objects` não aparece nos slides: o grupo
+     confirma antes de usar, como na 3.7 (decisão 5).
      - Alternativa descartada: devolver `null`. Repete o risco do erro 13 da Livraria.
 - **Casos de borda:**
   - **Simular com o perfil vigente:** devolve o mesmo que o `calcularAtual()`.
@@ -1989,7 +1997,8 @@ sem nenhuma mudança (8.1 e 8.8).
   entrada.
 - **Ponto de partida:** um arquivo de texto, `modais.txt`, na pasta de trabalho do programa (ver casos de borda),
   com uma linha por código novo no formato `codigoExterno;CODIGO_CONHECIDO`. Por exemplo, `RODO;RODOVIARIO` faz a
-  entrada aceitar `RODO` como o modal rodoviário. A configuração **acrescenta** códigos aos três fixos e não os substitui (decisão 1).
+  entrada aceitar `RODO` como o modal rodoviário. A configuração **acrescenta** códigos aos três fixos e não os
+  substitui (decisão 1).
 - **Classes criadas:** nenhuma.
 - **Classes alteradas:** quatro, todas na tabela da camada de entrada e saída (2.2.6), que é o que a exigência
   permite. O `ProcessadorDeLote` está nessa tabela, mas é a classe que percorre o lote e calcula. Nele, a mudança é só
@@ -2018,7 +2027,8 @@ sem nenhuma mudança (8.1 e 8.8).
   - o núcleo de cálculo, que continua sem ler dados (RN 10): quem lê o arquivo é o `Main`.
 - **Por que funciona:** a fábrica é o único lugar que compara código (4.3), e a lista única de pares código + objeto
   (2.2.6) aceita uma entrada a mais sem mudar a busca. O código externo aponta para o **mesmo objeto** do código
-  conhecido, o que é seguro porque os modais não têm estado (2.2.6, objeto compartilhado).
+  conhecido, o que é seguro porque os modais não têm estado (2.2.6, objeto compartilhado). Quanto à eficiência, a lista
+  da fábrica cresce com o tamanho da configuração, e não com o do lote, que continua em uma passagem, O(n) (6.1).
 - **Alteração ao vivo:**
   1. Na `FabricaDeCodigos`, trocar o construtor sem parâmetro por `FabricaDeCodigos(List<String> configuracao)`,
      escrever o laço da configuração depois das linhas fixas e criar o construtor sem parâmetro com
@@ -2051,8 +2061,10 @@ sem nenhuma mudança (8.1 e 8.8).
   5. **O código fixo vence.** Uma linha como `AEREO;RODOVIARIO` é ignorada, porque `AEREO` já existe, e o gabarito
      não muda.
   6. **A lista passa pelo `ProcessadorDeLote`, e o `Main` não monta a fábrica.**
-     - Alternativa descartada: o `Main` criar a `FabricaDeCodigos` e passá-la pronta. Mudaria a decisão 4 da 3.7 para
-       todas as classes do lote, e não só para este cenário.
+     - Alternativa descartada: o `Main` criar a `FabricaDeCodigos` e passá-la pronta. Não poupa nenhuma classe: a
+       fábrica ainda teria de descer pelos construtores do `ProcessadorDeLote` e do `InterpretadorDeLinha`, e as
+       mesmas quatro classes mudariam. Além disso, o `Main` passaria a depender da `FabricaDeCodigos`, que hoje ele não
+       conhece (2.2.6).
 - **Casos de borda:**
   - **Arquivo ausente ou vazio:** os três códigos fixos, como hoje.
   - **Arquivo na pasta errada:** o programa procura o `modais.txt` na pasta de trabalho. No Run do IntelliJ, é o campo
@@ -2069,8 +2081,6 @@ sem nenhuma mudança (8.1 e 8.8).
   - **O mesmo código externo duas vezes:** vale a primeira linha (decisão 5).
   - **Separador `,` no lote (7.12):** não muda a configuração. O `;` do `modais.txt` é separado do `;` do lote, e cada
     um fica numa classe diferente.
-  - **Eficiência:** a lista da fábrica cresce com o tamanho da configuração, e não com o do lote. O lote continua em
-    uma passagem, O(n) (6.1).
 - **Testes:**
   - novos, no `FabricaDeCodigosTest`: com `["RODO;RODOVIARIO"]`, `existeModal("RODO")` responde `true`, e
     `criarModal("RODO")` devolve o mesmo objeto que `criarModal("RODOVIARIO")` (`assertSame`); a lista vazia se
@@ -2179,10 +2189,226 @@ sem nenhuma mudança (8.1 e 8.8).
 - **Alternativa descartada:** um atributo `ativo` no `Cliente`, que ignoraria os avisos depois de cancelar. O transporte
   continuaria avisando quem não quer mais, e cada interessado novo precisaria repetir esse atributo.
 
-### 7.9 a 7.12: cenários 9 a 12
+### 7.9 Cenário 9: peso mínimo de 0,5 kg
 
-> **A fazer (T17, Murilo):** peso mínimo de 0,5 kg, sobretaxa de 8% acima de 2000 kg, perfil PREMIUM e separador `,`
-> na entrada. Os ganchos estão no fim da 6.1 e da 6.2.
+- **Exigência (ET 4):** um peso abaixo de 0,5 kg passa a ser rejeitado, com o motivo `peso minimo`. É uma validação
+  nova, aplicada logo depois de `peso invalido` na ordem da tabela de validação (RN 6).
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** só o `InterpretadorDeLinha`, da camada de entrada (2.2.6):
+  - uma constante `private static final double PESO_MINIMO_KG = 0.5`;
+  - uma verificação nova no passo 5 da 6.1, entre (d) `peso invalido` e (e) `distancia invalida`: se
+    `peso < PESO_MINIMO_KG`, a linha é rejeitada com o motivo `peso minimo`, do mesmo jeito que o `peso invalido`
+    (uma `LinhaInterpretada` com a `Rejeicao`). Como a comparação é `<`, 0,5 kg exatos são válidos.
+- **O que não muda:**
+  - `Modal`, `Encomenda` e o resto do núcleo, que só recebem encomendas já validadas (2.2.2);
+  - `Rejeicao`, `LinhaInterpretada` e `FormatadorDeSaida`, que levam e escrevem qualquer motivo;
+  - `ProcessadorDeLote` e `Relatorio`: a linha rejeitada continua fora dos totais (passo 8 da 6.1);
+  - `FabricaDeCodigos` e as outras validações do passo 5.
+- **Por que funciona:** as validações são uma sequência no `InterpretadorDeLinha`, na ordem da RN 6, e uma regra nova
+  entra na posição dela (4.2 e 5.4). A rejeição é um valor, e não uma exceção (decisão da 6.1), então o motivo novo
+  chega pronto à saída e não interrompe o lote.
+- **Alteração ao vivo:**
+  1. No `InterpretadorDeLinha`, declarar a constante `PESO_MINIMO_KG`.
+  2. Logo depois da verificação do `peso invalido`, acrescentar o `if` com a rejeição `peso minimo`.
+  3. Compilar e rodar o lote com `7;RODOVIARIO;0.4;10;A;B;ECONOMICO` e `8;RODOVIARIO;0.5;10;A;B;ECONOMICO` e conferir
+     `REJEITADA;7;peso minimo` e `VALIDA;8;12,92;2,71;0,00` (ver a atenção ao rodar no Windows, na 7.1).
+- **Decisões do cenário:**
+  1. **O mínimo fica no `InterpretadorDeLinha`, e não no `Modal`.** O mínimo é o mesmo para todos os modais, e a
+     validação da linha já mora ali (passo 5 da 6.1).
+     - Alternativa descartada: um `modal.abaixoDoPesoMinimo(peso)`, no molde do `excedeCapacidade(peso)`. Só valeria a
+       pena se o mínimo variasse por modal, e alteraria o `Modal` e as filhas sem que a exigência peça.
+  2. **A `Encomenda` continua sem validar o peso.** Quem valida antes de criar é o `InterpretadorDeLinha` (2.2.2). Um
+     teste que crie uma `Encomenda` de 0,3 kg direto continua funcionando, como hoje com qualquer peso. A regra vale
+     para a entrada, que é onde a RN 6 se aplica.
+- **Casos de borda:**
+  - **0,5 kg exatos:** válido (`<`, e não `<=`).
+  - **0,49 kg:** `peso minimo`.
+  - **Peso 0, `-0` ou negativo:** continua `peso invalido`, que vem antes na ordem.
+  - **`5e-1`:** vale 0,5 pelo `parseDouble` (8.3) e é válido.
+  - **Peso mínimo e distância negativa na mesma linha** (`7;AEREO;0.3;-5;A;B;RAPIDO`): `peso minimo`, que vem antes
+    de `distancia invalida`.
+  - **Peso mínimo e rota vazia** (`7;AEREO;0.3;10; ;B;RAPIDO`): `rota invalida`, que vem antes.
+- **Testes:**
+  - novos, no `InterpretadorDeLinhaTest`: os casos de borda acima e a linha válida de 0,5 kg do passo 3 da alteração
+    ao vivo (frete (15 + 0,2) × 0,85 = 12,92, tempo (10/60 + 2) × 1,25 = 2,71 e CO₂ 0,00). Na tabela "Ordem da
+    validação" da 8.3, uma linha com peso 0,3 e distância -5;
+  - regressão: nenhum caso atual da 8.3 e da 8.4 usa peso entre 0 e 0,5, então todos continuam passando.
+- **Alternativa descartada:** trocar `peso > 0` por `peso >= 0.5`, com o motivo `peso invalido` para os dois casos.
+  Seria uma linha só, mas a exigência pede um motivo novo, numa posição própria da ordem.
+
+### 7.10 Cenário 10: sobretaxa de 8% acima de 2000 kg
+
+- **Exigência (ET 4):** a sobretaxa de carga pesada passa a ser de 8% acima de 2000 kg. A regra é alterada em um
+  único ponto e vale para todos os modais.
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** só o `Modal`, nas duas constantes da 2.1.1: `LIMITE_CARGA_PESADA_KG` passa de 1000 para
+  2000, e `FATOR_SOBRETAXA` passa de 1,05 para 1,08. O `freteBase`, que usa as duas, não muda.
+- **O que não muda:**
+  - o corpo do `freteBase` e as outras fórmulas de `Modal`;
+  - `Rodoviario`, `Aereo` e `Aquaviario`, e também o `Ferroviario` (7.1), que não sabem da sobretaxa;
+  - os perfis, inclusive o PREMIUM (7.11), que recebem a base já com a sobretaxa;
+  - `Encomenda`, `Transporte`, a simulação e o lote, que chamam o mesmo `freteBase`.
+- **Por que funciona:** é o Template Method de `Modal` (5.2.1). A fórmula do frete, com a sobretaxa, fica escrita uma
+  vez na classe-mãe, e as filhas só dão os números. O limite e o fator são constantes com nome, declaradas uma vez
+  (2.1.1 e 4.2, linha "Sobretaxa").
+- **Alteração ao vivo:**
+  1. Em `Modal`, trocar `LIMITE_CARGA_PESADA_KG` para 2000.
+  2. Trocar `FATOR_SOBRETAXA` para 1.08.
+  3. Compilar e rodar o lote com `1;RODOVIARIO;2000;100;A;B;ECONOMICO` e `2;RODOVIARIO;2001;100;A;B;ECONOMICO` e
+     conferir 807,50 (sem sobretaxa) e 872,47 (com 8%) (ver a atenção ao rodar no Windows, na 7.1).
+  4. Se sobrar tempo, rodar os testes e mostrar que falham só os casos da tabela de valores novos, abaixo.
+- **Decisões do cenário:**
+  1. **A regra nova substitui a antiga.** O enunciado diz que a sobretaxa "passa a ser" de 8% acima de 2000 kg, então
+     de 1000 a 2000 kg deixa de haver sobretaxa.
+     - Alternativa descartada: faixas, com 5% de 1000 a 2000 kg e 8% acima de 2000 kg. Pediria mais duas constantes e
+       um `if` a mais no `freteBase`. Ainda seria um ponto só, mas o enunciado não pede faixas.
+  2. **Continua `>`:** 2000 kg exatos não pagam sobretaxa, como 1000 kg exatos hoje (RN 12).
+  3. **É um dos dois cenários que mudam valores esperados** (abertura da seção 7). A regra do enunciado muda, então os
+     testes que conferem a sobretaxa antiga passam a falhar, e isso é o esperado. A entrega segue a RN 3, e o cenário
+     só é aplicado na defesa.
+- **Casos de borda:** com a regra nova, todos em ECONOMICO, menos o gabarito, e com as contas feitas à mão a partir
+  da RN 2 a 5:
+
+  | Caso | Hoje (RN 3) | Com 8% acima de 2000 kg | Por quê |
+  |---|---|---|---|
+  | Gabarito 3: aquaviário, 2000 kg, 3000 km, ECOLOGICO | 2425,50 | **2310,00** (base 2100,00) | 2000 kg exatos deixam de pagar sobretaxa |
+  | Relatório das três do gabarito | 11220,50 / 55,18 / 444,35 | **11105,00** / 55,18 / 444,35 | Só o frete da 3 muda |
+  | Exemplo da RN 11 (relatório) | 3870,50 / 79,87 / 98,20 / 2 / 2 | **3755,00** / 79,87 / 98,20 / 2 / 2 | A encomenda 3 é a mesma do gabarito |
+  | Rodoviário, 1001 kg, 100 km | 491,23 / 4,58 / 6,21 | **467,84** / 4,58 / 6,21 | De 1000 a 2000 kg, sem sobretaxa: 550,4 × 0,85 |
+  | Aquaviário, 2000 kg, 0 km | 267,75 / 30,00 / 0,00 | **255,00** / 30,00 / 0,00 | 300,00 × 0,85, sem sobretaxa |
+  | Aéreo, 5000 kg, 10 km (6.1) | 11191,95 / 7,52 / 30,10 | **11511,72** / 7,52 / 30,10 | Continua com sobretaxa, agora de 8%: 12540 × 1,08 × 0,85 |
+  | Rodoviário, 2000 kg, 100 km (novo) | — | 807,50 / 4,58 / 12,40 | 950,00 × 0,85: no limite, sem sobretaxa |
+  | Rodoviário, 2001 kg, 100 km (novo) | — | 872,47 / 4,58 / 12,41 | 950,4 × 1,08 × 0,85 = 872,4672 |
+  | Aquaviário, 2001 kg, 0 km (novo) | — | 275,54 / 30,00 / 0,00 | A sobretaxa continua valendo com distância 0: 300,15 × 1,08 × 0,85 |
+
+  O tempo e o CO₂ não mudam, porque a sobretaxa só entra no frete.
+- **Testes:**
+  - alterados: na 8.2, o gabarito 3, o relatório das três e os casos de 1001 kg e de 2000 kg com 0 km passam aos
+    valores da tabela acima. Na 8.4, o exemplo da RN 11 e o `formatarRelatorio` das três. Na 6.1, os casos de borda
+    `7;AQUAVIARIO;2000;0;A;B;ECONOMICO` e `7;AEREO;5000;10;A;B;ECONOMICO`;
+  - novos, no `ModalTest`: 2000 kg e 2001 kg no rodoviário, e 2001 kg com 0 km no aquaviário;
+  - regressão: os casos sem carga pesada (8.2 com 500 kg, 8.6 e 8.7) não mudam.
+- **Alternativa descartada:** uma classe `SobretaxaCargaPesada`, ou um Decorator de `Modal`. As duas já foram
+  descartadas (2.1.1 e 5.3), e o cenário mostra o motivo: com as constantes, a mudança fica em duas linhas de um
+  arquivo.
+
+### 7.11 Cenário 11: perfil PREMIUM
+
+- **Exigência (ET 4):** surge o perfil PREMIUM, com frete × 1,20, tempo × 0,90 e CO₂ × 1,00, e o frete final nunca
+  menor que R$ 50,00. Ele deve ser adicionado sem alterar o cálculo dos modais nem os perfis que já existem.
+- **Classes criadas:** `Premium`, que estende `PerfilPorMultiplicadores`:
+  - implementa as três etapas: `multiplicadorFrete()` devolve 1,20, `multiplicadorTempo()`, 0,90, e
+    `multiplicadorCo2()`, 1,00. O 1,00 também é escrito, porque a etapa é abstrata;
+  - declara `private static final double FRETE_MINIMO = 50.0`;
+  - sobrescreve `aplicarFrete(base)`: chama `super.aplicarFrete(base)` e, se o resultado for menor que
+    `FRETE_MINIMO`, devolve `FRETE_MINIMO`. Senão, devolve o resultado (2.2.1).
+- **Classes alteradas:** só a `FabricaDeCodigos`, que ganha uma linha no construtor:
+  `perfis.add(new CodigoDePerfil("PREMIUM", new Premium()));`.
+- **O que não muda:**
+  - `Modal` e as filhas, como pede a exigência;
+  - `PerfilPorMultiplicadores`, `Economico`, `Rapido` e `Ecologico`, como pede a exigência;
+  - `Encomenda` e `ResultadoCalculo`: a encomenda chama `aplicarFrete` sem saber que o perfil tem piso, e o
+    resultado arredonda como sempre;
+  - `Transporte`: a troca para o PREMIUM e a simulação com ele funcionam sem mudança (gancho da 6.2 e 7.5).
+- **Por que funciona:** o perfil é uma Strategy (5.2.2), e o `Transporte` e a `Encomenda` dependem só de `Perfil`. Os
+  `aplicar...` de `PerfilPorMultiplicadores` ficam sem `final` justamente para serem o ponto de extensão do PREMIUM
+  (5.2.1): o esqueleto continua sendo o da mãe, e o PREMIUM acrescenta um passo depois dele.
+- **Alteração ao vivo:**
+  1. Criar a classe `Premium extends PerfilPorMultiplicadores`.
+  2. Usar "Implement methods" (Alt+Enter), que lista as três etapas, e escrever o `return` de cada uma.
+  3. Declarar a constante `FRETE_MINIMO`.
+  4. Sobrescrever o `aplicarFrete` ("Override methods", Ctrl+O), com o `super` e o `if` do piso.
+  5. Acrescentar a linha do `PREMIUM` no construtor da `FabricaDeCodigos`.
+  6. Compilar e rodar o lote com `10;RODOVIARIO;10;10;A;B;PREMIUM` e `11;RODOVIARIO;500;1000;A;B;PREMIUM` e conferir
+     `VALIDA;10;50,00;1,95;0,01` (piso) e `VALIDA;11;2040,00;16,80;31,00` (ver a atenção ao rodar no Windows, na 7.1).
+- **Decisões do cenário:**
+  1. **O piso é aplicado antes do arredondamento.** O `aplicarFrete` trabalha com o valor sem arredondar, como todo
+     perfil, e o `ResultadoCalculo` arredonda depois (2.1.2). Como 50,00 já tem duas casas, o frete final nunca sai
+     menor que 50,00, e o arredondamento continua num ponto só.
+     - Alternativa descartada: aplicar o piso depois de arredondar. Exigiria o perfil chamar o
+       `ResultadoCalculo.arredondar`, e o arredondamento passaria a ter dois pontos.
+  2. **O piso é um `if`, e não `Math.max`.** O `if` é o que os slides mostram. O `Math.max` não aparece neles, e a
+     conta é a mesma.
+  3. **A constante fica no `Premium`.** Só ele tem piso.
+     - Alternativa descartada: a constante em `PerfilPorMultiplicadores`. Alteraria uma classe que já existe, contra a
+       exigência, e as outras filhas herdariam um número que não usam.
+  4. **A sobretaxa vem antes do piso.** A sobretaxa entra no frete base, no `Modal`, e o piso entra no frete final,
+     depois do multiplicador. As duas regras não se conhecem.
+- **Casos de borda:**
+  - **Frete abaixo do piso:** rodoviário, 104 kg, 0 km: 41,60 × 1,20 = 49,92, e sai 50,00 / 1,80 / 0,00.
+  - **Frete logo acima do piso:** rodoviário, 105 kg, 0 km: 42,00 × 1,20 = 50,40, e sai 50,40 / 1,80 / 0,00.
+  - **Encomenda pequena:** `10;RODOVIARIO;10;10;A;B;PREMIUM` dá 19,00 × 1,20 = 22,80, e sai 50,00.
+  - **Troca para o PREMIUM e simulação com ele:** o piso vale igual, porque está no perfil.
+  - **Relatório:** soma o frete já com o piso (50,00), porque soma o `ResultadoCalculo` (RN 5).
+  - **Auditoria:** o CO₂ × 1,00 é o próprio CO₂ base, e o piso não mexe no CO₂.
+  - **`premium` em minúsculas:** `codigo inexistente`, como os outros códigos (RN 4).
+- **Testes:**
+  - novos, no `PerfilTest`: na base 100, o PREMIUM dá 120 / 90 / 100 (tabela "Perfil independente do modal" da
+    8.2); `aplicarFrete(40)` dá 50 (piso) e `aplicarFrete(50)` dá 60;
+  - novos, no `EncomendaTest`: o gabarito 1 em PREMIUM dá 2040,00 / 16,80 / 31,00, e os dois casos de borda de 104 kg
+    e 105 kg;
+  - novos, no `TransporteTest`: `trocarPerfil(new Premium())` e `simular(new Premium())` com uma encomenda abaixo do
+    piso, conferindo os 50,00;
+  - novos, no `FabricaDeCodigosTest`: `existePerfil("PREMIUM")` e o código novo no teste da lista única (8.3);
+  - regressão: os três perfis que já existem e o gabarito da RN 12 não mudam.
+- **Alternativa descartada:** aplicar o piso fora do perfil, na `Encomenda` ou no `ResultadoCalculo`. Eles teriam de
+  perguntar qual é o perfil, o que a ET 3.2 proíbe. O Decorator `PerfilComPiso` e o gancho `ajustarFrete` também
+  foram descartados (5.3 e 5.2.1).
+
+### 7.12 Cenário 12: separador `,` na entrada
+
+- **Exigência (ET 4):** a entrada passa a usar `,` como separador, em vez de `;`. A mudança fica só na camada de
+  entrada.
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** só o `InterpretadorDeLinha`, da camada de entrada (2.2.6): no passo 4 da 6.1,
+  `split(";", -1)` passa a `split(",", -1)`.
+- **O que não muda:**
+  - `FormatadorDeSaida`: a saída da RN 11 continua com `;` (decisão 1);
+  - `FabricaDeCodigos` e o `modais.txt` do cenário 6, que continua com `;` (decisão 2 e 7.6);
+  - `Main`, que continua lendo as linhas sem separar os campos, e `ProcessadorDeLote`;
+  - o resto do `InterpretadorDeLinha`: o `trim`, a contagem de 7 campos e as validações do passo 5;
+  - o núcleo de cálculo, que recebe uma `Encomenda` pronta.
+- **Por que funciona:** o separador aparece num ponto só, o `split` do passo 4 da 6.1 (4.2 e 5.4). Trocar o
+  separador é mudar essa linha.
+- **Alteração ao vivo:**
+  1. No `InterpretadorDeLinha`, trocar o `";"` do `split` por `","`.
+  2. Criar `entrada_virgula.txt` com o exemplo da RN 11 escrito com `,`.
+  3. Compilar e rodar o lote com esse arquivo e conferir que a saída é a mesma da RN 11, com `;` (ver a atenção ao
+     rodar no Windows, na 7.1).
+- **Decisões do cenário:**
+  1. **Só a entrada muda, e a saída continua com `;`.** A exigência fala da entrada, e a saída escreve os números com
+     vírgula decimal (`1445,00`, RN 11). Com `,` também separando os campos, a linha da saída ficaria ambígua.
+     - Alternativa descartada: trocar o separador da saída também. Alteraria o `FormatadorDeSaida` sem a exigência
+       pedir, e a vírgula decimal confundiria quem lê a saída.
+  2. **O `modais.txt` continua com `;`.** O separador da configuração fica na `FabricaDeCodigos` (7.6), e o do lote,
+     no `InterpretadorDeLinha`. Os dois mudam de forma independente.
+  3. **O `split` recebe uma expressão regular.** O `,` não é caractere especial, então `split(",", -1)` funciona como
+     está. Um separador como `|` ou `.` precisaria de escape (`"\\|"`), porque o `split` os leria como operadores.
+  4. **Uma linha no formato antigo é rejeitada.** Com `,`, a linha com `;` vira um campo só.
+     - Alternativa descartada: aceitar os dois separadores. O interpretador teria de descobrir o separador de cada
+       linha, o que o cenário não pede.
+- **Casos de borda:**
+  - **`1,RODOVIARIO,500,1000,Curitiba,Recife,ECONOMICO`:** `VALIDA;1;1445,00;23,33;31,00`.
+  - **Linha antiga, com `;`:** um campo só, e o 1º campo não é um inteiro, então sai `REJEITADA;LINHA<n>;formato
+    invalido` (passo 4 da 6.1).
+  - **Vírgula decimal** (`7,RODOVIARIO,10,5,10,A,B,ECONOMICO`): o `10,5` vira dois campos, a linha fica com 8, e sai
+    `REJEITADA;7;formato invalido`. O motivo é o mesmo de hoje, porque a entrada continua usando ponto decimal
+    (RN 10).
+  - **Vírgula no fim da linha:** cria um 8º campo vazio, que o `split(",", -1)` mantém, e sai `formato invalido`.
+  - **Cidade com vírgula** (`Sao Paulo, SP`): a linha ganha um campo e sai `formato invalido`. Hoje ela é válida. É
+    a consequência do formato novo, e a RN 10 não prevê escape.
+  - **`;` dentro de um campo** (origem `A;B`): vira texto comum, e a linha é válida.
+  - **`5,AEREO`:** `REJEITADA;5;formato invalido`, como `5;AEREO` hoje.
+- **Testes:**
+  - alterados: depois da troca, as linhas de **entrada** do `InterpretadorDeLinhaTest` e do `ProcessadorDeLoteTest`
+    (8.3, 8.4 e os casos de borda da 6.1) e o `entrada.txt` do nível do lote (8.1) são reescritos com `,`, fora dos
+    5 minutos da defesa. As saídas esperadas continuam com `;`. Cuidado com a busca e substituição: ela não pode
+    atingir as saídas esperadas, e casos como o `10,5` da 8.3 mudam de sentido;
+  - novos: os casos de borda acima, inclusive a linha antiga com `;` virando `LINHA<n>`;
+  - regressão: a 8.2 e a 8.5 a 8.7, que não passam pela entrada, e o `FabricaDeCodigosTest` da 7.6, que continua com
+    `;`, passam sem mudança.
+- **Alternativa descartada:** uma constante `SEPARADOR` no `InterpretadorDeLinha`, já descartada na 4.2. Ela não
+  reduziria o número de pontos a alterar, que já é um.
 
 ## 8. Plano de testes
 
@@ -2226,7 +2452,9 @@ comparação feita por um comando, e não pelo olho.
   o `COMO_EXECUTAR.md` manda compilar para rodar `java Main < entrada.txt`. Alternativa descartada: os testes em
   `LogiTech/src/testes`, em que um `javac` de todo o `src` falharia sem o JUnit.
 - **Testes de regressão:** num cenário de evolução, inclusive o da defesa ao vivo, todos os testes que já existem
-  continuam passando. Isso prova que a mudança só criou classes, sem reescrever a lógica que já existia (ET 3.2).
+  continuam passando. Isso prova que a mudança só criou classes, sem reescrever a lógica que já existia (ET 3.2). As
+  exceções são os cenários 10 e 12, que mudam uma regra do enunciado: a sobretaxa muda os valores esperados dos casos
+  que dependem dela (7.10), e o separador muda as linhas de entrada dos testes do lote (7.12).
 
 **Decisão: JUnit 5**
 
