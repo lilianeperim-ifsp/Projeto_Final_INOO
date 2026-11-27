@@ -16,7 +16,7 @@
 > | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
 > | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
 > | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita |
-> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita, em revisão |
+> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita |
 > | 7.5 a 7.8 Cenários de evolução 5 a 8 | T16 | Liliane | Escrita |
 > | 7.9 a 7.12 Cenários de evolução 9 a 12 | T17 | Murilo | Escrita |
 > | 7.13 Conferência dos 5 minutos | T18 | Liliane | Escrita, em revisão |
@@ -2454,7 +2454,7 @@ A conta supõe que:
 | 7.5 Simulação | nenhuma | rodar o teste da 8.6 | ~1 min | Cabe |
 | 7.6 Configuração externa | 4 alteradas | fábrica 175 + interpretador 55 + processador 55 + `Main` 175 + `modais.txt` 30 + compilar 15 + lote 60 | **~9 min 30 s** | **Não cabe** |
 | 7.7 CANCELADO | 1 criada, 4 alteradas | `Cancelado` 70 + `Status` 40 + `Aguardando` 35 + `EmTransito` 35 + `Transporte` 40 + compilar 15 + teste mínimo 90 | **~5 min 30 s** | **No limite** |
-| 7.8 Troca de assinatura | nenhuma | rodar o teste da 7.8 | ~1 min | Cabe |
+| 7.8 Troca de assinatura | nenhuma | rodar o caso da 8.7 (interessado removido) | ~1 min | Cabe |
 | 7.9 Peso mínimo | 1 alterada | abrir 10 + constante 15 + `if` 30 + compilar 15 + lote 60 | ~2 min | Cabe |
 | 7.10 Sobretaxa de 8% | 1 alterada | abrir 10 + 2 constantes 30 + compilar 15 + lote 60 | ~2 min | Cabe |
 | 7.11 PREMIUM | 1 criada, 1 alterada | criar 20 + implement 10 + 3 `return` 45 + constante 15 + `aplicarFrete` 55 + fábrica 25 + compilar 15 + lote 60 | ~4 min | Cabe |
@@ -2472,15 +2472,15 @@ inteira na hora.
   classe é escrita inteira, com seis atributos e a regra da entrada na região. Para encurtar seria preciso mudar a
   7.4, por exemplo mandando um SMS a cada posição dentro da região, alternativa já descartada na decisão 1 dela. O
   grupo mantém a 7.4 e ensaia este cenário primeiro na T45.
-- **7.7, no limite.** A conta já usa o teste mínimo do passo 6 (cancelar em `AGUARDANDO`, conferir o `true` e o nome
-  `CANCELADO`). Os passos de código (1 a 5) dão cerca de 4 min. São cinco classes, mas quatro delas ganham uma linha
-  cada, porque o `Cancelado` herda o padrão de `Status` (7.7, decisão 2). Se o tempo apertar, a mensagem do cliente e
-  os casos de rejeição ficam fora.
-- **7.6, não cabe.** Só o código e o `modais.txt`, sem compilar e rodar, dão cerca de 8 min. A causa é a cadeia de criação: a
-  lista lida pelo `Main` atravessa três construtores até chegar à `FabricaDeCodigos`, porque cada classe cria o
-  próprio colaborador (3.7, decisão 4) e a leitura fica no `Main` (7.6, decisão 2). É um acoplamento da montagem dos
-  objetos, e não do cálculo: o núcleo, os modais e os perfis não mudam. A ET 4 pede que isso seja explicado na defesa
-  quando a alteração leva mais tempo.
+- **7.7, no limite.** A conta usa um teste mínimo: o do passo 6 **sem** a mensagem do cliente, isto é, cancelar em
+  `AGUARDANDO` e conferir o `true` e o nome `CANCELADO`. Os passos de código (1 a 5) dão cerca de 4 min. São cinco
+  classes, mas quatro delas ganham uma linha cada, porque o `Cancelado` herda o padrão de `Status` (7.7, decisão 2).
+  Os casos de rejeição do campo "Testes" da 7.7 ficam fora dos 5 minutos.
+- **7.6, não cabe.** Só o código e o `modais.txt`, sem compilar e rodar, dão cerca de 8 min. A causa é a cadeia de
+  criação: a lista lida pelo `Main` atravessa três construtores até chegar à `FabricaDeCodigos`, porque cada classe
+  cria o próprio colaborador (3.7, decisão 4) e a leitura fica no `Main` (7.6, decisão 2). É um acoplamento da
+  montagem dos objetos, e não do cálculo: o núcleo, os modais e os perfis não mudam. A ET 4 pede que isso seja
+  explicado na defesa quando a alteração leva mais tempo.
 
 #### Decisão: a 7.6 fica como está e o acoplamento é explicado na defesa
 
@@ -2519,7 +2519,8 @@ O que o teste mostra:
 1. **A nota da 7.1 está certa, e o problema é maior que os acentos.** Origem e destino não entram no cálculo nem na
    saída, mas o BOM entra no primeiro campo da primeira linha. Pela 6.1, o `1` precedido do BOM não é um inteiro, e
    o `trim` não remove o BOM, porque só tira caracteres até U+0020. A primeira linha do lote sairia
-   `REJEITADA;LINHA1;formato invalido`, e o gabarito falharia. **O lote nunca é rodado com o `Get-Content` do PowerShell.**
+   `REJEITADA;LINHA1;formato invalido`, e o gabarito falharia. **O lote nunca é rodado com o `Get-Content` do
+   PowerShell.**
 2. **O `cmd /c` funciona.** A partir do JDK 18, o `Scanner` sem charset lê em UTF-8, mesmo com o Windows informando
    Cp1252 para a entrada, e o teste confirma. A saída da RN 11 não tem acentos (os motivos são escritos sem acento),
    então a codificação da saída não muda o resultado.
