@@ -1163,7 +1163,8 @@ A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Meth
 - **Classes:** `FabricaDeCodigos` (`existeModal`, `existePerfil`, `criarModal` e `criarPerfil`), com os pares
   `CodigoDeModal` e `CodigoDePerfil`. Quem a usa é o `InterpretadorDeLinha`.
 - **Por quê:** é o único lugar que compara código (4.3). Um modal ou perfil novo é uma linha no construtor da fábrica
-  (cenários 1, 2 e 11), e o código vindo de configuração externa (cenário 6) muda só a fábrica (6.1).
+  (cenários 1, 2 e 11), e o código vindo de configuração externa (cenário 6) muda quatro classes da camada de entrada
+  (7.6).
 - **Simple Factory e Factory Method:** o enunciado junta os dois na mesma linha da lista (ET 5), e o projeto usa só a
   Simple Factory: uma classe concreta que decide qual objeto criar. O *Use a cabeça!* a apresenta como um hábito de
   programação, e não como um padrão GoF. O Factory Method, com uma hierarquia de criadores, foi descartado (5.3).
@@ -1210,8 +1211,8 @@ A tabela segue as 11 linhas da lista do enunciado (ET 5), que junta Factory Meth
     cenário pede isso. A chamada direta ao `Transporte` basta.
 - **Adapter.**
   - *Onde poderia entrar:* no cenário 6 (código de modal vindo de configuração externa) ou na leitura de `System.in`.
-  - *Por que não:* não há duas interfaces incompatíveis para conciliar. A configuração externa muda só a forma como a
-    `FabricaDeCodigos` preenche a lista (6.1), e o `Main` já entrega uma `List<String>` ao processador.
+  - *Por que não:* não há duas interfaces incompatíveis para conciliar. A configuração externa muda quatro classes da
+    camada de entrada (7.6), sem nenhuma interface a adaptar, e o `Main` já entrega uma `List<String>` ao processador.
   - *Quando reconsiderar:* se a configuração vier de uma biblioteca com interface própria.
 
 ### 5.4 Pontos resolvidos sem padrão
@@ -2275,6 +2276,7 @@ acrescentam classes:
   | Exemplo da RN 11 (relatório) | 3870,50 / 79,87 / 98,20 / 2 / 2 | **3755,00** / 79,87 / 98,20 / 2 / 2 | A encomenda 3 é a mesma do gabarito |
   | Rodoviário, 1001 kg, 100 km | 491,23 / 4,58 / 6,21 | **467,84** / 4,58 / 6,21 | De 1000 a 2000 kg, sem sobretaxa: 550,4 × 0,85 |
   | Aquaviário, 2000 kg, 0 km | 267,75 / 30,00 / 0,00 | **255,00** / 30,00 / 0,00 | 300,00 × 0,85, sem sobretaxa |
+  | Aéreo, 5000 kg, 10 km (6.1) | 11191,95 / 7,52 / 30,10 | **11511,72** / 7,52 / 30,10 | Continua com sobretaxa, agora de 8%: 12540 × 1,08 × 0,85 |
   | Rodoviário, 2000 kg, 100 km (novo) | — | 807,50 / 4,58 / 12,40 | 950,00 × 0,85: no limite, sem sobretaxa |
   | Rodoviário, 2001 kg, 100 km (novo) | — | 872,47 / 4,58 / 12,41 | 950,4 × 1,08 × 0,85 = 872,4672 |
   | Aquaviário, 2001 kg, 0 km (novo) | — | 275,54 / 30,00 / 0,00 | A sobretaxa continua valendo com distância 0: 300,15 × 1,08 × 0,85 |
@@ -2282,8 +2284,8 @@ acrescentam classes:
   O tempo e o CO₂ não mudam, porque a sobretaxa só entra no frete.
 - **Testes:**
   - alterados: na 8.2, o gabarito 3, o relatório das três e os casos de 1001 kg e de 2000 kg com 0 km passam aos
-    valores da tabela acima. Na 8.4, o exemplo da RN 11 e o `formatarRelatorio` das três. Na 6.1, o caso de borda
-    `7;AQUAVIARIO;2000;0;A;B;ECONOMICO`;
+    valores da tabela acima. Na 8.4, o exemplo da RN 11 e o `formatarRelatorio` das três. Na 6.1, os casos de borda
+    `7;AQUAVIARIO;2000;0;A;B;ECONOMICO` e `7;AEREO;5000;10;A;B;ECONOMICO`;
   - novos, no `ModalTest`: 2000 kg e 2001 kg no rodoviário, e 2001 kg com 0 km no aquaviário;
   - regressão: os casos sem carga pesada (8.2 com 500 kg, 8.6 e 8.7) não mudam.
 - **Alternativa descartada:** uma classe `SobretaxaCargaPesada`, ou um Decorator de `Modal`. As duas já foram
