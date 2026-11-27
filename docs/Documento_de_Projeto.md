@@ -3,27 +3,33 @@
 **Disciplina:** Introdução à Orientação a Objetos (IFSP) · **Etapa 1** (entrega em 27/11, sem código)
 **Grupo:** Liliane, Murilo e Alexandre
 
-> **Documento oficial do grupo, em construção (desde 2026-11-10).** Este arquivo é a versão oficial do Documento de
-> Projeto. **Não pode ser apagado nem substituído por outro arquivo, apenas editado**, por PR, seção por seção.
+> **Documento oficial do grupo (desde 2026-11-10), versão de entrega da Etapa 1.** Este arquivo é a versão oficial do
+> Documento de Projeto. **Não pode ser apagado nem substituído por outro arquivo, apenas editado**, por PR. As
+> mudanças de rumo da Etapa 2 vão para a seção "Do projeto ao código".
 >
-> | Seção | Cartão | Responsável | Situação |
+> Todas as seções foram escritas, revisadas e mergeadas na `dev` por PR:
+>
+> | Seção | Cartão | Responsável | PR |
 > |---|---|---|---|
-> | 1. Análise do problema | T07 | Murilo | Escrita |
-> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
-> | 3. Diagrama de classes UML | T09 | Liliane | Escrita, em revisão |
-> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
-> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita |
-> | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
-> | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
-> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita |
-> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita |
-> | 7.5 a 7.8 Cenários de evolução 5 a 8 | T16 | Liliane | Escrita |
-> | 7.9 a 7.12 Cenários de evolução 9 a 12 | T17 | Murilo | Escrita |
-> | 7.13 Conferência dos 5 minutos | T18 | Liliane | Escrita, em revisão |
-> | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
+> | 1. Análise do problema | T07 | Murilo | #15 |
+> | 2. Catálogo de classes e interfaces | T08 | Alexandre | #18 |
+> | 3. Diagrama de classes UML | T09 | Liliane | #40 |
+> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | #50 |
+> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | #56 |
+> | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | #19 |
+> | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | #24 |
+> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | #58 |
+> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | #61 |
+> | 7.5 a 7.8 Cenários de evolução 5 a 8 | T16 | Liliane | #65 |
+> | 7.9 a 7.12 Cenários de evolução 9 a 12 | T17 | Murilo | #69 |
+> | 7.13 Conferência dos 5 minutos | T18 | Liliane | #73 |
+> | 8. Plano de testes | T19 | Murilo | #20 |
+>
+> Várias seções receberam ajustes em PRs posteriores (por exemplo, #58 e #69); o histórico completo está no
+> GitHub.
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
-> abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
+> abstrata e os padrões adotados estão na seção 2 (catálogo), na 4 (estratégia de resolução) e na 5 (padrões).
 
 ## 1. Análise do problema
 
@@ -74,8 +80,8 @@ cada variação. A coluna "Onde aparece" indica a seção de `contexto/regras-ne
 | Relatório consolidado | RN 9 | **Classe** | Acumula custo, tempo, CO₂, válidas e rejeitadas em uma única passagem e calcula a média só no final. |
 | Entrada (lote lido de `System.in`) | RN 10 | **Classe** (camada de entrada) | A leitura fica fora do núcleo, que recebe uma `List<String>`. É o único lugar que conhece os códigos de texto e o separador. |
 | Saída | RN 11 | **Classe** (camada de saída) | Monta cada linha no formato exato, com vírgula decimal. O núcleo não imprime. |
-| Aviso (evento de mudança) | RN 8 | **A decidir (T14)** | Pode ser só os parâmetros da notificação ou um objeto com ID, status e coordenadas. A resposta depende do fluxo de avisos. |
-| Sobretaxa de carga pesada | RN 3, ET 4 | **Regra em um único ponto (lugar a decidir no T10)** | Vale igual para todos os modais e o cenário dos **8% acima de 2000 kg** a altera em um só lugar. Não pode ser copiada em cada modal. |
+| Aviso (evento de mudança) | RN 8 | **A decidir (T14)** (resolvido em 2.1.4) | Pode ser só os parâmetros da notificação ou um objeto com ID, status e coordenadas. A resposta depende do fluxo de avisos. |
+| Sobretaxa de carga pesada | RN 3, ET 4 | **Regra em um único ponto (lugar a decidir no T10)** (resolvido em 2.1.1) | Vale igual para todos os modais e o cenário dos **8% acima de 2000 kg** a altera em um só lugar. Não pode ser copiada em cada modal. |
 | Linha do lote | RN 10 | **Descartado como classe** | É só um texto até ser interpretada. Depois vira encomenda ou rejeição. |
 | Cliente (como classe à parte) | RN 8 | **Descartado** | Já é um tipo de interessado. Uma segunda classe "Cliente" duplicaria o conceito. |
 | Operador | RN 1, ET 4 | **Descartado** | Ator externo: troca o perfil e pede simulações chamando o núcleo, mas não tem estado no sistema. |
@@ -170,9 +176,8 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 
 ## 2. Catálogo de classes e interfaces
 
-> **Em revisão (T08, Alexandre).** A 2.1 resolve as dúvidas da seção 1.7 que travavam o catálogo, e a 2.2 traz cada
-> classe e interface com responsabilidade, atributos, métodos e colaboradores. As decisões só valem depois da revisão
-> do PR pelos 3, e as abstrações `Modal` e `Perfil` são combinadas entre os 3 antes de qualquer código.
+> A 2.1 resolve as dúvidas da seção 1.7 que travavam o catálogo, e a 2.2 traz cada classe e interface com
+> responsabilidade, atributos, métodos e colaboradores.
 
 ### 2.1 Decisões que destravam o catálogo
 
@@ -254,9 +259,9 @@ reescrita. As duas últimas linhas foram apontadas na revisão do PR #16.
 - **Alternativa descartada:** o aviso levar uma referência ao transporte, e a auditoria perguntar o CO₂ a ele. Isso
   prende os interessados ao transporte e dá a eles acesso a métodos que mudam o estado: um interessado poderia mudar
   o status no meio do aviso.
-- **Resolvido no T11 e no T14 (5.2.3 e 6.3):** a auditoria precisa saber se o aviso é de entrega sem comparar o texto do status. A
-  saída é polimórfica: o próprio status responde se aquele aviso conta para a auditoria. No cenário CANCELADO, o
-  status novo responde que não, e a auditoria não soma nada.
+- **Resolvido no T11 e no T14 (5.2.3 e 6.3):** a auditoria precisa saber se o aviso é de entrega sem comparar o
+  texto do status. A saída é polimórfica: o próprio status responde se aquele aviso conta para a auditoria. No
+  cenário CANCELADO, o status novo responde que não, e a auditoria não soma nada.
 
 ### 2.2 Classes e interfaces
 
@@ -291,14 +296,14 @@ FormatadorDeSaida
 - **Template Method:** em `Modal`, o método-modelo é a fórmula (`freteBase`, `tempoBase` e `co2Base`), e as etapas
   adiadas para as filhas são os seis parâmetros. Em `PerfilPorMultiplicadores`, o método-modelo é cada `aplicar...`,
   e as etapas são os três multiplicadores. É o desenho do `Livro.calculaFrete()` abstrato da aula 11: cada filha
-  responde pelo próprio valor. O padrão é justificado no T11.
+  responde pelo próprio valor. O padrão está na 5.2.1.
 - **Modal novo e perfil novo:** o ferroviário é uma classe que implementa as seis etapas, e o corporativo, uma classe
   que implementa as três. Se faltar uma etapa, o código não compila, e o IntelliJ lista o que falta ("Implement
   methods"). O PREMIUM estende `PerfilPorMultiplicadores`, implementa as três etapas e sobrescreve `aplicarFrete`,
   chamando `super.aplicarFrete(base)` e aplicando o piso de R$ 50,00. Nenhum deles altera o que já existe.
 - **Critério para interface ou classe abstrata:** há interface quando o colaborador troca a implementação em
   execução ou quando existe mais de um jeito de implementar o contrato.
-  - O **perfil** tem as duas coisas: troca no transporte e na simulação (Strategy, a justificar no T11), e o PREMIUM
+  - O **perfil** tem as duas coisas: troca no transporte e na simulação (Strategy, 5.2.2), e o PREMIUM
     muda comportamento, não só números. Por isso `Encomenda` e `Transporte` dependem do contrato `Perfil`, como a
     Livraria faz com `Produto`, e a multiplicação fica escrita uma vez na classe abstrata, como a Livraria faz com
     `Livro`.
@@ -349,7 +354,7 @@ FormatadorDeSaida
 | `Entregue` | Não aceita transição nem troca de perfil, e conta para a auditoria | sobrescreve `permiteTrocaDePerfil()` (não) e `contaParaAuditoria()` (sim) | — |
 
 - **Por quê:** repetir o status atual ou pular uma etapa já sai rejeitado pelo comportamento padrão de `Status`, sem
-  nenhum `if` sobre qual é o status atual. O padrão (State) é justificado no T11.
+  nenhum `if` sobre qual é o status atual. O padrão (State) está na 5.2.3.
 - **Rejeição (decidida no T14, 6.3):** `iniciarTransito()` e `entregar()` devolvem um `Status`, então a rejeição não
   pode ser um `boolean`, e devolver `null` repete o risco do erro 13 da Livraria. Ao rejeitar, o status devolve a si
   mesmo (`this`), e o `Transporte` compara a resposta com `==` e devolve `false`. A exceção e o método à parte que
@@ -357,7 +362,7 @@ FormatadorDeSaida
 - **Cenário CANCELADO:** cria-se a classe `Cancelado` e entra um método `cancelar()` em `Status`, que rejeita por
   padrão. `Aguardando` e `EmTransito` o sobrescrevem. `Cancelado` não permite troca de perfil e não conta para a
   auditoria. O `Transporte` também é alterado, porque ganha o `cancelar()` que o operador chama. Classes criadas:
-  `Cancelado`. Classes alteradas: `Status`, `Aguardando`, `EmTransito` e `Transporte` (para o T16).
+  `Cancelado`. Classes alteradas: `Status`, `Aguardando`, `EmTransito` e `Transporte` (7.7).
 - **Alternativa descartada:** um método genérico `mudarStatus(Status novo)`. Para saber se a transição vale, o
   status atual precisaria descobrir o tipo de `novo`, o que exige `instanceof` ou comparação de texto.
 
@@ -374,7 +379,7 @@ FormatadorDeSaida
 
 - **Por que duas interfaces:** cada interessado assina só o que lhe interessa, e nenhum implementa um método vazio
   (erro 23 da Livraria). O SMS por região vira uma classe nova que implementa só `InteressadoEmPosicao`. O padrão
-  (Observer) é justificado no T11, e o fluxo dos avisos está na 6.3.
+  (Observer) está na 5.2.4, e o fluxo dos avisos está na 6.3.
 - **Alternativas descartadas:**
   - Uma interface só, com os dois métodos: `Cliente` e `AuditoriaAmbiental` teriam `posicaoMudou` vazio (erro 23).
   - Uma interface só, com um método e um campo "tipo do evento" no aviso: cada interessado teria que testar esse
@@ -452,12 +457,12 @@ diagrama diz quais. Os construtores aparecem quando os parâmetros importam.
 
 ### 3.1 Visão geral
 
-As dependências de dentro de cada grupo ficam nos diagramas 3.2 a 3.6. Aqui aparecem as que ligam grupos
-diferentes e mais cinco de dentro do grupo: a do `Main`, que ficaria solto; as de `InteressadoEmStatus` e
-`InteressadoEmPosicao` para o `Aviso`, que mostram o que os interessados recebem; e as da `FabricaDeCodigos` para
+As dependências de dentro de cada grupo ficam nos diagramas 3.2 a 3.6. Aqui aparecem as que ligam grupos diferentes e
+também algumas de dentro do grupo, entre elas estas cinco: a do `Main`, que ficaria solto; as de `InteressadoEmStatus`
+e `InteressadoEmPosicao` para o `Aviso`, que mostram o que os interessados recebem; e as da `FabricaDeCodigos` para
 `CodigoDeModal` e `CodigoDePerfil`, que mostram como um código da entrada chega ao `Modal` e ao `Perfil` (2.2.6). A
-`FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas, para `Modal` e
-`Perfil`.
+`FabricaDeCodigos` cria os seis modais e perfis concretos, e o diagrama resume essas seis setas em duas, para `Modal`
+e `Perfil`.
 
 ```mermaid
 classDiagram
@@ -953,7 +958,7 @@ O catálogo (2.2) não trazia os tipos dos atributos e dos retornos. Estes viera
 
 ## 4. Estratégia de resolução dos pontos de variação
 
-> **Em revisão (T10, Alexandre).** Esta seção diz **como** o projeto isola o que muda entre modais, entre perfis e entre
+> Esta seção diz **como** o projeto isola o que muda entre modais, entre perfis e entre
 > interessados (ET 6, item 4). A fronteira com as seções vizinhas é esta:
 >
 > - a seção 4 descreve o **mecanismo** de cada ponto de variação;
@@ -1007,9 +1012,9 @@ O catálogo (2.2) não trazia os tipos dos atributos e dos retornos. Estes viera
 
 ### 4.3 Onde o tipo concreto aparece
 
-Esta lista serve de prova da ET 3.2 na defesa: são os **únicos** lugares do código, inclusive os testes, que escrevem o nome de
-um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o objeto, e nunca para perguntar qual ele
-é.
+Esta lista serve de prova da ET 3.2 na defesa: são os **únicos** lugares do código, inclusive os testes, que escrevem
+o nome de um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o objeto, e nunca para
+perguntar qual ele é.
 
 | Lugar | O que cria | Por quê ali |
 |---|---|---|
@@ -1041,7 +1046,7 @@ um modal, perfil ou status concreto. Em todos, o tipo aparece para **criar** o o
 
 ## 5. Padrões e mecanismos escolhidos
 
-> **Em revisão (T11, Alexandre).** Esta seção dá nome ao mecanismo de cada ponto de variação da seção 4 (ET 6, item
+> Esta seção dá nome ao mecanismo de cada ponto de variação da seção 4 (ET 6, item
 > 5). Para cada padrão usado, ela traz o problema que ele resolve aqui, as classes que o compõem e uma alternativa
 > descartada. Para cada padrão da lista do enunciado que não foi usado, diz onde ele poderia entrar e por que ficou de
 > fora. A ET 5 diz que nenhum padrão é obrigatório e que um padrão sem justificativa não rende pontos, então a seção
@@ -1521,7 +1526,7 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 
 ### 6.3 Mudança de status e avisos
 
-> **Em revisão (T14, Alexandre).** O operador muda o status ou a posição de um transporte, e o transporte avisa quem
+> O operador muda o status ou a posição de um transporte, e o transporte avisa quem
 > assinou (RN 7 e RN 8). Esta seção também decide o mecanismo da operação rejeitada no `Status` e no `Transporte`, a
 > parte da dúvida da 1.7 que a 6.1 deixou para o T14.
 
@@ -1727,7 +1732,7 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 
 ## 7. Resposta aos cenários de evolução
 
-> **Em construção.** Para cada cenário de `contexto/especificacoes-tecnicas.md`, seção 4, esta seção diz quais classes
+> Para cada cenário de `contexto/especificacoes-tecnicas.md`, seção 4, esta seção diz quais classes
 > são criadas e quais são alteradas (ET 6, item 7). A subseção 7.N responde ao cenário N, na numeração da seção 4
 > (1 = ferroviário, 12 = separador). O mecanismo de cada ponto de variação está na 4.2, e o padrão, na 5.
 >
@@ -1736,7 +1741,7 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 > | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita (PR #61) |
 > | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita (PR #65) |
 > | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | Escrita (PR #69) |
-> | 7.13 | Conferência dos 5 minutos da defesa ao vivo | T18 | Liliane | Escrita, em revisão |
+> | 7.13 | Conferência dos 5 minutos da defesa ao vivo | T18 | Liliane | Escrita (PR #73) |
 
 **Formato de cada cenário.** As subseções seguem os mesmos campos, nesta ordem, para que qualquer um do grupo ache a
 resposta no mesmo lugar na defesa:
@@ -1842,7 +1847,8 @@ acrescentam classes:
     encomenda do gabarito calculada com o `Corporativo`. O gabarito da RN 12 não tem o corporativo, então o valor
     esperado é uma conta feita à mão: o valor base do gabarito, sem arredondar (2.1.2), vezes o multiplicador
     escolhido. A tabela da RN 12 mostra a base já arredondada (tempo 18,67, e não 18,6667), e partir dela pode dar um
-    centavo de diferença. O esperado nunca é copiado da saída do programa (8.1). No `FabricaDeCodigosTest`, `existePerfil("CORPORATIVO")`;
+    centavo de diferença. O esperado nunca é copiado da saída do programa (8.1). No `FabricaDeCodigosTest`,
+    `existePerfil("CORPORATIVO")`;
   - regressão: os perfis que já existem e o gabarito da RN 12 não mudam.
 - **Alternativa descartada:** `Corporativo` implementar `Perfil` direto, já que só tem multiplicadores. Repetiria
   `base × fator` nos três métodos (erro 5 da Livraria), que é o que a classe abstrata evita.
