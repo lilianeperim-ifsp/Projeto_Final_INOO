@@ -1727,8 +1727,8 @@ Ganchos para os cenários (T15 a T17), que dizem as classes criadas e alteradas:
 >
 > | Subseções | Cenários | Cartão | Responsável | Situação |
 > |---|---|---|---|---|
-> | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita, em revisão |
-> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | A fazer |
+> | 7.1 a 7.4 | Ferroviário, corporativo, troca do perfil ativo, SMS por região | T15 | Alexandre | Escrita (PR #61) |
+> | 7.5 a 7.8 | Simulação, configuração externa, CANCELADO, troca de assinatura | T16 | Liliane | Escrita, em revisão (PR #65) |
 > | 7.9 a 7.12 | Peso mínimo, sobretaxa de 8%, PREMIUM, separador `,` | T17 | Murilo | A fazer |
 >
 > A T18 (Liliane) confere se cada alteração cabe nos 5 minutos da defesa ao vivo.
@@ -1739,6 +1739,7 @@ resposta no mesmo lugar na defesa:
 | Campo | O que traz |
 |---|---|
 | **Exigência (ET 4)** | O texto do enunciado para o cenário |
+| **Ponto de partida** (opcional) | O que o cenário supõe e o enunciado não define, como o formato do arquivo na 7.6 |
 | **Classes criadas** | Cada classe nova, com o que ela estende ou implementa e o que escreve |
 | **Classes alteradas** | Cada classe que já existe e muda, com o que muda nela. "Nenhuma", quando for o caso |
 | **O que não muda** | As classes que provam a exigência (por exemplo, o `Transporte` no cenário 4) |
@@ -1749,9 +1750,10 @@ resposta no mesmo lugar na defesa:
 | **Testes** | Os casos novos e os que já existem e devem continuar passando |
 | **Alternativa descartada** | Quando houver uma forma de responder ao cenário que o grupo não escolheu |
 
-Os dois campos opcionais aparecem só quando o cenário tem escolhas ou situações-limite próprias (como na 7.2 e na
-7.4). A alternativa descartada de uma decisão fica dentro da própria decisão, logo abaixo dela. O campo
-**Alternativa descartada** fica para a alternativa ao cenário como um todo.
+Os campos opcionais aparecem só quando o cenário precisa deles: o ponto de partida, quando supõe algo que o
+enunciado não define (como na 7.6), e as decisões e os casos de borda, quando tem escolhas ou situações-limite
+próprias (como na 7.2 e na 7.4). A alternativa descartada de uma decisão fica dentro da própria decisão, logo abaixo
+dela. O campo **Alternativa descartada** fica para a alternativa ao cenário como um todo.
 
 Os testes de regressão valem para todos os cenários: o gabarito da RN 12 e os casos da 8.2 a 8.7 continuam passando
 sem nenhuma mudança (8.1 e 8.8).
@@ -1937,10 +1939,245 @@ sem nenhuma mudança (8.1 e 8.8).
   - regressão: a central continua com uma linha de log por posição, e o cliente continua sem receber nada de posição
     (8.7).
 
-### 7.5 a 7.8: cenários 5 a 8
+### 7.5 Cenário 5: simular a encomenda sob outro perfil
 
-> **A fazer (T16, Liliane):** simulação sob outro perfil, código de modal vindo de configuração externa, status
-> CANCELADO e troca de assinatura dos avisos. Os ganchos estão no fim da 6.1, da 6.2 e da 6.3.
+- **Exigência (ET 4):** o operador simula a mesma encomenda sob outro perfil. Frete, tempo e CO₂ saem das regras de
+  cálculo que já existem, sem duplicá-las e sem alterar o perfil ativo.
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** nenhuma. O projeto já atende ao cenário com `Transporte.simular(perfil)` (bloco 3 da 6.2).
+- **O que não muda:**
+  - o perfil vigente do transporte, que continua sendo o mesmo objeto, e o `calcularAtual()`;
+  - o status, a posição e os interessados: a simulação não avisa ninguém (6.2);
+  - `Encomenda`, `Modal` e os perfis, porque a simulação chama o mesmo `encomenda.calcular(perfil)` do cálculo normal.
+- **Por que funciona:**
+  - o perfil é uma Strategy (5.2.2) passada como objeto. `simular(outro)` chama `encomenda.calcular(outro)`, e
+    `calcularAtual()` chama `encomenda.calcular(perfil vigente)`. A regra de cálculo fica escrita uma vez só (2.1.3);
+  - a encomenda guarda só os dados pedidos e recalcula a cada chamada (1.6), então não há resultado guardado para a
+    simulação sobrescrever;
+  - a simulação não pergunta nada ao status, porque não muda o transporte (passo 8 da 6.2).
+- **Alteração ao vivo:** não há código a mudar. A demonstração é o teste da 8.6:
+  1. Criar o transporte da encomenda de exemplo, pedida em ECONOMICO.
+  2. Chamar `simular(new Rapido())` e conferir 2380,00 / 14,93 / 35,65.
+  3. Chamar `calcularAtual()` e conferir que continua 1445,00 / 23,33 / 31,00.
+- **Decisões do cenário:**
+  1. **A simulação é permitida em qualquer status**, inclusive `ENTREGUE` e `CANCELADO` (7.7). Ela só lê a encomenda e
+     não muda o transporte, então não há regra da RN 7 para ela respeitar.
+     - Alternativa descartada: perguntar ao status se a simulação é permitida. Seria uma pergunta a mais em `Status`,
+       sem nenhuma regra do enunciado que a peça.
+  2. **`simular(null)` lança `NullPointerException` logo na entrada**, com `Objects.requireNonNull`, como os
+     construtores com parâmetro (3.7). A simulação devolve um `ResultadoCalculo` e não tem como responder `false`,
+     como o `trocarPerfil(null)` (6.3). Quem chama é um teste ou o operador, e não o lote, então a exceção não chega
+     ao processamento da entrada padrão. `Objects` não aparece nos slides: o grupo confirma antes de usar, como na 3.7
+     (decisão 5).
+     - Alternativa descartada: devolver `null`. Repete o risco do erro 13 da Livraria.
+- **Casos de borda:**
+  - **Simular com o perfil vigente:** devolve o mesmo que o `calcularAtual()`.
+  - **Simular depois da troca de perfil:** o vigente é o novo, e a simulação continua sem mudá-lo.
+  - **Simular depois do `ENTREGUE`:** o CO₂ que a auditoria já somou não muda, porque o aviso é imutável (2.1.4 e
+    8.7).
+  - **Simular com um perfil novo, como o corporativo (7.2) ou o PREMIUM (7.11):** funciona sem mudar o `Transporte`,
+    que depende só de `Perfil`.
+- **Testes:** os da 8.6 (`simular(RAPIDO)` com o vigente ECONOMICO, simulação em `ENTREGUE`, nenhum aviso) e o da 8.7
+  (a simulação depois da entrega não muda a auditoria). Casos novos no `TransporteTest`: simular em `CANCELADO`
+  (depois da 7.7) e `simular(null)` lançando `NullPointerException`.
+- **Alternativa descartada:** copiar o transporte, trocar o perfil na cópia e calcular. Duplicaria o estado, e a cópia
+  com os mesmos interessados poderia gerar avisos.
+
+### 7.6 Cenário 6: código de modal vindo de configuração externa
+
+- **Exigência (ET 4):** o código de modal passa a vir de uma configuração externa. A mudança fica só na camada de
+  entrada.
+- **Ponto de partida:** um arquivo de texto, `modais.txt`, na pasta de trabalho do programa (ver casos de borda),
+  com uma linha por código novo no formato `codigoExterno;CODIGO_CONHECIDO`. Por exemplo, `RODO;RODOVIARIO` faz a
+  entrada aceitar `RODO` como o modal rodoviário. A configuração **acrescenta** códigos aos três fixos e não os substitui (decisão 1).
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** quatro, todas na tabela da camada de entrada e saída (2.2.6), que é o que a exigência
+  permite. O `ProcessadorDeLote` está nessa tabela, mas é a classe que percorre o lote e calcula. Nele, a mudança é só
+  um construtor a mais, que recebe a lista e a repassa ao `InterpretadorDeLinha`, sem tocar no `processar(linhas)`.
+  Essa linha não tem como ser evitada: cada classe cria o próprio colaborador (3.7, decisão 4), e a lista só chega à
+  fábrica passando por ele (decisão 6):
+  - `Main`: antes de ler o lote, lê `modais.txt` para uma `List<String>` com um `Scanner` sobre o arquivo, como já faz
+    com o `System.in` (passo 1 da 6.1). Se o arquivo não existe, trata o `FileNotFoundException` e segue com a lista
+    vazia. Depois cria `new ProcessadorDeLote(configuracao)`. `File` (`java.io`) e `FileNotFoundException`, uma
+    exceção verificada, não aparecem nos slides: o grupo confirma antes de usar, como na 3.7 (decisão 5);
+  - `ProcessadorDeLote` e `InterpretadorDeLinha`: cada um ganha um construtor que recebe a lista e a repassa ao
+    colaborador que já cria (3.7, decisão 4): `new InterpretadorDeLinha(configuracao)` e
+    `new FabricaDeCodigos(configuracao)`. O construtor sem parâmetro continua e chama o novo com uma lista vazia
+    (`this(new ArrayList<>())`);
+  - `FabricaDeCodigos`: o construtor novo preenche os três modais e os três perfis fixos, como hoje, e depois percorre
+    a configuração. Para cada linha, separa as duas partes com `split(";", -1)` e faz `trim` em cada uma, como no
+    passo 4 da 6.1. Se o código conhecido existe e o código externo ainda não, acrescenta
+    `new CodigoDeModal(codigoExterno, modal do código conhecido)`. O construtor sem parâmetro chama o novo com uma
+    lista vazia.
+- **O que não muda:**
+  - `existeModal`, `criarModal` e o `indiceDoModal`: o código novo é uma entrada a mais na lista única (2.2.6);
+  - a validação do `InterpretadorDeLinha` (passo 5 da 6.1), que continua perguntando `existeModal(codigo)`;
+  - `Modal` e as filhas, `Encomenda`, `Transporte` e `FormatadorDeSaida`: recebem um `Modal` e não sabem de onde ele
+    veio (gancho da 6.1);
+  - o `processar(linhas)` do `ProcessadorDeLote`: o laço, o cálculo, o relatório e a formatação continuam iguais;
+  - o núcleo de cálculo, que continua sem ler dados (RN 10): quem lê o arquivo é o `Main`.
+- **Por que funciona:** a fábrica é o único lugar que compara código (4.3), e a lista única de pares código + objeto
+  (2.2.6) aceita uma entrada a mais sem mudar a busca. O código externo aponta para o **mesmo objeto** do código
+  conhecido, o que é seguro porque os modais não têm estado (2.2.6, objeto compartilhado).
+- **Alteração ao vivo:**
+  1. Na `FabricaDeCodigos`, trocar o construtor sem parâmetro por `FabricaDeCodigos(List<String> configuracao)`,
+     escrever o laço da configuração depois das linhas fixas e criar o construtor sem parâmetro com
+     `this(new ArrayList<>())`.
+  2. No `InterpretadorDeLinha` e no `ProcessadorDeLote`, criar o construtor que recebe a lista e a repassa, e fazer o
+     sem parâmetro chamá-lo com uma lista vazia.
+  3. No `Main`, ler `modais.txt` com `Scanner` e `try/catch`, e passar a lista ao `ProcessadorDeLote`.
+  4. Criar `modais.txt` com `RODO;RODOVIARIO` na raiz de `LogiTech/`, ao lado da `src/` (ver casos de borda).
+  5. Compilar e rodar o lote com `10;RODO;500;1000;Santos;Campinas;ECONOMICO` e conferir a linha `VALIDA` com os
+     valores do rodoviário (ver a atenção ao rodar no Windows, na 7.1).
+
+  São quatro classes, e é o cenário com mais passos até aqui: a T18 confere se ele cabe nos 5 minutos.
+- **Decisões do cenário:**
+  1. **A configuração acrescenta códigos e não substitui os fixos.** Sem o arquivo, o programa funciona como hoje, e o
+     gabarito da RN 12 continua passando sem nenhum arquivo extra.
+     - Alternativa descartada: a lista de modais vir só da configuração. Sem o arquivo o gabarito quebraria, e a
+       alteração ao vivo teria de reescrever o construtor da fábrica.
+  2. **O `Main` lê o arquivo, e a lista desce pelos construtores.** A leitura fica no mesmo lugar que a do `System.in`,
+     e a fábrica continua sem fazer I/O: o `FabricaDeCodigosTest` passa a lista direto, sem arquivo no disco.
+     - Alternativa descartada: a `FabricaDeCodigos` abrir o arquivo sozinha. Mudaria uma classe só, mas a fábrica
+       passaria a tratar `FileNotFoundException`, e o teste dela dependeria de um arquivo.
+  3. **A configuração liga um código novo a um modal que já existe**, e não cria um modal.
+     - Alternativa descartada: a configuração trazer o nome da classe e a fábrica criá-la por reflexão
+       (`Class.forName`). Não está nas aulas, e um nome errado só aparece na execução.
+  4. **Uma linha inválida da configuração é ignorada**, sem mensagem: linha sem `;`, com mais de duas partes, com uma
+     parte vazia ou apontando para um código que não existe. A RN 11 não tem formato de saída para a configuração, e o
+     lote continua sem exceção.
+     - Alternativa descartada: rejeitar o arquivo inteiro na primeira linha inválida. Uma linha errada desligaria
+       todos os códigos novos.
+  5. **O código fixo vence.** Uma linha como `AEREO;RODOVIARIO` é ignorada, porque `AEREO` já existe, e o gabarito
+     não muda.
+  6. **A lista passa pelo `ProcessadorDeLote`, e o `Main` não monta a fábrica.**
+     - Alternativa descartada: o `Main` criar a `FabricaDeCodigos` e passá-la pronta. Mudaria a decisão 4 da 3.7 para
+       todas as classes do lote, e não só para este cenário.
+- **Casos de borda:**
+  - **Arquivo ausente ou vazio:** os três códigos fixos, como hoje.
+  - **Arquivo na pasta errada:** o programa procura o `modais.txt` na pasta de trabalho. No Run do IntelliJ, é o campo
+    "Working directory", que por padrão é a raiz do projeto `LogiTech/`, e não a `src/`. No `cmd`, é a pasta em que o
+    comando é digitado. Fora dela, o arquivo conta como ausente, e o `RODO` sai `codigo inexistente` sem mensagem
+    (decisões 1 e 4). O `COMO_EXECUTAR.md` diz qual é a pasta.
+  - **Espaços em volta do `;`:** `RODO ; RODOVIARIO` vale como `RODO;RODOVIARIO`, por causa do `trim`. Já
+    ` ;RODOVIARIO` tem uma parte vazia e é ignorada (decisão 4).
+  - **Linha em branco no arquivo:** ignorada (decisão 4).
+  - **Maiúsculas e minúsculas:** `rodo;RODOVIARIO` cria o código `rodo`, e só ele. O código continua diferenciando
+    maiúsculas de minúsculas (RN 4), e `RODO` no lote sai `codigo inexistente`.
+  - **Código externo apontando para outro código externo**, como `R;RODO` depois de `RODO;RODOVIARIO`: funciona, porque
+    o arquivo é lido em ordem e `RODO` já está na lista. Na ordem inversa, `R;RODO` é ignorada.
+  - **O mesmo código externo duas vezes:** vale a primeira linha (decisão 5).
+  - **Separador `,` no lote (7.12):** não muda a configuração. O `;` do `modais.txt` é separado do `;` do lote, e cada
+    um fica numa classe diferente.
+  - **Eficiência:** a lista da fábrica cresce com o tamanho da configuração, e não com o do lote. O lote continua em
+    uma passagem, O(n) (6.1).
+- **Testes:**
+  - novos, no `FabricaDeCodigosTest`: com `["RODO;RODOVIARIO"]`, `existeModal("RODO")` responde `true`, e
+    `criarModal("RODO")` devolve o mesmo objeto que `criarModal("RODOVIARIO")` (`assertSame`); a lista vazia se
+    comporta como o construtor sem parâmetro; cada linha inválida da decisão 4 é ignorada; `AEREO;RODOVIARIO` não muda
+    o `AEREO`; `R;RODO` funciona depois de `RODO;RODOVIARIO`, e não antes. No `ProcessadorDeLoteTest`, uma linha com
+    `RODO` sai com os mesmos valores da mesma linha com `RODOVIARIO`;
+  - regressão: o gabarito da RN 12, sem `modais.txt`, e os testes da 8.3 e da 8.4, que usam os construtores sem
+    parâmetro.
+- **Alternativa descartada:** um arquivo `.properties` lido com `Properties`. É um mapa de chave e valor, perto do `Map`
+  que o enunciado proíbe, e o formato `codigo;codigo` lido com `Scanner` usa só o que já está no projeto.
+
+### 7.7 Cenário 7: status CANCELADO
+
+- **Exigência (ET 4):** surge o status CANCELADO, alcançável de `AGUARDANDO` e de `EM_TRANSITO`. Depois dele, nenhuma
+  transição nem troca de perfil é aceita. A central e o cliente são avisados, e a auditoria não soma nada.
+- **Classes criadas:** `Cancelado`, que estende `Status` e sobrescreve só dois métodos: `getNome()`, que devolve
+  `"CANCELADO"`, e `permiteTrocaDePerfil()`, que devolve `false`.
+- **Classes alteradas:**
+  - `Status`: ganha `cancelar()`, que devolve `this` (rejeita por padrão, como as outras transições, 6.3, decisão 1);
+  - `Aguardando` e `EmTransito`: sobrescrevem `cancelar()` devolvendo `new Cancelado()`;
+  - `Transporte`: ganha `public boolean cancelar()`, com uma linha: `return aplicarTransicao(status.cancelar());`
+    (6.3, decisão 3).
+- **O que não muda:**
+  - `Entregue`: herda o `cancelar()` padrão, então cancelar depois da entrega é rejeitado sem nenhum código;
+  - `AuditoriaAmbiental`: o `Cancelado` herda o `contaParaAuditoria()` padrão (não), e a auditoria não soma;
+  - `CentralDeControle` e `Cliente`: recebem o aviso pelos passos 6 a 8 da 6.3 e leem o nome pelo `getNome()`;
+  - `Aviso`, as interfaces dos interessados e o `aplicarTransicao` do `Transporte`;
+  - o `trocarPerfil` do `Transporte`, que já pergunta `permiteTrocaDePerfil()` ao status (passo 2 da 6.2).
+- **Por que funciona:** é o State (5.2.3). Cada status responde as próprias perguntas, com o padrão em `Status`:
+  rejeitar a transição, permitir a troca e não contar para a auditoria (4.2). O `Cancelado` herda as transições que
+  devolvem `this`, então rejeita todas, inclusive o próprio `cancelar()`. O `Transporte` não pergunta qual é o status:
+  a comparação `novo == status` do passo 4 da 6.3 já decide se a transição foi aceita.
+- **Alteração ao vivo:**
+  1. Criar a classe `Cancelado extends Status`.
+  2. Usar "Implement methods" para o `getNome()` e sobrescrever o `permiteTrocaDePerfil()` com `return false;`.
+  3. Em `Status`, acrescentar `cancelar()` com `return this;`.
+  4. Em `Aguardando` e em `EmTransito`, sobrescrever `cancelar()` com `return new Cancelado();`.
+  5. No `Transporte`, acrescentar `cancelar()` com a linha do `aplicarTransicao`.
+  6. Rodar o teste: cancelar em `AGUARDANDO`, conferir o `true`, o nome `CANCELADO` e a mensagem do cliente.
+- **Decisões do cenário:**
+  1. **A posição continua podendo mudar depois do `CANCELADO`.** A exigência proíbe só transição e troca de perfil,
+     e a RN 7 deixa a posição mudar em qualquer status, como já acontece em `ENTREGUE`. A central continua recebendo os
+     avisos de posição.
+     - Alternativa descartada: bloquear a posição com um `permiteAtualizarPosicao()` em `Status`. Seria um método a
+       mais e uma pergunta nova no passo 10 da 6.3, sem regra do enunciado que a peça.
+  2. **O `Cancelado` sobrescreve só o que difere do padrão.** As três transições e o `contaParaAuditoria()` vêm de
+     `Status`. É a regra da 6.3 para um status novo: rejeitar é devolver `this`.
+     - Alternativa descartada: sobrescrever todas as transições no `Cancelado`, devolvendo `this` em cada uma. Repetiria
+       o padrão (erro 5 da Livraria).
+  3. **O cliente recebe a mesma mensagem das outras mudanças de status**, com o nome `CANCELADO`. O `Cliente` não
+     muda, porque monta a mensagem com `getStatus().getNome()` (6.3).
+- **Casos de borda:**
+  - **Cancelar em `ENTREGUE`:** `false`, sem aviso.
+  - **Cancelar duas vezes:** a segunda devolve `false`, sem aviso, porque o `Cancelado` herda o `cancelar()` padrão.
+  - **`iniciarTransito()` ou `entregar()` depois do `CANCELADO`:** `false`, sem aviso.
+  - **`trocarPerfil(...)` depois do `CANCELADO`:** `false`, e o perfil vigente não muda.
+  - **Cancelar antes de qualquer posição:** aceito, e o aviso vai sem posição, como nas outras transições (6.3).
+  - **Atualizar a posição depois do `CANCELADO`:** `true`, e a central é avisada (decisão 1).
+  - **Simular depois do `CANCELADO`:** permitida (7.5, decisão 1).
+  - **A auditoria e o transporte cancelado:** recebe o aviso e não soma nada. Um transporte cancelado nunca chega a
+    `ENTREGUE`, então nunca soma.
+- **Testes:**
+  - novos, no `StatusTest` e no `TransporteTest`: cancelar em `AGUARDANDO` e em `EM_TRANSITO` é aceito, e o
+    `getNome()` passa a `CANCELADO`; cancelar em `ENTREGUE` e cancelar de novo são rejeitados; depois do `CANCELADO`,
+    `iniciarTransito()`, `entregar()` e `trocarPerfil(...)` devolvem `false`; a posição continua aceita. Em toda
+    rejeição, o teste confere as três coisas da 8.5. No `AvisosTest`: ao cancelar, a central ganha uma linha, o cliente
+    ganha uma mensagem e a auditoria continua em 0;
+  - regressão: os casos da 8.5 e da 8.7, em que os três status antigos continuam com as mesmas respostas.
+- **Alternativa descartada:** um atributo `boolean cancelado` no `Transporte`, testado em cada operação. Cada método
+  ganharia um `if`, um método novo poderia esquecê-lo, e a resposta ficaria fora do status, contra a 2.2.3 e a 4.2.
+
+### 7.8 Cenário 8: troca de assinatura dos avisos
+
+- **Exigência (ET 4):** o cliente cancela a assinatura dos avisos com o transporte em execução, e outro interessado
+  passa a recebê-los. O transporte deixa de avisar o primeiro e passa a avisar o segundo, sem ser recriado.
+- **Classes criadas:** nenhuma.
+- **Classes alteradas:** nenhuma. O `Transporte` já tem `removerInteressadoEmStatus(...)` e
+  `adicionarInteressadoEmStatus(...)` (2.2.4).
+- **O que não muda:** o transporte, que continua sendo o mesmo objeto, com o status, a posição, o perfil vigente e os
+  outros interessados; o `Cliente`, que guarda as mensagens que já recebeu.
+- **Por que funciona:** é o Observer (5.2.4). Os interessados ficam numa lista do transporte, que aceita adicionar e
+  remover em execução. O transporte conhece só a interface `InteressadoEmStatus`, então o "outro interessado" pode ser
+  outro `Cliente` ou qualquer classe que a implemente. O laço percorre uma cópia da lista (6.3, decisão 6), então a
+  troca é segura até dentro de um aviso.
+- **Alteração ao vivo:** não há código a mudar. A demonstração é um teste:
+  1. Criar o transporte e assinar um cliente com `adicionarInteressadoEmStatus(cliente)`.
+  2. Chamar `iniciarTransito()` e conferir 1 mensagem no cliente.
+  3. Chamar `removerInteressadoEmStatus(cliente)` e `adicionarInteressadoEmStatus(outro)`.
+  4. Chamar `entregar()` e conferir que o cliente continua com 1 mensagem e que o outro tem 1.
+- **Decisões do cenário:**
+  1. **A troca vale a partir do próximo aviso.** Quem se remove dentro do `statusMudou` ainda recebe o aviso que está
+     sendo enviado, e quem é acrescentado dentro dele só recebe os próximos (6.3, decisão 6).
+  2. **"Cancelar a assinatura" não é o status `CANCELADO` (7.7).** Aqui muda quem recebe os avisos, e o transporte
+     continua com o mesmo status.
+- **Casos de borda:**
+  - **Remover um interessado que não está na lista:** nada acontece (6.3).
+  - **Assinar de novo o cliente removido:** ele volta a receber os próximos avisos, e não os que perdeu.
+  - **Adicionar o outro antes de remover o cliente:** entre as duas chamadas, os dois estão na lista, mas nenhum aviso
+    sai entre elas. O resultado é o mesmo.
+  - **O cliente também assinava posição:** não acontece com o `Cliente`, que só implementa `InteressadoEmStatus`
+    (2.2.4). Para um interessado nas duas listas, como a `CentralDeControle`, cada lista é trocada à parte.
+  - **A auditoria e a central:** continuam recebendo, porque a troca mexe só no cliente.
+- **Testes:** no `AvisosTest`, o caso "interessado removido" da 8.7 ganha a segunda parte: depois de remover o cliente
+  e adicionar o outro, o próximo aviso vai só para o outro, e o cliente continua com as mensagens de antes. Também a
+  remoção dentro do `statusMudou`: o interessado recebe o aviso atual e nenhum dos próximos.
+- **Alternativa descartada:** um atributo `ativo` no `Cliente`, que ignoraria os avisos depois de cancelar. O transporte
+  continuaria avisando quem não quer mais, e cada interessado novo precisaria repetir esse atributo.
 
 ### 7.9 a 7.12: cenários 9 a 12
 
