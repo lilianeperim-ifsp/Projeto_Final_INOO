@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-27
 tipo: tarefa
-status: aceito
+status: concluido
 prazo: 2026-11-27
 prioridade: maxima
 ---
@@ -44,3 +44,6 @@ Os ajustes da 5.2.5 e da 5.3 **entram neste PR**, para ficar uma revisão só e 
 hoje. O antes e o depois das duas frases estão no comentário
 https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/69#issuecomment-7221713974. Fecho este recado quando
 aprovar o PR.
+
+**2026-11-27, Alexandre:** concluído. O commit `638c1c0` trouxe o caso do aéreo com 5000 kg na 7.10 e as frases da
+5.2.5 e da 5.3. Reli o diff completo, aprovei e mergeei o PR #69 na `dev` (merge `7f84451`, 27/11 às 15:39 UTC).
