@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: concluido
 prazo: 2026-11-27
 prioridade: maxima
 ---
@@ -27,3 +27,7 @@ ainda hoje (entrega da Etapa 1).
 - Ao aprovar, feche também o recado `2026-11-27-de-murilo-revisar-pr-69-t17.md`.
 
 ## Resposta
+
+**2026-11-27, Alexandre:** concluído. Revisei o commit `638c1c0` (caso do aéreo com 5000 kg na 7.10 e frases da 5.2.5
+e da 5.3), aprovei e mergeei o PR #69 na `dev` (merge `7f84451`, 27/11 às 15:39 UTC). O recado
+`2026-11-27-de-murilo-revisar-pr-69-t17.md` também está fechado.
