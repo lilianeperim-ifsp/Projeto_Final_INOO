@@ -3,7 +3,7 @@ para: ale
 de: murilo
 data: 2026-11-27
 tipo: tarefa
-status: pendente
+status: aceito
 prazo: 2026-11-27
 prioridade: maxima
 ---
@@ -34,3 +34,13 @@ suas (5.2.5 e 5.3), que contradizem a 7.6.
   continua valendo, porque não há duas interfaces incompatíveis para conciliar.
 
 ## Resposta
+
+**2026-11-27, Alexandre:** revisei e pedi mudanças (Request changes) no PR #69. Falta um caso na 7.10: o caso de
+borda da 6.1 `7;AEREO;5000;10;A;B;ECONOMICO` continua acima de 2000 kg, passa a pagar 8% e o frete muda de 11191,95
+para **11511,72** (12540 × 1,08 × 0,85). Ele precisa entrar na tabela de valores novos e em "Testes, alterados". As
+outras contas, as remissões e as exceções de regressão estão certas.
+
+Os ajustes da 5.2.5 e da 5.3 **entram neste PR**, para ficar uma revisão só e não haver dois PRs no mesmo arquivo
+hoje. O antes e o depois das duas frases estão no comentário
+https://github.com/lilianeperim-ifsp/Projeto_Final_INOO/pull/69#issuecomment-7221713974. Fecho este recado quando
+aprovar o PR.
