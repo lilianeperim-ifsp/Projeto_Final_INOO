@@ -3,27 +3,30 @@
 **Disciplina:** Introdução à Orientação a Objetos (IFSP) · **Etapa 1** (entrega em 27/11, sem código)
 **Grupo:** Liliane, Murilo e Alexandre
 
-> **Documento oficial do grupo, em construção (desde 2026-11-10).** Este arquivo é a versão oficial do Documento de
-> Projeto. **Não pode ser apagado nem substituído por outro arquivo, apenas editado**, por PR, seção por seção.
+> **Documento oficial do grupo (desde 2026-11-10), versão de entrega da Etapa 1.** Este arquivo é a versão oficial do
+> Documento de Projeto. **Não pode ser apagado nem substituído por outro arquivo, apenas editado**, por PR. As
+> mudanças de rumo da Etapa 2 vão para a seção "Do projeto ao código".
 >
-> | Seção | Cartão | Responsável | Situação |
+> Todas as seções foram escritas, revisadas e mergeadas na `dev` por PR:
+>
+> | Seção | Cartão | Responsável | PR |
 > |---|---|---|---|
-> | 1. Análise do problema | T07 | Murilo | Escrita |
-> | 2. Catálogo de classes e interfaces | T08 | Alexandre | Escrita |
-> | 3. Diagrama de classes UML | T09 | Liliane | Escrita, em revisão |
-> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | Escrita, em revisão |
-> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | Escrita |
-> | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | Escrita |
-> | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | Escrita |
-> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | Escrita |
-> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | Escrita |
-> | 7.5 a 7.8 Cenários de evolução 5 a 8 | T16 | Liliane | Escrita |
-> | 7.9 a 7.12 Cenários de evolução 9 a 12 | T17 | Murilo | Escrita |
-> | 7.13 Conferência dos 5 minutos | T18 | Liliane | Escrita, em revisão |
-> | 8. Plano de testes | T19 | Murilo | Escrita, em revisão |
+> | 1. Análise do problema | T07 | Murilo | #15 |
+> | 2. Catálogo de classes e interfaces | T08 | Alexandre | #18, #21 e #43 (2.2.6) |
+> | 3. Diagrama de classes UML | T09 | Liliane | #40 |
+> | 4. Estratégia de resolução dos pontos de variação | T10 | Alexandre | #50 |
+> | 5. Padrões e mecanismos escolhidos | T11 | Alexandre | #56 |
+> | 6.1 Fluxo: processamento de uma linha do lote | T12 | Murilo | #19 |
+> | 6.2 Fluxo: troca de perfil em tempo de execução | T13 | Murilo | #24 |
+> | 6.3 Fluxo: mudança de status e avisos | T14 | Alexandre | #58 |
+> | 7.1 a 7.4 Cenários de evolução 1 a 4 | T15 | Alexandre | #61 |
+> | 7.5 a 7.8 Cenários de evolução 5 a 8 | T16 | Liliane | #65 (correções no #69) |
+> | 7.9 a 7.12 Cenários de evolução 9 a 12 | T17 | Murilo | #69 |
+> | 7.13 Conferência dos 5 minutos | T18 | Liliane | #73 |
+> | 8. Plano de testes | T19 | Murilo | #20 e #22 |
 >
 > A seção 1 diz **quais conceitos existem e o que cada um é**. Nomes de classes, a escolha entre interface e classe
-> abstrata e os padrões adotados ficam para o T08 (catálogo), o T10 (estratégia de resolução) e o T11 (padrões).
+> abstrata e os padrões adotados estão na seção 2 (catálogo), na 4 (estratégia de resolução) e na 5 (padrões).
 
 ## 1. Análise do problema
 
